@@ -1,0 +1,118 @@
+extends layout
+
+block content
+  .container
+    .pb-2.mt-2.mb-4.border-bottom
+      h3 Past Quality
+
+  .container-fluid
+    form(method='POST')
+      input(type='hidden', name='_csrf', value=_csrf)
+      div.table-responsive
+        table.table.table-sm(summary='Past Miller Beach / NWI Air Quality & Weather')
+          caption
+            | Past Miller Beach / NWI Air Quality &amp; Weather
+          thead
+            tr
+              th(colspan='1')
+                | Time
+              th(colspan='1')
+                | PM25
+              th(colspan='1')
+                | PM10
+              th#par.span(colspan='11' scope='colgroup')
+                | Weather
+          tbody
+            tr
+              th(colspan=3)
+                |
+              th.text-uppercase#stud(scope='col')
+                | Summary
+              th.text-uppercase#villa(scope='col')
+                | Temp
+              th.text-uppercase#villa(scope='col')
+                abbr(title='%') Humidity
+              th.text-uppercase#villa(scope='col')
+                abbr(title='millibars') Pressure
+              th.text-uppercase#apt(scope='col')
+                abbr(title='MPH') Wind Speed
+              th.text-uppercase#chal(scope='col')
+                abbr(title='MPH') Wind Gust
+              th.text-uppercase#chal(scope='col')
+                | Wind Bearing
+              th.text-uppercase#chal(scope='col')
+                abbr(title='%') Cloud Coverage
+              th.text-uppercase#villa(scope='col')
+                | UV Index
+              th.text-uppercase#villa(scope='col')
+                abbr(title='miles') Visibility
+              th.text-uppercase#villa(scope='col')
+                | Ozone #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
+            each airshit in airshits
+              tr
+                td(colspan="1")
+                  abbr(title=`${airshit.createdAt}`)
+                    | #{dateTimeToHuman(airshit.createdAt)} ago
+                td.aqi(class={
+                  'aqi--good': airshit.PM25REALTIME['category'] === 'Good',
+                  'aqi--moderate': airshit.PM25REALTIME['category'] === 'Moderate',
+                  'aqi--unhealthy-sensitive': airshit.PM25REALTIME['category'] === 'Unhealthy for Sensitive Groups',
+                  'aqi--unhealthy': airshit.PM25REALTIME['category'] === 'Unhealthy',
+                  'aqi--unhealthy-very': airshit.PM25REALTIME['category'] === 'Very Unhealthy',
+                  'aqi--death': airshit.PM25REALTIME['category'] === 'Hazardous',
+                })
+                  span.score
+                    span.number
+                      | #{airshit.PM25REALTIME.aqi}
+                    span.category
+                      | #{airshit.PM25REALTIME.category}
+                td.aqi(class={
+                  'aqi--good': airshit.PM10REALTIME['category'] === 'Good',
+                  'aqi--moderate': airshit.PM10REALTIME['category'] === 'Moderate',
+                  'aqi--unhealthy-sensitive': airshit.PM10REALTIME['category'] === 'Unhealthy for Sensitive Groups',
+                  'aqi--unhealthy': airshit.PM10REALTIME['category'] === 'Unhealthy',
+                  'aqi--unhealthy-very': airshit.PM10REALTIME['category'] === 'Very Unhealthy',
+                  'aqi--death': airshit.PM10REALTIME['category'] === 'Hazardous',
+                })
+                  span.score
+                    span.number
+                      | #{airshit.PM10REALTIME.aqi}
+                    span.category
+                      | #{airshit.PM10REALTIME.category}
+                td(headers='par pbed1 stud')
+                  span.d-block.lead.text-center.font-weight-bold.mb-0.small #{airshit.REPORTED_WEATHER.summary}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.TEMP_F} &deg;F
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['humidity']}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{airshit.PRESSURE_BAR}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windSpeed}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windGust}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(1)}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.uvIndex}
+                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility']}
+                td(headers='par pbed1 apt')
+                  span.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone']}
+
+      - var PossiblePages = Math.trunc(total/limit)+1;
+      - var nextPage = currentPage
+
+      nav(aria-label="...")
+        ul.pagination.pagination-md.justify-content-center
+          li.page-item(class= {disabled: currentPage==1})
+            a.page-link(href="/past?page="+(currentPage-1) tabindex="-1") Previous
+          - var p = 1;
+          while p <= PossiblePages
+            li.page-item(class= {active: currentPage == p} )
+              a.page-link(href="/past?page="+p)=p
+            - p++;
+          li.page-item(class={disabled: currentPage == PossiblePages})
+            a.page-link(href="/past?page="+ ++nextPage ) Next

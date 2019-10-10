@@ -1,0 +1,306 @@
+@import "themes/default/variables";
+
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "node_modules/@ladjs/bootstrap-social/bootstrap-social.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "node_modules/@fortawesome/fontawesome-free/scss/brands";
+@import "node_modules/@fortawesome/fontawesome-free/scss/regular";
+@import "node_modules/@fortawesome/fontawesome-free/scss/solid";
+
+@import "themes/default/default";
+
+// Scaffolding
+// -------------------------
+
+.card {
+  &.aqi {
+    &--good {
+      @extend .bg-success;
+      @extend .text-white;
+    }
+    &--moderate {
+      background-color: #FFDC00;
+      @extend .text-dark;
+    }
+    &--unhealthy-sensitive {
+      background-color: #FF851B;
+      @extend .text-dark;
+    }
+    &--unhealthy {
+      background-color: #FF4136;
+      @extend .text-dark;
+    }
+    &--unhealthy-very {
+      background-color: #85144b;
+      @extend .text-white;
+    }
+    &--death {
+      background-color: #111111;
+      @extend .text-white;
+    }
+  }
+}
+
+.table {
+  .aqi {
+    .score {
+      text-align:center;
+      display:block;
+      padding: 0.25rem;
+
+      .number {
+        display:block;
+        font-size: 1.5rem;
+      }
+      .category {
+        display:block;
+        margin-top: -6px;
+        text-transform: uppercase;
+        letter-spacing: -0.5px;
+      }
+    }
+    &--good {
+      span {
+        @extend .bg-success;
+        @extend .text-white;
+      }
+    }
+    &--moderate {
+      span {
+        background-color: #FFDC00;
+        @extend .text-dark;
+      }
+    }
+    &--unhealthy-sensitive {
+      span {
+        background-color: #FF851B;
+        @extend .text-dark;
+      }
+    }
+    &--unhealthy {
+      span {
+        background-color: #FF4136;
+        @extend .text-dark;
+      }
+    }
+    &--unhealthy-very {
+      span {
+        background-color: #85144b;
+        @extend .text-white;
+      }
+    }
+    &--death {
+      span {
+        background-color: #111111;
+        @extend .text-white;
+      }
+    }
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  padding-top: 80px;
+  margin-bottom: 75px;
+  font-size: 14px;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 45px;
+  line-height: 45px;
+
+  p, ul {
+    margin-bottom: 0;
+  }
+}
+
+// Input Fields
+// -------------------------
+
+textarea {
+  resize: vertical;
+}
+
+// Navbar
+// -------------------------
+
+.navbar-nav img {
+  width: 30px;
+  min-height: 30px;
+  margin: -15px 15px -15px;
+}
+
+.navbar{
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.navbar-brand{
+  font-size: 18px;
+  float: left;
+}
+
+.navbar-toggler {
+  position: relative;
+  float: right;
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+.navbar-toggler-icon {
+  font-size: 16px;
+}
+
+.dropdown-menu {
+  left: initial;
+  right: 0;
+}
+
+/*
+* Solves Bootstrap 4 issue
+* https://github.com/twbs/bootstrap/issues/25654
+*/
+/* Styles in sm disposition and up */
+@media (min-width: 576px) and (max-width: 767px) {
+  /* Solves bs4 bug */
+  .navbar-expand-md > .container,
+  .navbar-expand-lg > .container,
+  .navbar-expand-xl > .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
+/* Styles in md disposition and up */
+@media (min-width: 768px) and (max-width: 991px) {
+  /* Solves bs4 bug */
+  .navbar-expand-lg > .container,
+  .navbar-expand-xl > .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
+/* Styles in lg disposition and up */
+@media (min-width: 992px) and (max-width: 1199px) {
+  /* Solves bs4 bug */
+  .navbar-expand-xl > .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+}
+
+// Alerts
+// -------------------------
+
+.alert {
+  margin-top: 20px;
+}
+
+// Thumbnails
+// -------------------------
+
+.thumbnail {
+  padding: 0;
+  border-radius: 0;
+  box-shadow: 0 0 5px #ccc, inset 0 0 0 #000;
+}
+
+// Font Icons
+// -------------------------
+
+.fa {
+  margin-right: 6px;
+}
+
+.fab {
+  margin-right: 6px;
+}
+
+.fas {
+  margin-right: 6px;
+}
+
+.far {
+  margin-right: 6px;
+}
+
+// Basic Snapchat Button CSS
+.btn-snapchat {
+  background-color: #fffc00;
+  color: #000 !important;
+
+  &:hover, &:active {
+    background-color: #f1ef00;
+  }
+}
+
+.card {
+  overflow:hidden;
+  .card-body{
+    .rotate {
+      z-index: 8;
+      float: right;
+      height: 100%;
+
+      i {
+        color: rgba(20, 20, 20, 0.15);
+        position: absolute;
+        left: 0;
+        left: auto;
+        right: -10px;
+        bottom: -10px;
+        display: block;
+      }
+    }
+  }
+}
+
+.made-with-love {
+
+  color: #666;
+  font-size: 12px;
+  display: block;
+  position: absolute;
+  bottom: -75px;
+  position: absolute;
+  width: 90%;
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%) translateY(-50%);
+  text-align: center;
+
+  a {
+    color: #000000;
+    text-decoration: none;
+  }
+
+  .fa {
+    color: #E90606;
+    margin: 0 3px;
+    font-size: 10px;
+    animation: pound 0.35s infinite alternate;
+    -webkit-animation: pound 0.35s infinite alternate;
+  }
+}
+
+@-webkit-keyframes pound {
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pound {
+  to {
+    transform: scale(1.1);
+  }
+}

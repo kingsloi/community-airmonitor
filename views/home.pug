@@ -1,0 +1,127 @@
+extends layout
+
+block content
+  .container
+    .row
+      .col-md-6
+        h1.h2 Miller Beach / NWI Air Quality
+        p.lead.font-we We track #[a(href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank")= "PM2.5, PM10"], temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), so we can (hopefully) determine who, where, what, and how the weather affects the quality of the air we breathe, from a community-funded air sensor in the scenic Miller neighborhood of Gary, Indiana.
+
+        p.lead In the future, depending on what data is openly available, we may be able to also gather data from the many industries around the area, such as train schedules, burn schedules, traffic throughput, construction, air traffic, mill non-conformances, shipping schedules, etc.
+
+        .row
+          .col-md-6.py-2
+            .card.h-100.aqi(class={
+              'aqi--good': airshit.PM25REALTIME['category'] === 'Good',
+              'aqi--moderate': airshit.PM25REALTIME['category'] === 'Moderate',
+              'aqi--unhealthy-sensitive': airshit.PM25REALTIME['category'] === 'Unhealthy for Sensitive Groups',
+              'aqi--unhealthy': airshit.PM25REALTIME['category'] === 'Unhealthy',
+              'aqi--unhealthy-very': airshit.PM25REALTIME['category'] === 'Very Unhealthy',
+              'aqi--death': airshit.PM25REALTIME['category'] === 'Hazardous',
+            })
+              .card-body
+                .rotate
+                  i.fa.fa-signal.fa-5x
+                h6.text-uppercase PM2.5
+                h1.display-4.font-weight-bold.mb-0 #{airshit.PM25REALTIME['aqi']}
+                p.x.lead.mb-0.pl-2.float-righat #{airshit.PM25REALTIME['category']}
+
+          .col-md-6.py-2
+            .card.h-100.aqi(class={
+              'aqi--good': airshit.PM10REALTIME['category'] === 'Good',
+              'aqi--moderate': airshit.PM10REALTIME['category'] === 'Moderate',
+              'aqi--unhealthy-sensitive': airshit.PM10REALTIME['category'] === 'Unhealthy for Sensitive Groups',
+              'aqi--unhealthy': airshit.PM10REALTIME['category'] === 'Unhealthy',
+              'aqi--unhealthy-very': airshit.PM10REALTIME['category'] === 'Very Unhealthy',
+              'aqi--death': airshit.PM10REALTIME['category'] === 'Hazardous',
+            })
+              .card-body
+                .rotate
+                  i.fa.fa-signal.fa-5x
+                h6.text-uppercase PM10
+                h1.display-4.font-weight-bold.mb-0 #{airshit.PM10REALTIME['aqi']}
+                p.x.lead.mb-0.pl-2.float-righat #{airshit.PM10REALTIME['category']}
+
+      .col-md-6
+        div.table-responsive
+          table.table
+            tbody
+              tr
+                td(colspan="2")
+                  p.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.REPORTED_WEATHER['summary']} - #{airshit.TEMP_F} &deg;F
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Dew Point
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['dewPoint']} &deg;F
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Cloud Coverage
+                td()
+                  p.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(1)} %
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 UV Index
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['uvIndex']}
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Pressure
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['pressure']} #[sub millibars]
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Humidity
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['humidity']} #[sub %]
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 OZone
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone']} #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Visibility
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility']} #[sub miles]
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Wind Speed
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['windSpeed']} - #{airshit.REPORTED_WEATHER['windGust']} #[sub mph] / #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+            tfoot
+              tr
+                th(colspan="2" class="small text-uppercase text-right")
+                  p.mb-0
+                    | Weather By: #[a(href="https://darksky.net/forecast/41.5899,-87.3468/us12/en" target="_blank")= "darksky.net"]
+                    | | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)}
+
+        //=JSON.stringify(airshit)
+
+    hr.my-5.pb-4
+    .row
+      .col-md-6
+        h2.h4.text-uppercase.font-weight-light Special Thanks / Contributions
+        p.mb-2(style="font-size:2rem;") 👏👏👏👏👏
+        p.lead #[a(href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" role="button" target="_blank")= "PurpleAir sensor"] crowd funded by:
+
+        ul.lead.mb-4
+          li Mary
+          li Adam
+          li Sloan
+          li Leslie
+          li Danielle
+          li Kingsley
+          li Kathy
+          li Scott
+
+      .col-md-6
+        h2.h4.text-uppercase.font-weight-light News / Links / Sources
+        ul
+          li Website: #[a(href="https://www.wunderground.com/wundermap?lat=41.602&lon=-87.337" target="_blank")= "Wunderground"]
+          li Website: #[a(href="https://echo.epa.gov/facilities/facility-search" target="_blank")= "EPA Facility Lookup"]
+            ul
+              li e.g. #[a(href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank")= "ARCELORMITTAL BURNS HARBOR"]
+          li Website: #[a(href="https://www.lung.org/our-initiatives/healthy-air/sota/city-rankings/states/indiana/lake.html" target="_blank")= "Lake County, IN Air Quality | lung.org"]
+          li Website: #[a(href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank")= "ELPC vs. ArcelorMittalLawsuit"]
+          li Study / Whitepaper: #[a(href="https://www.sciencedirect.com/science/article/pii/S0160412019301941" target="_blank")= "The first pollution investigation of road sediment in Gary, Indiana: Anthropogenic metals and possible health implications for a socioeconomically disadvantaged area"]
