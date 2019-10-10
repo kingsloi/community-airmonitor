@@ -41,7 +41,14 @@ exports.index = (req, res) => {
 };
 
 exports.sync = (req, res) => {
-const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
+
+  var hash = req.query.hash;
+
+  if (hash !== process.env.SYNC_SECRET_HASH) {
+    res.status(400).end();
+  }
+
+  const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
 
   const apiKey   = process.env.FORCASEIO_API;
   const location = '41.6198902,-87.2452952';
