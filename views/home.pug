@@ -108,6 +108,17 @@ block content
                   p.lead.font-weight-bold.mb-0 Trains in #[abbr(title="See 'Region' below for coordinates") Region]
                 td()
                   p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE} #[small.small.font-weight-light southshore]
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Traffic in #[abbr(title="See 'Region' below for coordinates") Region]
+                td()
+                  p.lead.mb-0
+                    span.separator
+                      | #{airshit.TRAFFIC.INCIDENTS.length} #[small.small.font-weight-light incidents]
+                    span.separator
+                      | #{airshit.congestionMiles()} #[small.small.font-weight-light miles of congestion]
+                    span.separator
+                      | #{airshit.congestionTime()} #[small.small.font-weight-light minutes of congestion]
             tfoot
               tr
                 th(colspan="2" class="small text-uppercase text-right")
@@ -120,8 +131,12 @@ block content
                     - var coordinates = region.map((array) => array.reverse()).join("\r\n");
                     | #[a.pl-1(href=`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(coordinates)}` target="_blank" title=`${coordinates}`)= "map"]
                     br
-                    | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"] |
-                    | Trains by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "southshore.etaspot.net"]
+                    span.d-block
+                      | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
+                    span.d-block
+                      | Trains by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "southshore.etaspot.net"]
+                    span.d-block
+                      | Traffic by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "mapquest.com"]
                     br
                     | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago
 

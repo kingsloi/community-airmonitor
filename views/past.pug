@@ -20,7 +20,7 @@ block content
                 | PM25
               th(colspan='1')
                 | PM10
-              th(colspan='1')
+              th(colspan='2')
                 | Region
               th#par.span(colspan='10' scope='colgroup')
                 | Weather
@@ -28,32 +28,34 @@ block content
             tr
               th(colspan=3)
                 |
-              th.text-uppercase#summary(scope='col')
-                | Trains
+              th.text-uppercase#traffic(scope='col')
+                | Traffic #[sub.d-block=`Miles`]
+              th.text-uppercase#trains(scope='col')
+                | Trains #[sub.d-block=`Total`]
               th.text-uppercase#summary(scope='col')
                 | Summary
               th.text-uppercase#temp(scope='col')
-                abbr(title='F') Temp
+                | Temp #[sub.d-block=`\xB0 f`]
               th.text-uppercase#humidity(scope='col')
-                abbr(title='%') Humidity
+                | Humidity #[sub.d-block=`%`]
               th.text-uppercase#Rain(scope='col')
-                abbr(title='Inches of liquid water per hour') precipIntensity
+                | precipIntensity #[sub.d-block=`in of liquid water per hour`]
               th.text-uppercase#pressure(scope='col')
-                abbr(title='in HG') Pressure
+                | Pressure #[sub.d-block=`in Hg`]
               th.text-uppercase#windspeed(scope='col')
-                abbr(title='MPH') Wind Speed
+                | Wind Speed #[sub.d-block=`miles`]
               th.text-uppercase#windgust(scope='col')
-                abbr(title='MPH') Wind Gust
+                | Wind Gust #[sub.d-block=`MPH`]
               th.text-uppercase#windbearing(scope='col')
                 | Wind Bearing
               th.text-uppercase#cloudcoverage(scope='col')
-                abbr(title='%') Cloud Coverage
+                | Cloud Coverage #[sub.d-block=`%`]
               th.text-uppercase#uvindex(scope='col')
                 | UV Index
               th.text-uppercase#visibility(scope='col')
-                abbr(title='miles') Visibility
+                | Visibility #[sub.d-block=`miles`]
               th.text-uppercase#ozone(scope='col')
-                | Ozone #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
+                | Ozone #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub.d-block DU]]
             each airshit in airshits
               tr
                 td(colspan="1")
@@ -85,6 +87,8 @@ block content
                       | #{airshit.PM10REALTIME.aqi}
                     span.category
                       | #{airshit.PM10REALTIME.category}
+                td(headers='congestion miles')
+                  span.d-block.lead.text-center.mb-0 #{airshit.congestionMiles()}
                 td(headers='trains')
                   span.d-block.lead.text-center.mb-0 #{airshit.trainsCount()}
                 td(headers='summary')
@@ -102,7 +106,7 @@ block content
                 td(headers='windGust')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windGust}
                 td(headers='windBearing')
-                  span.d-block.lead.mb-0.p-2(title=`${airshit.REPORTED_WEATHER['windBearing']} degrees`)
+                  span.d-block.lead.mb-0.p-2(title=`${airshit.REPORTED_WEATHER['windBearing']} \xB0 degrees`)
                     | #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
                 td(headers='cloudCover')
                   span.d-block.lead.mb-0.p-2 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(2)}

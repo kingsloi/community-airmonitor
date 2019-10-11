@@ -37,20 +37,24 @@ exports.sync = (req, res) => {
 
   const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
 
-  const apiKey   = process.env.FORCASEIO_API;
+  const weatherApiKey   = process.env.FORCASEIO_API;
+  const trafficApiKey   = process.env.MAPQUESTAPI_KEY;
+  const trafficBounds = coordinates.join(",");
   const location = `${process.env.LOCATION_LAT || '41.619829'},${process.env.LOCATION_LON || '-87.245317'}`;
   const exclude  = 'minutely,hourly,daily,alerts,flags';
   const purpleId = process.env.PURPLE_ID;
 
   axios.all([
     axios.get(`https://www.purpleair.com/json?show=${purpleId}`),
-    axios.get(`https://api.forecast.io/forecast/${apiKey}/${location}?units=us&exclude=${exclude}`),
+    axios.get(`https://api.forecast.io/forecast/${weatherApiKey}/${location}?units=us&exclude=${exclude}`),
     axios.get(`http://southshore.etaspot.net/service.php?service=get_vehicles&includeETAData=1&orderedETAArray=1&token=TESTING`),
+    axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=congestion`)
   ])
-  .then(axios.spread((purpleData, weatherData, southshoreData) => {
+  .then(axios.spread((purpleData, weatherData, southshoreData, trafficData) => {
     const weather = weatherData.data;
     const purple = purpleData.data;
     const southshore = southshoreData.data;
+    const traffic = trafficData.data;
 
     const one = purple.results[0];
     const two = purple.results[1];
@@ -133,6 +137,15 @@ exports.sync = (req, res) => {
       return inside([train.lat, train.lng], coordinates) && train.inService;
     });
 
+    const incidents = traffic.incidents.map((incident) => {
+      return {
+        lat: incident.lat,
+        lng: incident.lng,
+        distance: incident.distance,
+        freeFlowMinDelay: incident.delayFromFreeFlow
+      }
+    });
+
     Promise.all(promises)
       .then(result => {
         const shitstamp = new Airshit({
@@ -146,6 +159,9 @@ exports.sync = (req, res) => {
           TRAINS: {
             SOUTHSHORE: southshoreTravelingOnThru.length
           },
+          TRAFFIC: {
+            INCIDENTS: incidents
+          }
         });
 
         shitstamp.save(function (err, response) {

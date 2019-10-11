@@ -35,6 +35,9 @@ const airshitSchema = new mongoose.Schema({
   TRAINS: {
     SOUTHSHORE: Number,
   },
+  TRAFFIC: {
+    INCIDENTS: Array
+  }
 }, { timestamps: true });
 
 airshitSchema.plugin(mongoosePaginate);
@@ -62,6 +65,28 @@ airshitSchema.methods.trainsCount = function trainsCount() {
   });
 
   return total;
+};
+
+airshitSchema.methods.congestionMiles = function congestionMiles() {
+  let total = 0;
+  const incidents = this.TRAFFIC.INCIDENTS;
+
+  incidents.map((incident) => {
+    total += incident.distance;
+  });
+
+  return total.toFixed(0);
+};
+
+airshitSchema.methods.congestionTime = function congestionTime() {
+  let total = 0;
+  const incidents = this.TRAFFIC.INCIDENTS;
+
+  incidents.map((incident) => {
+    total += incident.freeFlowMinDelay;
+  });
+
+  return total.toFixed(0);
 };
 
 const Airshit = mongoose.model('Airshit', airshitSchema);

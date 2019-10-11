@@ -12946,6 +12946,13 @@ readers do not read off random characters that represent icons */
 .card.aqi--death {
   background-color: #111111; }
 
+.lead .separator {
+  padding: 0.25rem;
+  display: block; }
+
+sub.d-block {
+  padding-bottom: 0.75rem; }
+
 .table .aqi .score {
   text-align: center;
   display: block;
