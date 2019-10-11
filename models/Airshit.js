@@ -56,7 +56,6 @@ airshitSchema.methods.trainsCount = function trainsCount() {
 
   // todo, figure out how to reduce without $init being outputted
   Object.keys(trains).map((train) => {
-    console.log(trains[train], typeof trains[train]);
     if (typeof trains[train] === 'number') {
       total += trains[train];
     }
