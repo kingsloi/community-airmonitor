@@ -80,6 +80,11 @@ block content
                   p.lead.mb-0 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(0) } #[sub in Hg]
               tr
                 td
+                  p.lead.font-weight-bold.mb-0 Rain Intensity
+                td()
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['precipIntensity']} #[sub in of liquid water]
+              tr
+                td
                   p.lead.font-weight-bold.mb-0 Humidity
                 td()
                   p.lead.mb-0 #{airshit.HUMIDITY_PERCENT} #[sub %]
@@ -102,13 +107,13 @@ block content
               tr
                 th(colspan="2" class="small text-uppercase text-right")
                   p.mb-0
-                    | temperature, humidity, pressure recorded at sensor
+                    | Temperature, humidity, pressure recorded at sensor
                     br
                     | Sensor: #{location.lat},#{location.lon}
                     br
-                    | Weather By: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
+                    | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
                     br
-                    | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)}
+                    | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago
 
         //=JSON.stringify(airshit)
 

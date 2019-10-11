@@ -13,6 +13,7 @@ const dotenv = require('dotenv');
 const MongoStore = require('connect-mongo')(session);
 const flash = require('express-flash');
 const path = require('path');
+const moment = require('moment');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const sass = require('node-sass-middleware');
@@ -94,6 +95,34 @@ app.use(lusca.xssProtection(true));
 app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.locals.user = req.user;
+  res.locals.degeesToCompass = (angle) => {
+      const degreePerDirection = 360 / 8;
+
+      /**
+       * Offset the angle by half of the degrees per direction
+       * Example: in 4 direction system North (320-45) becomes (0-90)
+       */
+      const offsetAngle = angle + degreePerDirection / 2;
+
+      return (offsetAngle >= 0 * degreePerDirection && offsetAngle < 1 * degreePerDirection) ? "↑ N"
+        : (offsetAngle >= 1 * degreePerDirection && offsetAngle < 2 * degreePerDirection) ? "↗ NE"
+          : (offsetAngle >= 2 * degreePerDirection && offsetAngle < 3 * degreePerDirection) ? "→ E"
+            : (offsetAngle >= 3 * degreePerDirection && offsetAngle < 4 * degreePerDirection) ? "↘ SE"
+              : (offsetAngle >= 4 * degreePerDirection && offsetAngle < 5 * degreePerDirection) ? "↓ S"
+                : (offsetAngle >= 5 * degreePerDirection && offsetAngle < 6 * degreePerDirection) ? "↙ SW"
+                  : (offsetAngle >= 6 * degreePerDirection && offsetAngle < 7 * degreePerDirection) ? "← W"
+                    : "↖ NW";
+  };
+  res.locals.timestampToHuman = (timestamp) => {
+    const moment1 = moment.unix(timestamp);
+    const moment2 = moment();
+    return moment.duration(moment1.diff(moment2)).humanize();
+  };
+  res.locals.dateTimeToHuman = (datetime) => {
+    const moment1 = moment(datetime);
+    const moment2 = moment();
+    return moment.duration(moment1.diff(moment2)).humanize();
+  };
   next();
 });
 app.use((req, res, next) => {
@@ -122,6 +151,7 @@ app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawes
  */
 app.get('/', airShirtController.index);
 app.get('/past', airShirtController.past);
+app.get('/history-and-updates', airShirtController.history);
 app.get('/sync', airShirtController.sync);
 // app.get('/login', userController.getLogin);
 // app.post('/login', userController.postLogin);

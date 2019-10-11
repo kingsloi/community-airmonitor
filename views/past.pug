@@ -3,7 +3,7 @@ extends layout
 block content
   .container
     .pb-2.mt-2.mb-4.border-bottom
-      h3 Past Quality
+      h1.h2 Past Quality
 
   .container-fluid
     form(method='POST')
@@ -26,27 +26,29 @@ block content
             tr
               th(colspan=3)
                 |
-              th.text-uppercase#stud(scope='col')
+              th.text-uppercase#summary(scope='col')
                 | Summary
-              th.text-uppercase#villa(scope='col')
+              th.text-uppercase#temp(scope='col')
                 abbr(title='F') Temp
-              th.text-uppercase#villa(scope='col')
+              th.text-uppercase#humidity(scope='col')
                 abbr(title='%') Humidity
-              th.text-uppercase#villa(scope='col')
-                abbr(title='millibars') Pressure
-              th.text-uppercase#apt(scope='col')
+              th.text-uppercase#Rain(scope='col')
+                abbr(title='Inches of liquid water per hour') precipIntensity
+              th.text-uppercase#pressure(scope='col')
+                abbr(title='in HG') Pressure
+              th.text-uppercase#windspeed(scope='col')
                 abbr(title='MPH') Wind Speed
-              th.text-uppercase#chal(scope='col')
+              th.text-uppercase#windgust(scope='col')
                 abbr(title='MPH') Wind Gust
-              th.text-uppercase#chal(scope='col')
+              th.text-uppercase#windbearing(scope='col')
                 | Wind Bearing
-              th.text-uppercase#chal(scope='col')
+              th.text-uppercase#cloudcoverage(scope='col')
                 abbr(title='%') Cloud Coverage
-              th.text-uppercase#villa(scope='col')
+              th.text-uppercase#uvindex(scope='col')
                 | UV Index
-              th.text-uppercase#villa(scope='col')
+              th.text-uppercase#visibility(scope='col')
                 abbr(title='miles') Visibility
-              th.text-uppercase#villa(scope='col')
+              th.text-uppercase#ozone(scope='col')
                 | Ozone #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
             each airshit in airshits
               tr
@@ -79,12 +81,14 @@ block content
                       | #{airshit.PM10REALTIME.aqi}
                     span.category
                       | #{airshit.PM10REALTIME.category}
-                td(headers='par pbed1 stud')
+                td(headers='summary')
                   span.d-block.lead.text-center.font-weight-bold.mb-0.small #{airshit.REPORTED_WEATHER.summary}
-                td(headers='par pbed1 apt')
+                td(headers='temp f')
                   span.d-block.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.TEMP_F}
-                td(headers='par pbed1 apt')
+                td(headers='humidity')
                   span.d-block.lead.mb-0.p-2 #{airshit.HUMIDITY_PERCENT }
+                td(headers='precipIntensity')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['precipIntensity']}
                 td(headers='PRESSURE_BAR')
                   span.d-block.lead.mb-0.p-2 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(2) }
                 td(headers='windSpeed')
@@ -92,7 +96,8 @@ block content
                 td(headers='windGust')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windGust}
                 td(headers='windBearing')
-                  span.d-block.lead.mb-0.p-2 #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+                  span.d-block.lead.mb-0.p-2(title=`${airshit.REPORTED_WEATHER['windBearing']} degrees`)
+                    | #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
                 td(headers='cloudCover')
                   span.d-block.lead.mb-0.p-2 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(2)}
                 td(headers='uvIndex')

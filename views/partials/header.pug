@@ -8,7 +8,9 @@
       span.navbar-toggler-icon
     .collapse.navbar-collapse
       ul.nav.navbar-nav
-        li.nav-item(class=(title === 'Home') ? 'active' : undefined)
+        li.nav-item(class=(slug === 'home') ? 'active' : undefined)
           a.nav-link(href='/') Now
-        li.nav-item(class=(title === 'Past') ? 'active' : undefined)
+        li.nav-item(class=(slug === 'past') ? 'active' : undefined)
           a.nav-link(href='/past') Past
+        li.nav-item(class=(slug === 'history-and-updates') ? 'active' : undefined)
+          a.nav-link(href='/history-and-updates') History &amp; Updates

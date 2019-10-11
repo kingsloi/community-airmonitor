@@ -11,35 +11,13 @@ exports.index = (req, res) => {
     Airshit.findOne({}, {}, { sort: { _id : -1 } })
     .exec((err, airshit) => {
         res.render('home', {
+            slug: 'home',
             title: 'Miller Beach / NWI Air Quality',
             location: {
               lat: process.env.LOCATION_LAT || '41.619829',
               lon: process.env.LOCATION_LON || '-87.245317',
             },
             airshit,
-            degeesToCompass: function(angle) {
-                const degreePerDirection = 360 / 8;
-
-                /**
-                 * Offset the angle by half of the degrees per direction
-                 * Example: in 4 direction system North (320-45) becomes (0-90)
-                 */
-                const offsetAngle = angle + degreePerDirection / 2;
-
-                return (offsetAngle >= 0 * degreePerDirection && offsetAngle < 1 * degreePerDirection) ? "↑ N"
-                  : (offsetAngle >= 1 * degreePerDirection && offsetAngle < 2 * degreePerDirection) ? "↗ NE"
-                    : (offsetAngle >= 2 * degreePerDirection && offsetAngle < 3 * degreePerDirection) ? "→ E"
-                      : (offsetAngle >= 3 * degreePerDirection && offsetAngle < 4 * degreePerDirection) ? "↘ SE"
-                        : (offsetAngle >= 4 * degreePerDirection && offsetAngle < 5 * degreePerDirection) ? "↓ S"
-                          : (offsetAngle >= 5 * degreePerDirection && offsetAngle < 6 * degreePerDirection) ? "↙ SW"
-                            : (offsetAngle >= 6 * degreePerDirection && offsetAngle < 7 * degreePerDirection) ? "← W"
-                              : "↖ NW";
-            },
-            timestampToHuman: function(timestamp) {
-                const moment1 = moment.unix(timestamp);
-                const moment2 = moment();
-                return moment.duration(moment1.diff(moment2)).humanize();
-            }
         });
     });
 };
@@ -162,7 +140,7 @@ exports.sync = (req, res) => {
       })
       .catch(err => {
         console.log(err);
-        res.send({ success: true });
+        res.send({ success: false });
       });
   }))
   .catch((error) => {
@@ -179,38 +157,23 @@ exports.past = (req, res) => {
   })
   .then((result)=>{
     return res.render('past', {
+      slug: 'past',
       title: "Past Miller Beach / NWI Air Quality",
       airshits: result.docs,
       total: result.totalDocs,
       currentPage: result.page,
       limit: result.limit,
-      degeesToCompass: function(angle) {
-          const degreePerDirection = 360 / 8;
-
-          /**
-           * Offset the angle by half of the degrees per direction
-           * Example: in 4 direction system North (320-45) becomes (0-90)
-           */
-          const offsetAngle = angle + degreePerDirection / 2;
-
-          return (offsetAngle >= 0 * degreePerDirection && offsetAngle < 1 * degreePerDirection) ? "↑ N"
-            : (offsetAngle >= 1 * degreePerDirection && offsetAngle < 2 * degreePerDirection) ? "↗ NE"
-              : (offsetAngle >= 2 * degreePerDirection && offsetAngle < 3 * degreePerDirection) ? "→ E"
-                : (offsetAngle >= 3 * degreePerDirection && offsetAngle < 4 * degreePerDirection) ? "↘ SE"
-                  : (offsetAngle >= 4 * degreePerDirection && offsetAngle < 5 * degreePerDirection) ? "↓ S"
-                    : (offsetAngle >= 5 * degreePerDirection && offsetAngle < 6 * degreePerDirection) ? "↙ SW"
-                      : (offsetAngle >= 6 * degreePerDirection && offsetAngle < 7 * degreePerDirection) ? "← W"
-                        : "↖ NW";
-      },
-      dateTimeToHuman: function(timestamp) {
-          const moment1 = moment(timestamp);
-          const moment2 = moment();
-          return moment.duration(moment1.diff(moment2)).humanize();
-      }
     });
   })
   .catch((err)=>{
     console.log(err);
     return res.send('Error Contacting the database or Some Trouble happened while exec Pagination Script');
   })
+};
+
+exports.history = (req, res) => {
+  return res.render('history-and-updates', {
+    slug: 'history-and-updates',
+    title: "History & Updates | Miller Beach / NWI Air Quality",
+  });
 };

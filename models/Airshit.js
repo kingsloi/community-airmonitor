@@ -28,12 +28,13 @@ const airshitSchema = new mongoose.Schema({
     uvIndex: Number,
     visibility: Number,
     ozone: Number,
-    summary: String
+    summary: String,
+    precipIntensity: String,
+    precipType: String
   },
 }, { timestamps: true });
 
 airshitSchema.plugin(mongoosePaginate);
-
 
 /**
  *
