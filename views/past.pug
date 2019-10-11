@@ -29,7 +29,7 @@ block content
               th.text-uppercase#stud(scope='col')
                 | Summary
               th.text-uppercase#villa(scope='col')
-                | Temp
+                abbr(title='F') Temp
               th.text-uppercase#villa(scope='col')
                 abbr(title='%') Humidity
               th.text-uppercase#villa(scope='col')
@@ -82,25 +82,25 @@ block content
                 td(headers='par pbed1 stud')
                   span.d-block.lead.text-center.font-weight-bold.mb-0.small #{airshit.REPORTED_WEATHER.summary}
                 td(headers='par pbed1 apt')
-                  span.d-block.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.TEMP_F} &deg;F
+                  span.d-block.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.TEMP_F}
                 td(headers='par pbed1 apt')
-                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['humidity']}
-                td(headers='par pbed1 apt')
-                  span.d-block.lead.mb-0.p-2 #{airshit.PRESSURE_BAR}
-                td(headers='par pbed1 apt')
+                  span.d-block.lead.mb-0.p-2 #{airshit.HUMIDITY_PERCENT }
+                td(headers='PRESSURE_BAR')
+                  span.d-block.lead.mb-0.p-2 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(2) }
+                td(headers='windSpeed')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windSpeed}
-                td(headers='par pbed1 apt')
+                td(headers='windGust')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windGust}
-                td(headers='par pbed1 apt')
+                td(headers='windBearing')
                   span.d-block.lead.mb-0.p-2 #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
-                td(headers='par pbed1 apt')
-                  span.d-block.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(1)}
-                td(headers='par pbed1 apt')
+                td(headers='cloudCover')
+                  span.d-block.lead.mb-0.p-2 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(2)}
+                td(headers='uvIndex')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.uvIndex}
-                td(headers='par pbed1 apt')
-                  span.d-block.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility']}
-                td(headers='par pbed1 apt')
-                  span.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone']}
+                td(headers='visibility')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['visibility'].toFixed(2)}
+                td(headers='ozone')
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['ozone'].toFixed(2)}
 
       - var PossiblePages = Math.trunc(total/limit)+1;
       - var nextPage = currentPage

@@ -39,6 +39,12 @@ block content
                 h1.display-4.font-weight-bold.mb-0 #{airshit.PM10REALTIME['aqi']}
                 p.x.lead.mb-0.pl-2.float-righat #{airshit.PM10REALTIME['category']}
 
+
+        p.lead.text-right.text-uppercase
+          a(href="/past" role="button")
+            | see past quality
+            i.fa.pl-1.fa-chevron-right(aria-hidden='true')
+
         p.lead.font-we We track #[a(href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank")= "PM2.5, PM10"], temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), so we can (hopefully) determine who, where, what, and how the weather affects the quality of the air we breathe, from a community-funded air sensor in the scenic Miller neighborhood of Gary, Indiana.
 
         p.lead In the future, depending on what data is openly available, we may be able to also gather data from the many industries around the area, such as train schedules, burn schedules, traffic throughput, construction, air traffic, mill non-conformances, shipping schedules, etc.
@@ -56,48 +62,53 @@ block content
                 td
                   p.lead.font-weight-bold.mb-0 Dew Point
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['dewPoint']} &deg;F
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)} &deg;F
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Cloud Coverage
                 td()
-                  p.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(1)} %
+                  p.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(0)} %
               tr
                 td
                   p.lead.font-weight-bold.mb-0 UV Index
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['uvIndex']}
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['uvIndex'].toFixed(0)}
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Pressure
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['pressure']} #[sub millibars]
+                  p.lead.mb-0 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(0) } #[sub in Hg]
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Humidity
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['humidity']} #[sub %]
+                  p.lead.mb-0 #{airshit.HUMIDITY_PERCENT} #[sub %]
               tr
                 td
                   p.lead.font-weight-bold.mb-0 OZone
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone']} #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone'].toFixed(0)} #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Visibility
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility']} #[sub miles]
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility'].toFixed(0)} #[sub miles]
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Wind Speed
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['windSpeed']} - #{airshit.REPORTED_WEATHER['windGust']} #[sub mph] / #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] / #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
             tfoot
               tr
                 th(colspan="2" class="small text-uppercase text-right")
                   p.mb-0
-                    | Weather By: #[a(href="https://darksky.net/forecast/41.5899,-87.3468/us12/en" target="_blank")= "darksky.net"]
-                    | | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)}
+                    | temperature, humidity, pressure recorded at sensor
+                    br
+                    | Sensor: #{location.lat},#{location.lon}
+                    br
+                    | Weather By: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
+                    br
+                    | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)}
 
         //=JSON.stringify(airshit)
 
@@ -121,10 +132,13 @@ block content
       .col-md-6
         h2.h4.text-uppercase.font-weight-light News / Links / Sources
         ul
+          li Website: #[a(href="https://www.in.gov/idem/airquality/pages/monitoring_data/pm25.html" target="_blank")= "IDEM PM2.5 Monitoring Locations"]
           li Website: #[a(href="https://www.wunderground.com/wundermap?lat=41.602&lon=-87.337" target="_blank")= "Wunderground"]
+          li Website: #[a(href="https://airnow.gov/index.cfm?action=airnow.local_city&cityid=58" target="_blank")= "GOV/EPA Gary/Hammond Air Quality"]
           li Website: #[a(href="https://echo.epa.gov/facilities/facility-search" target="_blank")= "EPA Facility Lookup"]
             ul
               li e.g. #[a(href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank")= "ARCELORMITTAL BURNS HARBOR"]
           li Website: #[a(href="https://www.lung.org/our-initiatives/healthy-air/sota/city-rankings/states/indiana/lake.html" target="_blank")= "Lake County, IN Air Quality | lung.org"]
-          li Website: #[a(href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank")= "ELPC vs. ArcelorMittalLawsuit"]
+          li Lawsuit: #[a(href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank")= "ELPC vs. ArcelorMittalLawsuit"]
           li Study / Whitepaper: #[a(href="https://www.sciencedirect.com/science/article/pii/S0160412019301941" target="_blank")= "The first pollution investigation of road sediment in Gary, Indiana: Anthropogenic metals and possible health implications for a socioeconomically disadvantaged area"]
+

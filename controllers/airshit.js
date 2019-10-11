@@ -12,6 +12,10 @@ exports.index = (req, res) => {
     .exec((err, airshit) => {
         res.render('home', {
             title: 'Miller Beach / NWI Air Quality',
+            location: {
+              lat: process.env.LOCATION_LAT || '41.619829',
+              lon: process.env.LOCATION_LON || '-87.245317',
+            },
             airshit,
             degeesToCompass: function(angle) {
                 const degreePerDirection = 360 / 8;
@@ -42,7 +46,7 @@ exports.index = (req, res) => {
 
 exports.sync = (req, res) => {
 
-  var hash = req.query.hash;
+  const hash = req.query.hash;
 
   if (hash !== process.env.SYNC_SECRET_HASH) {
     res.status(400).end();
@@ -51,14 +55,13 @@ exports.sync = (req, res) => {
   const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
 
   const apiKey   = process.env.FORCASEIO_API;
-  const location = '41.6198902,-87.2452952';
+  const location = `${process.env.LOCATION_LAT || '41.619829'},${process.env.LOCATION_LON || '-87.245317'}`;
   const exclude  = 'minutely,hourly,daily,alerts,flags';
   const purpleId = process.env.PURPLE_ID;
 
-
   axios.all([
     axios.get(`https://www.purpleair.com/json?show=${purpleId}`),
-    axios.get(`https://api.forecast.io/forecast/${apiKey}/${location}?units=si&exclude=${exclude}`),
+    axios.get(`https://api.forecast.io/forecast/${apiKey}/${location}?units=us&exclude=${exclude}`),
   ])
   .then(axios.spread((purpleData, weatherData) => {
     const weather = weatherData.data;
