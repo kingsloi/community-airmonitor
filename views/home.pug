@@ -103,15 +103,25 @@ block content
                   p.lead.font-weight-bold.mb-0 Wind Speed
                 td()
                   p.lead.mb-0 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] / #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+              tr
+                td
+                  p.lead.font-weight-bold.mb-0 Trains in #[abbr(title="See 'Region' below for coordinates") Region]
+                td()
+                  p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE} #[small.small.font-weight-light southshore]
             tfoot
               tr
                 th(colspan="2" class="small text-uppercase text-right")
                   p.mb-0
                     | Temperature, humidity, pressure recorded at sensor
                     br
-                    | Sensor: #{location.lat},#{location.lon}
+                    | Sensor: #[code #{location.lat},#{location.lon}]
                     br
-                    | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
+                    | Region:
+                    - var coordinates = region.map((array) => array.reverse()).join("\r\n");
+                    | #[a.pl-1(href=`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(coordinates)}` target="_blank" title=`${coordinates}`)= "map"]
+                    br
+                    | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"] |
+                    | Trains by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "southshore.etaspot.net"]
                     br
                     | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago
 

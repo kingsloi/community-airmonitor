@@ -70,6 +70,7 @@
     "passport-snapchat": "^1.0.0",
     "passport-twitter": "^1.0.4",
     "paypal-rest-sdk": "^1.8.1",
+    "point-in-polygon": "^1.0.1",
     "popper.js": "^1.15.0",
     "pug": "^2.0.4",
     "request": "^2.88.0",

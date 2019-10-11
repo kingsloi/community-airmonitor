@@ -2,29 +2,34 @@ const Airshit = require('../models/Airshit');
 const moment = require('moment');
 const axios = require('axios');
 const aqibot = require('aqi-bot');
+const inside = require('point-in-polygon');
+const region = require('../config/region');
 
 /**
  * GET /
  * Home page.
  */
 exports.index = (req, res) => {
-    Airshit.findOne({}, {}, { sort: { _id : -1 } })
-    .exec((err, airshit) => {
-        res.render('home', {
-            slug: 'home',
-            title: 'Miller Beach / NWI Air Quality',
-            location: {
-              lat: process.env.LOCATION_LAT || '41.619829',
-              lon: process.env.LOCATION_LON || '-87.245317',
-            },
-            airshit,
-        });
-    });
+  Airshit.findOne({}, {}, { sort: { _id : -1 } })
+  .exec((err, airshit) => {
+      res.render('home', {
+          slug: 'home',
+          title: 'Miller Beach / NWI Air Quality',
+          region: region.coordinates(),
+          location: {
+            lat: process.env.LOCATION_LAT || '41.619829',
+            lon: process.env.LOCATION_LON || '-87.245317',
+          },
+          airshit,
+      });
+  });
 };
 
 exports.sync = (req, res) => {
-
   const hash = req.query.hash;
+
+  // https://www.keene.edu/campus/maps/tool/
+  const coordinates = region.coordinates();
 
   if (hash !== process.env.SYNC_SECRET_HASH) {
     res.status(400).end();
@@ -40,10 +45,12 @@ exports.sync = (req, res) => {
   axios.all([
     axios.get(`https://www.purpleair.com/json?show=${purpleId}`),
     axios.get(`https://api.forecast.io/forecast/${apiKey}/${location}?units=us&exclude=${exclude}`),
+    axios.get(`http://southshore.etaspot.net/service.php?service=get_vehicles&includeETAData=1&orderedETAArray=1&token=TESTING`),
   ])
-  .then(axios.spread((purpleData, weatherData) => {
+  .then(axios.spread((purpleData, weatherData, southshoreData) => {
     const weather = weatherData.data;
     const purple = purpleData.data;
+    const southshore = southshoreData.data;
 
     const one = purple.results[0];
     const two = purple.results[1];
@@ -120,9 +127,14 @@ exports.sync = (req, res) => {
       promises.push(aqi);
     });
 
+    const trains = southshore.get_vehicles;
+
+    const southshoreTravelingOnThru = trains.filter(function(train) {
+      return inside([train.lat, train.lng], coordinates) && train.inService;
+    });
+
     Promise.all(promises)
       .then(result => {
-
         const shitstamp = new Airshit({
           PM25REALTIME: results['PM25REALTIME'],
           PM10REALTIME: results['PM10REALTIME'],
@@ -131,6 +143,9 @@ exports.sync = (req, res) => {
           HUMIDITY_PERCENT: one['humidity'],
           PRESSURE_BAR: one['pressure'],
           REPORTED_WEATHER: weather.currently,
+          TRAINS: {
+            SOUTHSHORE: southshoreTravelingOnThru.length
+          },
         });
 
         shitstamp.save(function (err, response) {

@@ -20,12 +20,16 @@ block content
                 | PM25
               th(colspan='1')
                 | PM10
-              th#par.span(colspan='11' scope='colgroup')
+              th(colspan='1')
+                | Region
+              th#par.span(colspan='10' scope='colgroup')
                 | Weather
           tbody
             tr
               th(colspan=3)
                 |
+              th.text-uppercase#summary(scope='col')
+                | Trains
               th.text-uppercase#summary(scope='col')
                 | Summary
               th.text-uppercase#temp(scope='col')
@@ -81,6 +85,8 @@ block content
                       | #{airshit.PM10REALTIME.aqi}
                     span.category
                       | #{airshit.PM10REALTIME.category}
+                td(headers='trains')
+                  span.d-block.lead.text-center.mb-0 #{airshit.trainsCount()}
                 td(headers='summary')
                   span.d-block.lead.text-center.font-weight-bold.mb-0.small #{airshit.REPORTED_WEATHER.summary}
                 td(headers='temp f')

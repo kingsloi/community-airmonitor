@@ -32,6 +32,9 @@ const airshitSchema = new mongoose.Schema({
     precipIntensity: String,
     precipType: String
   },
+  TRAINS: {
+    SOUTHSHORE: Number,
+  },
 }, { timestamps: true });
 
 airshitSchema.plugin(mongoosePaginate);
@@ -47,8 +50,19 @@ airshitSchema.pre('save', function save(next) {
 /**
  *
  */
-airshitSchema.methods.gravatar = function gravatar(size) {
-  //
+airshitSchema.methods.trainsCount = function trainsCount() {
+  let total = 0;
+  const trains = this.TRAINS;
+
+  // todo, figure out how to reduce without $init being outputted
+  Object.keys(trains).map((train) => {
+    console.log(trains[train], typeof trains[train]);
+    if (typeof trains[train] === 'number') {
+      total += trains[train];
+    }
+  });
+
+  return total;
 };
 
 const Airshit = mongoose.model('Airshit', airshitSchema);
