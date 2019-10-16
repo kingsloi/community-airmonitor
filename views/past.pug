@@ -122,7 +122,7 @@ block content
           li.page-item(class= {disabled: currentPage==1})
             a.page-link(href="/past?page="+(currentPage-1) tabindex="-1") Previous
           - var p = 0;
-          while p <= possiblePages.length
+          while p < possiblePages.length
             li.page-item(class= {active: currentPage == possiblePages[p]} )
               a.page-link(href="/past?page="+possiblePages[p])=possiblePages[p]
             - p++;
