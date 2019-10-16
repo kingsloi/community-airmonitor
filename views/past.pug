@@ -121,10 +121,10 @@ block content
         ul.pagination.pagination-md.justify-content-center
           li.page-item(class= {disabled: currentPage==1})
             a.page-link(href="/past?page="+(currentPage-1) tabindex="-1") Previous
-          - var p = 1;
+          - var p = 0;
           while p <= possiblePages.length
             li.page-item(class= {active: currentPage == p} )
-              a.page-link(href="/past?page="+p)=p
+              a.page-link(href="/past?page="+possiblePages[p])=possiblePages[p]
             - p++;
           li.page-item(class={disabled: currentPage == possiblePages.length})
             a.page-link(href="/past?page="+ ++currentPage ) Next
