@@ -117,17 +117,14 @@ block content
                 td(headers='ozone')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['ozone'].toFixed(2)}
 
-      - var PossiblePages = Math.trunc(total/limit)+1;
-      - var nextPage = currentPage
-
-      nav(aria-label="...")
+      nav(aria-label="past navigation")
         ul.pagination.pagination-md.justify-content-center
           li.page-item(class= {disabled: currentPage==1})
             a.page-link(href="/past?page="+(currentPage-1) tabindex="-1") Previous
           - var p = 1;
-          while p <= PossiblePages
+          while p <= possiblePages.length
             li.page-item(class= {active: currentPage == p} )
               a.page-link(href="/past?page="+p)=p
             - p++;
-          li.page-item(class={disabled: currentPage == PossiblePages})
-            a.page-link(href="/past?page="+ ++nextPage ) Next
+          li.page-item(class={disabled: currentPage == possiblePages.length})
+            a.page-link(href="/past?page="+ ++currentPage ) Next

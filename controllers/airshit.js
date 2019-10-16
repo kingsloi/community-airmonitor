@@ -4,6 +4,7 @@ const axios = require('axios');
 const aqibot = require('aqi-bot');
 const inside = require('point-in-polygon');
 const region = require('../config/region');
+const { generatePageRange } = require('../helpers/pagination');
 
 /**
  * GET /
@@ -194,6 +195,7 @@ exports.past = (req, res) => {
       total: result.totalDocs,
       currentPage: result.page,
       limit: result.limit,
+      possiblePages: generatePageRange(result.page, parseInt(result.totalDocs / result.limit) + 1),
     });
   })
   .catch((err)=>{
