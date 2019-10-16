@@ -119,7 +119,7 @@ block content
 
       nav(aria-label="past navigation")
         ul.pagination.pagination-md.justify-content-center
-          li.page-item(class= {disabled: currentPage==0})
+          li.page-item(class= {disabled: currentPage==1})
             a.page-link(href="/past?page="+(currentPage-1) tabindex="-1") Previous
           - var p = 0;
           while p <= possiblePages.length
