@@ -23,5 +23,5 @@ exports.generatePageRange = function(currentPage, lastPage, delta = 2) {
         return pages;
     }, []);
 
-    return Object.values(reduced);
+    return reduced;
 };
