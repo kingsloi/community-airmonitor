@@ -195,7 +195,7 @@ exports.past = (req, res) => {
       total: result.totalDocs,
       currentPage: result.page,
       limit: result.limit,
-      possiblePages: generatePageRange(result.page, parseInt(result.totalDocs / result.totalPages) + 1),
+      possiblePages: generatePageRange(result.page, result.totalPages),
     });
   })
   .catch((err)=>{
