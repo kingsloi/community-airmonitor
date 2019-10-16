@@ -23,5 +23,7 @@ exports.generatePageRange = function(currentPage, lastPage, delta = 2) {
         return pages;
     }, []);
 
+    console.log(reduced);
+
     return reduced;
 };
