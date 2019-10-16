@@ -126,5 +126,5 @@ block content
             li.page-item(class= {active: currentPage == possiblePages[p]} )
               a.page-link(href="/past?page="+possiblePages[p])=possiblePages[p]
             - p++;
-          li.page-item(class={disabled: currentPage == totalPages})
+          li.page-item(class={disabled: currentPage == total})
             a.page-link(href="/past?page="+ ++currentPage ) Next
