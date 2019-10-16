@@ -188,6 +188,7 @@ exports.past = (req, res) => {
     page: req.query.page ? req.query.page : 1
   })
   .then((result)=>{
+    console.log(result);
     return res.render('past', {
       slug: 'past',
       title: "Past Miller Beach / NWI Air Quality",
