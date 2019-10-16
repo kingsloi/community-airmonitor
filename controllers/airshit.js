@@ -193,7 +193,7 @@ exports.past = (req, res) => {
       slug: 'past',
       title: "Past Miller Beach / NWI Air Quality",
       airshits: result.docs,
-      total: result.totalDocs,
+      total: result.totalPages,
       currentPage: result.page,
       limit: result.limit,
       possiblePages: generatePageRange(result.page, result.totalPages),
