@@ -96,7 +96,8 @@ app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.locals.user = req.user;
   res.locals.degeesToCompass = (angle) => {
-    const val =  Math.floor((angle / 45) + 0.5);
+    const opposite = (angle+180)%360;
+    const val =  Math.floor((opposite / 45) + 0.5);
     const arr = ['↑ N', '↗ NE', '→ E', '↘ SE', '↓ S', '↙ SW', '← W', '↖ NW'];
     return `${arr[(val % 8)]} (${angle}\xB0)`;
   };
