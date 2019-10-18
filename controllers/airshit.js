@@ -2,26 +2,74 @@ const Airshit = require('../models/Airshit');
 const moment = require('moment');
 const axios = require('axios');
 const aqibot = require('aqi-bot');
-const inside = require('point-in-polygon');
+const geo = require('geolocation-utils');
 const region = require('../config/region');
 const { generatePageRange } = require('../helpers/pagination');
+const async = require('async');
+const calculations = require('../helpers/calculations');
 
 /**
  * GET /
  * Home page.
  */
 exports.index = (req, res) => {
-  Airshit.findOne({}, {}, { sort: { _id : -1 } })
-  .exec((err, airshit) => {
+  const today = moment();
+  const startWeek = today.startOf('week').format('YYYY-MM-DD HH:mm:ss');
+  const endWeek = moment(startWeek).endOf('week').format('YYYY-MM-DD HH:mm:ss');
+
+  const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
+  const endMonth = moment(startMonth).endOf('month').format('YYYY-MM-DD HH:mm:ss');
+
+  const startYear = today.startOf('year').format('YYYY-MM-DD HH:mm:ss');
+  const endYear = moment(startYear).endOf('year').format('YYYY-MM-DD HH:mm:ss');
+
+  async.series([
+    (callback) => { // latest
+      Airshit.findOne({}, {}, { sort: { _id : -1 } }).exec(callback);
+    },
+    (callback) => { // week high
+      Airshit.find({createdAt: {'$gte': startWeek, '$lte': endWeek}}).exec(callback);
+    },
+    (callback) => { // month high
+      Airshit.find({createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
+    },
+
+  ], function(err, results) {
+      const highestInWeek = Math.max(...results[1].map((airshit) => {
+        return calculations.totalAirQuality(airshit);
+      }));
+      const highestWeekDay = results[1].find((airshit) => {
+        return calculations.totalAirQuality(airshit) === highestInWeek;
+      });
+
+      const highestInMonth = Math.max(...results[2].map((airshit) => {
+        return calculations.totalAirQuality(airshit);
+      }));
+      const highestMonthDay = results[2].find((airshit) => {
+        return calculations.totalAirQuality(airshit) === highestInMonth;
+      });
+
+      const highestInYear = Math.max(...results[2].map((airshit) => {
+        return calculations.totalAirQuality(airshit);
+      }));
+      const highestYearDay = results[2].find((airshit) => {
+        return calculations.totalAirQuality(airshit) === highestInYear;
+      });
+
       res.render('home', {
           slug: 'home',
-          title: 'Miller Beach / NWI Air Quality',
+          title: 'Current Miller Beach / NWI Air Quality',
+          airshit: results[0],
           region: region.coordinates(),
           location: {
             lat: process.env.LOCATION_LAT || '41.619829',
             lon: process.env.LOCATION_LON || '-87.245317',
           },
-          airshit,
+          highs: {
+            week: highestWeekDay,
+            month: highestMonthDay,
+            year: highestYearDay,
+          }
       });
   });
 };
@@ -38,7 +86,7 @@ exports.sync = (req, res) => {
 
   const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
 
-  const weatherApiKey   = process.env.FORCASEIO_API;
+  const weatherApiKey   = process.env.FORCASTIO_API;
   const trafficApiKey   = process.env.MAPQUESTAPI_KEY;
   const trafficBounds = coordinates.join(",");
   const location = `${process.env.LOCATION_LAT || '41.619829'},${process.env.LOCATION_LON || '-87.245317'}`;
@@ -135,7 +183,16 @@ exports.sync = (req, res) => {
     const trains = southshore.get_vehicles;
 
     const southshoreTravelingOnThru = trains.filter(function(train) {
-      return inside([train.lat, train.lng], coordinates) && train.inService;
+      return geo.insidePolygon([train.lat, train.lng], coordinates) && train.inService;
+    });
+
+    const southshoreTrains = southshoreTravelingOnThru.map(function(train) {
+      return {
+        id: train.trainID,
+        lat: train.lat,
+        lng: train.lng,
+        direction: train.direction
+      }
     });
 
     const incidents = traffic.incidents.map((incident) => {
@@ -158,7 +215,7 @@ exports.sync = (req, res) => {
           PRESSURE_BAR: one['pressure'],
           REPORTED_WEATHER: weather.currently,
           TRAINS: {
-            SOUTHSHORE: southshoreTravelingOnThru.length
+            SOUTHSHORE: southshoreTrains
           },
           TRAFFIC: {
             INCIDENTS: incidents
@@ -187,8 +244,7 @@ exports.past = (req, res) => {
     limit: req.query.l ? parseInt(req.query.l) : 12,
     page: req.query.page ? req.query.page : 1
   })
-  .then((result)=>{
-    console.log(result);
+  .then((result) => {
     return res.render('past', {
       slug: 'past',
       title: "Past Miller Beach / NWI Air Quality",

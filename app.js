@@ -18,6 +18,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const sass = require('node-sass-middleware');
 const multer = require('multer');
+const _ = require('lodash');
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
@@ -95,10 +96,10 @@ app.use(lusca.xssProtection(true));
 app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.locals.user = req.user;
-  res.locals.degeesToCompass = (angle) => {
-    const val =  Math.floor((angle / 45) + 0.5);
-    const arr = ['↑ N', '↗ NE', '→ E', '↘ SE', '↓ S', '↙ SW', '← W', '↖ NW'];
-    return `${arr[(val % 8)]} (${angle}\xB0)`;
+  res.locals.moment = moment;
+  res.locals._ = _;
+  res.locals.degeesToRotation = (angle) => {
+    return (angle + 180) % 360;
   };
   res.locals.timestampToHuman = (timestamp) => {
     const moment1 = moment.unix(timestamp);

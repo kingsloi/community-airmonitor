@@ -62,7 +62,12 @@
 sub {
     &.d-block {
         padding-bottom: 0.75rem;
+        line-height: 0.333rem;
     }
+}
+
+.br-0 {
+    border-radius: 0px;
 }
 
 .table {

@@ -46,8 +46,8 @@ block content
                 | Wind Speed #[sub.d-block=`miles`]
               th.text-uppercase#windgust(scope='col')
                 | Wind Gust #[sub.d-block=`MPH`]
-              th.text-uppercase#windbearing(scope='col')
-                | Wind Bearing
+              th.text-uppercase#winddirection(scope='col')
+                | Wind Direction
               th.text-uppercase#cloudcoverage(scope='col')
                 | Cloud Coverage #[sub.d-block=`%`]
               th.text-uppercase#uvindex(scope='col')
@@ -100,22 +100,22 @@ block content
                 td(headers='precipIntensity')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['precipIntensity']}
                 td(headers='PRESSURE_BAR')
-                  span.d-block.lead.mb-0.p-2 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(2) }
+                  span.d-block.lead.mb-0.p-2 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(0) }
                 td(headers='windSpeed')
-                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windSpeed}
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windSpeed.toFixed(0)}
                 td(headers='windGust')
-                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windGust}
-                td(headers='windBearing')
-                  span.d-block.lead.mb-0.p-2(title=`${airshit.REPORTED_WEATHER['windBearing']} \xB0 degrees`)
-                    | #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.windGust.toFixed(0)}
+                td(headers='windDirection')
+                  span.d-block.lead.mb-0.p-2.text-center(title=`${airshit.REPORTED_WEATHER['windBearing']} \xB0 degrees`, style=`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`)
+                    | &#x2191;
                 td(headers='cloudCover')
-                  span.d-block.lead.mb-0.p-2 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(2)}
+                  span.d-block.lead.mb-0.p-2 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(0)}
                 td(headers='uvIndex')
                   span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER.uvIndex}
                 td(headers='visibility')
-                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['visibility'].toFixed(2)}
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['visibility'].toFixed(0)}
                 td(headers='ozone')
-                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['ozone'].toFixed(2)}
+                  span.d-block.lead.mb-0.p-2 #{airshit.REPORTED_WEATHER['ozone'].toFixed(0)}
 
       nav(aria-label="past navigation")
         ul.pagination.pagination-md.justify-content-center

@@ -4,7 +4,9 @@ block content
   .container
     .row
       .col-xl-6
-        h1.h2 Miller Beach / NWI Air Quality
+        h1.h2.pb-3 Miller Beach / NWI Air Quality
+
+        p.small.text-uppercase.mb-0.text-dark Currently
 
         .row.mb-3
           .col-md-6.py-2
@@ -21,7 +23,7 @@ block content
                   i.fa.fa-signal.fa-5x
                 h6.text-uppercase PM2.5
                 h1.display-4.font-weight-bold.mb-0 #{airshit.PM25REALTIME['aqi']}
-                p.x.lead.mb-0.pl-2.float-righat #{airshit.PM25REALTIME['category']}
+                p.lead.mb-0.pl-2 #{airshit.PM25REALTIME['category']}
 
           .col-md-6.py-2
             .card.h-100.aqi(class={
@@ -37,12 +39,71 @@ block content
                   i.fa.fa-signal.fa-5x
                 h6.text-uppercase PM10
                 h1.display-4.font-weight-bold.mb-0 #{airshit.PM10REALTIME['aqi']}
-                p.x.lead.mb-0.pl-2.float-righat #{airshit.PM10REALTIME['category']}
+                p.lead.mb-0.pl-2 #{airshit.PM10REALTIME['category']}
 
+        p.small.text-uppercase.mb-2.text-dark Historical Highs
+
+        .row.mb-3.no-gutters
+          .col-md-4.text-white
+            .card.br-0.aqi(class={
+              'aqi--good': _.inRange(highs.week.totalAirQuality(), 0, 50),
+              'aqi--moderate': _.inRange(highs.week.totalAirQuality(), 51, 100),
+              'aqi--unhealthy-sensitive': _.inRange(highs.week.totalAirQuality(), 101, 150),
+              'aqi--unhealthy': _.inRange(highs.week.totalAirQuality(), 151, 200),
+              'aqi--unhealthy-very': _.inRange(highs.week.totalAirQuality(), 201, 300),
+              'aqi--death': highs.week.totalAirQuality() >= 301,
+            })
+              .card-header
+                h5.mb-0.card-title.text-uppercase.small
+                  | Week High
+              .card-body
+                .rotate
+                  i.fa.fa-signal.fa-5x
+                small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
+                p.h4.font-weight-bold.mb-0 #{highs.week.totalAirQuality()}
+                p.small.mb-0(title=`${moment(highs.week.createdAt)}`) #{moment(highs.week.createdAt).format('dd Do MMM YY.')}
+
+          .col-md-4.text-white
+            .card.br-0.aqi(class={
+              'aqi--good': _.inRange(highs.month.totalAirQuality(), 0, 50),
+              'aqi--moderate': _.inRange(highs.month.totalAirQuality(), 51, 100),
+              'aqi--unhealthy-sensitive': _.inRange(highs.month.totalAirQuality(), 101, 150),
+              'aqi--unhealthy': _.inRange(highs.month.totalAirQuality(), 151, 200),
+              'aqi--unhealthy-very': _.inRange(highs.month.totalAirQuality(), 201, 300),
+              'aqi--death': highs.month.totalAirQuality() >= 301,
+            })
+              .card-header
+                h5.mb-0.card-title.text-uppercase.small
+                  | Month High
+              .card-body
+                .rotate
+                  i.fa.fa-signal.fa-5x
+                small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
+                p.h4.font-weight-bold.mb-0 #{highs.month.totalAirQuality()}
+                p.small.mb-0(title=`${moment(highs.month.createdAt)}`) #{moment(highs.month.createdAt).format('dd Do MMM YY.')}
+
+          .col-md-4.text-white
+            .card.br-0.aqi(class={
+              'aqi--good': _.inRange(highs.year.totalAirQuality(), 0, 50),
+              'aqi--moderate': _.inRange(highs.year.totalAirQuality(), 51, 100),
+              'aqi--unhealthy-sensitive': _.inRange(highs.year.totalAirQuality(), 101, 150),
+              'aqi--unhealthy': _.inRange(highs.year.totalAirQuality(), 151, 200),
+              'aqi--unhealthy-very': _.inRange(highs.year.totalAirQuality(), 201, 300),
+              'aqi--death': highs.year.totalAirQuality() >= 301,
+            })
+              .card-header
+                h5.mb-0.card-title.text-uppercase.small
+                  | Year High
+              .card-body
+                .rotate
+                  i.fa.fa-signal.fa-5x
+                small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
+                p.h4.font-weight-bold.mb-0 #{highs.year.totalAirQuality()}
+                p.small.mb-0(title=`${moment(highs.year.createdAt)}`) #{moment(highs.year.createdAt).format('dd Do MMM YY.')}
 
         p.lead.text-right.text-uppercase
           a(href="/past" role="button")
-            | see past quality
+            | see past air quality
             i.fa.pl-1.fa-chevron-right(aria-hidden='true')
 
         p.lead.font-we We track #[a(href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank")= "PM2.5, PM10"], temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), so we can (hopefully) determine who, where, what, and how the weather affects the quality of the air we breathe, from a community-funded air sensor in the scenic Miller neighborhood of Gary, Indiana.
@@ -102,12 +163,15 @@ block content
                 td
                   p.lead.font-weight-bold.mb-0 Wind Speed
                 td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] / #{degeesToCompass(airshit.REPORTED_WEATHER['windBearing'])}
+                  p.lead.mb-0
+                    span.mr-3 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] /
+                    span.d-inline-block.lead.mb-0(title=`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`, style=`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`)
+                      | &#x2191;
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Trains in #[abbr(title="See 'Region' below for coordinates") Region]
                 td()
-                  p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE} #[small.small.font-weight-light southshore]
+                  p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE.length} #[small.small.font-weight-light southshore]
               tr
                 td
                   p.lead.font-weight-bold.mb-0 Traffic in #[abbr(title="See 'Region' below for coordinates") Region]

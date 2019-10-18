@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const _ = require('lodash');
+const calculations = require('../helpers/calculations');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
 const airshitSchema = new mongoose.Schema({
@@ -33,7 +35,7 @@ const airshitSchema = new mongoose.Schema({
     precipType: String
   },
   TRAINS: {
-    SOUTHSHORE: Number,
+    SOUTHSHORE: Array,
   },
   TRAFFIC: {
     INCIDENTS: Array
@@ -56,11 +58,17 @@ airshitSchema.pre('save', function save(next) {
 airshitSchema.methods.trainsCount = function trainsCount() {
   let total = 0;
   const trains = this.TRAINS;
+  const tracks = Object.keys(trains);
 
-  // todo, figure out how to reduce without $init being outputted
-  Object.keys(trains).map((train) => {
-    if (typeof trains[train] === 'number') {
-      total += trains[train];
+  tracks.map((track) => {
+    // todo, figure out how to reduce without $init being outputted
+    if (track !== '$init') {
+
+      if (_.some(trains[track], _.isObject)) {
+        total += trains[track].length;
+      } else if (_.some(trains[track], _.isNumber)) {
+        total += parseInt(trains[track], 10);
+      }
     }
   });
 
@@ -87,6 +95,10 @@ airshitSchema.methods.congestionTime = function congestionTime() {
   });
 
   return total.toFixed(0);
+};
+
+airshitSchema.methods.totalAirQuality = function totalAirQuality() {
+  return calculations.totalAirQuality(this);
 };
 
 const Airshit = mongoose.model('Airshit', airshitSchema);
