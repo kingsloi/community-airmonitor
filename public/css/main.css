@@ -6924,10 +6924,10 @@ a.text-danger:hover, a.text-danger:focus {
 a.text-light:hover, a.text-light:focus {
   color: #cbd3da !important; }
 
-.text-dark, .card.aqi--moderate, .card.aqi--unhealthy-sensitive, .card.aqi--unhealthy, .table .aqi--moderate span, .table .aqi--unhealthy-sensitive span, .table .aqi--unhealthy span {
+.text-dark, .form-control::placeholder, .card.aqi--moderate, .card.aqi--unhealthy-sensitive, .card.aqi--unhealthy, .table .aqi--moderate span, .table .aqi--unhealthy-sensitive span, .table .aqi--unhealthy span {
   color: #343a40 !important; }
 
-a.text-dark:hover, a.card.aqi--moderate:hover, a.card.aqi--unhealthy-sensitive:hover, a.card.aqi--unhealthy:hover, a.text-dark:focus, a.card.aqi--moderate:focus, a.card.aqi--unhealthy-sensitive:focus, a.card.aqi--unhealthy:focus {
+a.text-dark:hover, a.form-control:hover::placeholder, a.card.aqi--moderate:hover, a.card.aqi--unhealthy-sensitive:hover, a.card.aqi--unhealthy:hover, a.text-dark:focus, a.form-control:focus::placeholder, a.card.aqi--moderate:focus, a.card.aqi--unhealthy-sensitive:focus, a.card.aqi--unhealthy:focus {
   color: #121416 !important; }
 
 .text-body {

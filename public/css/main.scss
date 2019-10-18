@@ -12,6 +12,10 @@
 // Scaffolding
 // -------------------------
 
+.form-control::placeholder {
+    @extend .text-dark;
+}
+
 .card {
     &.aqi {
         &--good {

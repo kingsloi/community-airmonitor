@@ -15,7 +15,7 @@ const calculations = require('../helpers/calculations');
 exports.index = (req, res) => {
   const today = moment();
   const startWeek = today.startOf('isoWeek').format('YYYY-MM-DD HH:mm:ss');
-  const endWeek = moment(startWeek).endOf('week').format('YYYY-MM-DD HH:mm:ss');
+  const endWeek = moment(startWeek).endOf('isoWeek').format('YYYY-MM-DD HH:mm:ss');
 
   const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
   const endMonth = moment(startMonth).endOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -239,9 +239,30 @@ exports.sync = (req, res) => {
 }
 
 exports.past = (req, res) => {
-  Airshit.paginate({}, {
+
+  const params = {};
+
+  if (req.query.date_from && req.query.date_to) {
+    let date_from = Date.parse(req.query.date_from);
+
+    if (isNaN(date_from) == false) {
+      date_from = moment(date_from).format('YYYY-MM-DD HH:mm:ss')
+    }
+
+    let date_to = Date.parse(req.query.date_to);
+
+    if (isNaN(date_to) == false) {
+      date_to = moment(date_to).format('YYYY-MM-DD HH:mm:ss')
+    }
+
+    const from = moment(req.query.date_from).format('YYYY-MM-DD HH:mm:ss');
+    const to = moment(req.query.date_to).format('YYYY-MM-DD HH:mm:ss');
+    params['createdAt'] = {'$gte': from, '$lte': to};
+  }
+
+  Airshit.paginate(params, {
     sort: {'_id': -1},
-    limit: req.query.l ? parseInt(req.query.l) : 12,
+    limit: req.query.l ? parseInt(req.query.l) : 48,
     page: req.query.page ? req.query.page : 1
   })
   .then((result) => {
@@ -253,6 +274,10 @@ exports.past = (req, res) => {
       currentPage: result.page,
       limit: result.limit,
       possiblePages: generatePageRange(result.page, result.totalPages),
+      filters: {
+        date_from: req.query.date_from || '',
+        date_to: req.query.date_to || '',
+      }
     });
   })
   .catch((err)=>{
