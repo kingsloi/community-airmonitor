@@ -61,7 +61,7 @@ block content
                   i.fa.fa-signal.fa-5x
                 small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
                 p.h4.font-weight-bold.mb-0 #{highs.week.totalAirQuality()}
-                p.small.mb-0(title=`${moment(highs.week.createdAt)}`) #{moment(highs.week.createdAt).format('dd Do MMM YY.')}
+                p.small.mb-0(title=`${moment(highs.week.createdAt)}`) #{moment(highs.week.createdAt).format('dd Do MMM YY HH:mm.')}
 
           .col-md-4.text-white
             .card.br-0.aqi(class={
@@ -80,7 +80,7 @@ block content
                   i.fa.fa-signal.fa-5x
                 small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
                 p.h4.font-weight-bold.mb-0 #{highs.month.totalAirQuality()}
-                p.small.mb-0(title=`${moment(highs.month.createdAt)}`) #{moment(highs.month.createdAt).format('dd Do MMM YY.')}
+                p.small.mb-0(title=`${moment(highs.month.createdAt)}`) #{moment(highs.month.createdAt).format('dd Do MMM YY HH:mm.')}
 
           .col-md-4.text-white
             .card.br-0.aqi(class={
@@ -99,7 +99,7 @@ block content
                   i.fa.fa-signal.fa-5x
                 small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
                 p.h4.font-weight-bold.mb-0 #{highs.year.totalAirQuality()}
-                p.small.mb-0(title=`${moment(highs.year.createdAt)}`) #{moment(highs.year.createdAt).format('dd Do MMM YY.')}
+                p.small.mb-0(title=`${moment(highs.year.createdAt)}`) #{moment(highs.year.createdAt).format('dd Do MMM YY HH:mm.')}
 
         p.lead.text-right.text-uppercase
           a(href="/past" role="button")
