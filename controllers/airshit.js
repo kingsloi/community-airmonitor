@@ -14,7 +14,7 @@ const calculations = require('../helpers/calculations');
  */
 exports.index = (req, res) => {
   const today = moment();
-  const startWeek = today.startOf('week').format('YYYY-MM-DD HH:mm:ss');
+  const startWeek = today.startOf('isoWeek').format('YYYY-MM-DD HH:mm:ss');
   const endWeek = moment(startWeek).endOf('week').format('YYYY-MM-DD HH:mm:ss');
 
   const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
