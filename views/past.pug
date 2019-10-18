@@ -72,8 +72,10 @@ block content
           each airshit in airshits
             tr
               td(colspan="1")
-                abbr(title=`${airshit.createdAt}`)
-                  | #{dateTimeToHuman(airshit.createdAt)} ago
+                | #{dateTimeToHuman(airshit.createdAt)} ago
+                small
+                  small.d-block.pt-3
+                    | #{ moment(airshit.createdAt).format('dd Do MMM YY HH:mm') }
               td.aqi(class={
                 'aqi--good': airshit.PM25REALTIME['category'] === 'Good',
                 'aqi--moderate': airshit.PM25REALTIME['category'] === 'Moderate',
