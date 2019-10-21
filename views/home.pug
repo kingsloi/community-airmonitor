@@ -41,7 +41,7 @@ block content
                 p.display-4.font-weight-bold.mb-0 #{airshit.PM10REALTIME['aqi']}
                 h3.lead.mb-0.pl-2 #{airshit.PM10REALTIME['category']}
 
-        unless highs.week && highs.month && highs.year
+        unless highs.week.totalAirQuality() && highs.month.totalAirQuality() && highs.year.totalAirQuality()
           h2.small.text-uppercase.mb-2.text-dark Historical Highs
 
           .row.mb-3.no-gutters
