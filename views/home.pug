@@ -9,37 +9,110 @@ block content
         h2.small.text-uppercase.mb-0.text-dark Currently
 
         .row.mb-3
-          .col-md-6.py-2
-            .card.h-100.aqi(class={
-              'aqi--good': airshit.PM25REALTIME['category'] === 'Good',
-              'aqi--moderate': airshit.PM25REALTIME['category'] === 'Moderate',
-              'aqi--unhealthy-sensitive': airshit.PM25REALTIME['category'] === 'Unhealthy for Sensitive Groups',
-              'aqi--unhealthy': airshit.PM25REALTIME['category'] === 'Unhealthy',
-              'aqi--unhealthy-very': airshit.PM25REALTIME['category'] === 'Very Unhealthy',
-              'aqi--death': airshit.PM25REALTIME['category'] === 'Hazardous',
-            })
-              .card-body
-                .rotate
-                  i.fa.fa-signal.fa-5x
-                h3.h6.text-uppercase PM2.5
-                p.display-4.font-weight-bold.mb-0 #{airshit.PM25REALTIME['aqi']}
-                h4.lead.mb-0.pl-2 #{airshit.PM25REALTIME['category']}
+          if ! airshit
+            .col-md-6.py-2
+              p.small.text-uppercase.text-center No measurements have been taken yet.
 
-          .col-md-6.py-2
-            .card.h-100.aqi(class={
-              'aqi--good': airshit.PM10REALTIME['category'] === 'Good',
-              'aqi--moderate': airshit.PM10REALTIME['category'] === 'Moderate',
-              'aqi--unhealthy-sensitive': airshit.PM10REALTIME['category'] === 'Unhealthy for Sensitive Groups',
-              'aqi--unhealthy': airshit.PM10REALTIME['category'] === 'Unhealthy',
-              'aqi--unhealthy-very': airshit.PM10REALTIME['category'] === 'Very Unhealthy',
-              'aqi--death': airshit.PM10REALTIME['category'] === 'Hazardous',
-            })
-              .card-body
-                .rotate
-                  i.fa.fa-signal.fa-5x
-                h3.h6.text-uppercase PM10
-                p.display-4.font-weight-bold.mb-0 #{airshit.PM10REALTIME['aqi']}
-                h3.lead.mb-0.pl-2 #{airshit.PM10REALTIME['category']}
+          if airshit && airshit.PM25REALTIME
+            .col-md-6.py-2
+              .card.h-100.aqi(class={
+                'aqi--good': airshit.PM25REALTIME['category'] === 'Good',
+                'aqi--moderate': airshit.PM25REALTIME['category'] === 'Moderate',
+                'aqi--unhealthy-sensitive': airshit.PM25REALTIME['category'] === 'Unhealthy for Sensitive Groups',
+                'aqi--unhealthy': airshit.PM25REALTIME['category'] === 'Unhealthy',
+                'aqi--unhealthy-very': airshit.PM25REALTIME['category'] === 'Very Unhealthy',
+                'aqi--death': airshit.PM25REALTIME['category'] === 'Hazardous',
+              })
+                .card-body
+                  .rotate
+                    i.fa.fa-signal.fa-5x
+                  h3.h6.text-uppercase PM2.5
+                  p.display-4.font-weight-bold.mb-0 #{airshit.PM25REALTIME['aqi']}
+                  h4.lead.mb-0.pl-2 #{airshit.PM25REALTIME['category']}
+
+          if airshit && airshit.PM10REALTIME
+            .col-md-6.py-2
+              .card.h-100.aqi(class={
+                'aqi--good': airshit.PM10REALTIME['category'] === 'Good',
+                'aqi--moderate': airshit.PM10REALTIME['category'] === 'Moderate',
+                'aqi--unhealthy-sensitive': airshit.PM10REALTIME['category'] === 'Unhealthy for Sensitive Groups',
+                'aqi--unhealthy': airshit.PM10REALTIME['category'] === 'Unhealthy',
+                'aqi--unhealthy-very': airshit.PM10REALTIME['category'] === 'Very Unhealthy',
+                'aqi--death': airshit.PM10REALTIME['category'] === 'Hazardous',
+              })
+                .card-body
+                  .rotate
+                    i.fa.fa-signal.fa-5x
+                  h3.h6.text-uppercase PM10
+                  p.display-4.font-weight-bold.mb-0 #{airshit.PM10REALTIME['aqi']}
+                  h3.lead.mb-0.pl-2 #{airshit.PM10REALTIME['category']}
+
+        h2.small.text-uppercase.mb-2.text-dark Historical Highs
+
+        .row.mb-3.no-gutters
+          if ! highs.week && ! highs.month && ! highs.year
+            .col-md-6.py-2
+              p.small.text-uppercase.text-center No measurements have been taken yet.
+
+          if highs.week
+            .col-md-4.text-white
+              .card.br-0.aqi(class={
+                'aqi--good': _.inRange(highs.week.totalAirQuality(), 0, 50),
+                'aqi--moderate': _.inRange(highs.week.totalAirQuality(), 51, 100),
+                'aqi--unhealthy-sensitive': _.inRange(highs.week.totalAirQuality(), 101, 150),
+                'aqi--unhealthy': _.inRange(highs.week.totalAirQuality(), 151, 200),
+                'aqi--unhealthy-very': _.inRange(highs.week.totalAirQuality(), 201, 300),
+                'aqi--death': highs.week.totalAirQuality() >= 301,
+              })
+                .card-header
+                  h5.mb-0.card-title.text-uppercase.small
+                    | Week High
+                .card-body
+                  .rotate
+                    i.fa.fa-signal.fa-5x
+                  small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
+                  p.h4.font-weight-bold.mb-0 #{highs.week.totalAirQuality()}
+                  p.small.mb-0(title=`${moment(highs.week.createdAt)}`) #{moment(highs.week.createdAt).format('dd Do MMM YY HH:mm.')}
+
+          if highs.month
+            .col-md-4.text-white
+              .card.br-0.aqi(class={
+                'aqi--good': _.inRange(highs.month.totalAirQuality(), 0, 50),
+                'aqi--moderate': _.inRange(highs.month.totalAirQuality(), 51, 100),
+                'aqi--unhealthy-sensitive': _.inRange(highs.month.totalAirQuality(), 101, 150),
+                'aqi--unhealthy': _.inRange(highs.month.totalAirQuality(), 151, 200),
+                'aqi--unhealthy-very': _.inRange(highs.month.totalAirQuality(), 201, 300),
+                'aqi--death': highs.month.totalAirQuality() >= 301,
+              })
+                .card-header
+                  h5.mb-0.card-title.text-uppercase.small
+                    | Month High
+                .card-body
+                  .rotate
+                    i.fa.fa-signal.fa-5x
+                  small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
+                  p.h4.font-weight-bold.mb-0 #{highs.month.totalAirQuality()}
+                  p.small.mb-0(title=`${moment(highs.month.createdAt)}`) #{moment(highs.month.createdAt).format('dd Do MMM YY HH:mm.')}
+
+          if highs.year
+            .col-md-4.text-white
+              .card.br-0.aqi(class={
+                'aqi--good': _.inRange(highs.year.totalAirQuality(), 0, 50),
+                'aqi--moderate': _.inRange(highs.year.totalAirQuality(), 51, 100),
+                'aqi--unhealthy-sensitive': _.inRange(highs.year.totalAirQuality(), 101, 150),
+                'aqi--unhealthy': _.inRange(highs.year.totalAirQuality(), 151, 200),
+                'aqi--unhealthy-very': _.inRange(highs.year.totalAirQuality(), 201, 300),
+                'aqi--death': highs.year.totalAirQuality() >= 301,
+              })
+                .card-header
+                  h5.mb-0.card-title.text-uppercase.small
+                    | Year High
+                .card-body
+                  .rotate
+                    i.fa.fa-signal.fa-5x
+                  small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
+                  p.h4.font-weight-bold.mb-0 #{highs.year.totalAirQuality()}
+                  p.small.mb-0(title=`${moment(highs.year.createdAt)}`) #{moment(highs.year.createdAt).format('dd Do MMM YY HH:mm.')}
 
         p.lead.text-right.text-uppercase
           a(href="/past" role="button")
@@ -56,73 +129,79 @@ block content
         div.table-responsive
           table.table
             tbody
-              tr
-                td(colspan="2")
-                  p.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.REPORTED_WEATHER['summary']} - #{airshit.TEMP_F} &deg;F
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Dew Point
-                td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)} &deg;F
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Cloud Coverage
-                td()
-                  p.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(0)} %
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 UV Index
-                td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['uvIndex'].toFixed(0)}
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Pressure
-                td()
-                  p.lead.mb-0 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(0) } #[sub in Hg]
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Rain Intensity
-                td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['precipIntensity']} #[sub in of liquid water]
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Humidity
-                td()
-                  p.lead.mb-0 #{airshit.HUMIDITY_PERCENT} #[sub %]
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 OZone
-                td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone'].toFixed(0)} #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Visibility
-                td()
-                  p.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility'].toFixed(0)} #[sub miles]
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Wind Speed
-                td()
-                  p.lead.mb-0
-                    span.mr-3 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] /
-                    span.d-inline-block.lead.mb-0(title=`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`, style=`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`)
-                      | &#x2191;
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Trains in #[abbr(title="See 'Region' below for coordinates") Region]
-                td()
-                  p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE.length} #[small.small.font-weight-light southshore]
-              tr
-                td
-                  p.lead.font-weight-bold.mb-0 Traffic in #[abbr(title="See 'Region' below for coordinates") Region]
-                td()
-                  p.lead.mb-0
-                    span.separator
-                      | #{airshit.TRAFFIC.INCIDENTS.length} #[small.small.font-weight-light incidents]
-                    span.separator
-                      | #{airshit.congestionMiles()} #[small.small.font-weight-light miles of congestion]
-                    span.separator
-                      | #{airshit.congestionTime()} #[small.small.font-weight-light minutes of congestion]
+              if ! airshit
+                tr
+                  td(colspan="2")
+                    p.small.text-uppercase.text-center.mb-0 No measurements have been taken yet.
+
+              if airshit
+                tr
+                  td(colspan="2")
+                    p.lead.text-center.font-weight-bold.mb-0.p-2 #{airshit.REPORTED_WEATHER['summary']} - #{airshit.TEMP_F} &deg;F
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Dew Point
+                  td()
+                    p.lead.mb-0 #{airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)} &deg;F
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Cloud Coverage
+                  td()
+                    p.lead.mb-0 #{(airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(0)} %
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 UV Index
+                  td()
+                    p.lead.mb-0 #{airshit.REPORTED_WEATHER['uvIndex'].toFixed(0)}
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Pressure
+                  td()
+                    p.lead.mb-0 #{(airshit.PRESSURE_BAR * 0.02953).toFixed(0) } #[sub in Hg]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Rain Intensity
+                  td()
+                    p.lead.mb-0 #{airshit.REPORTED_WEATHER['precipIntensity']} #[sub in of liquid water]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Humidity
+                  td()
+                    p.lead.mb-0 #{airshit.HUMIDITY_PERCENT} #[sub %]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 OZone
+                  td()
+                    p.lead.mb-0 #{airshit.REPORTED_WEATHER['ozone'].toFixed(0)} #[a(href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank") #[sub DU]]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Visibility
+                  td()
+                    p.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility'].toFixed(0)} #[sub miles]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Wind Speed
+                  td()
+                    p.lead.mb-0
+                      span.mr-3 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] /
+                      span.d-inline-block.lead.mb-0(title=`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`, style=`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`)
+                        | &#x2191;
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Trains in #[abbr(title="See 'Region' below for coordinates") Region]
+                  td()
+                    p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE.length} #[small.small.font-weight-light southshore]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Traffic in #[abbr(title="See 'Region' below for coordinates") Region]
+                  td()
+                    p.lead.mb-0
+                      span.separator
+                        | #{airshit.TRAFFIC.INCIDENTS.length} #[small.small.font-weight-light incidents]
+                      span.separator
+                        | #{airshit.congestionMiles()} #[small.small.font-weight-light miles of congestion]
+                      span.separator
+                        | #{airshit.congestionTime()} #[small.small.font-weight-light minutes of congestion]
             tfoot
               tr
                 th(colspan="2" class="small text-uppercase text-right")
@@ -142,7 +221,8 @@ block content
                     span.d-block
                       | Traffic by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "mapquest.com"]
                     br
-                    | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago
+                    if airshit
+                      | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago
 
         //=JSON.stringify(airshit)
 
