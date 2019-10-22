@@ -12951,8 +12951,8 @@ readers do not read off random characters that represent icons */
   display: block; }
 
 sub.d-block {
-  padding-bottom: 0.75rem;
-  line-height: 0.333rem; }
+  padding-bottom: 0.25rem;
+  line-height: inherit; }
 
 .br-0 {
   border-radius: 0px; }

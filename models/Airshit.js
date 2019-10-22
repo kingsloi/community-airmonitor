@@ -4,7 +4,7 @@ const calculations = require('../helpers/calculations');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
 const airshitSchema = new mongoose.Schema({
-  LAST_READ_AT: { type: String },
+  LAST_READ_AT: String,
   TEMP_F: String,
   HUMIDITY_PERCENT: String,
   PRESSURE_BAR: String,
@@ -39,6 +39,11 @@ const airshitSchema = new mongoose.Schema({
   },
   TRAFFIC: {
     INCIDENTS: Array
+  },
+  FLIGHTS: {
+      ORD: Array,
+      MDW: Array,
+      GYY: Array
   }
 }, { timestamps: true });
 
@@ -58,6 +63,26 @@ airshitSchema.pre('save', function save(next) {
 airshitSchema.methods.trainsCount = function trainsCount() {
   let total = 0;
   const trains = this.TRAINS;
+  const tracks = Object.keys(trains);
+
+  tracks.map((track) => {
+    // todo, figure out how to reduce without $init being outputted
+    if (track !== '$init') {
+
+      if (_.some(trains[track], _.isObject)) {
+        total += trains[track].length;
+      } else if (_.some(trains[track], _.isNumber)) {
+        total += parseInt(trains[track], 10);
+      }
+    }
+  });
+
+  return total;
+};
+
+airshitSchema.methods.flightsCount = function flightsCount() {
+  let total = 0;
+  const trains = this.FLIGHTS;
   const tracks = Object.keys(trains);
 
   tracks.map((track) => {

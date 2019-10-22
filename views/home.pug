@@ -202,6 +202,18 @@ block content
                         | #{airshit.congestionMiles()} #[small.small.font-weight-light miles of congestion]
                       span.separator
                         | #{airshit.congestionTime()} #[small.small.font-weight-light minutes of congestion]
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Flights over #[abbr(title="See 'Region' below for coordinates") Region]
+                  td()
+                    p.lead.mb-0
+                      span.separator
+                        | #{airshit.FLIGHTS.GYY.length} #[small.small.font-weight-light GYY]
+                      span.separator
+                        | #{airshit.FLIGHTS.MDW.length} #[small.small.font-weight-light MDW]
+                      span.separator
+                        | #{airshit.FLIGHTS.ORD.length} #[small.small.font-weight-light ORD]
+
             tfoot
               tr
                 th(colspan="2" class="small text-uppercase text-right")
@@ -220,6 +232,8 @@ block content
                       | Trains by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "southshore.etaspot.net"]
                     span.d-block
                       | Traffic by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "mapquest.com"]
+                    span.d-block
+                      | Flight Tracking by: #[a(href=`https://aviation-edge.com` target="_blank")= "aviation-edge.com"]
                     br
                     if airshit
                       | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago

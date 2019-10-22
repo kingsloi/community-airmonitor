@@ -7,6 +7,7 @@ const region = require('../config/region');
 const { generatePageRange } = require('../helpers/pagination');
 const async = require('async');
 const calculations = require('../helpers/calculations');
+const _ = require('lodash');
 
 /**
  * GET /
@@ -33,7 +34,6 @@ exports.index = (req, res) => {
     (callback) => { // month high
       Airshit.find({createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
     },
-
   ], function(err, results) {
       const highestInWeek = Math.max(...results[1].map((airshit) => {
         return calculations.totalAirQuality(airshit);
@@ -86,25 +86,43 @@ exports.sync = (req, res) => {
 
   const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
 
-  const weatherApiKey   = process.env.FORCASTIO_API;
-  const trafficApiKey   = process.env.MAPQUESTAPI_KEY;
-  const trafficBounds = coordinates.join(",");
+  const purpleId = process.env.PURPLE_AIR_ID;
+
+  const airportEndpoints = [];
+  const flightsApiKey = process.env.AVIATION_EDGE_API_KEY;
+  const airports = process.env.NEARBY_AIRPORTS_IATAS.split(',');
+
   const location = `${process.env.LOCATION_LAT || '41.619829'},${process.env.LOCATION_LON || '-87.245317'}`;
+  const weatherApiKey   = process.env.FORCASTIO_API_KEY;
   const exclude  = 'minutely,hourly,daily,alerts,flags';
-  const purpleId = process.env.PURPLE_ID;
+  const trafficApiKey   = process.env.MAPQUEST_API_KEY;
+  const trafficBounds = coordinates.join(',');
+
+  // Each nearby airport
+  // get the arr-iving and dep-arting flights at the airport
+  airports.forEach((airport) => {
+    ['arr', 'dep'].forEach((direction) => {
+      airportEndpoints.push(axios.get(`https://aviation-edge.com/v2/public/flights?key=${flightsApiKey}&${direction}Iata=${airport}`));
+    });
+  });
 
   axios.all([
     axios.get(`https://www.purpleair.com/json?show=${purpleId}`),
     axios.get(`https://api.forecast.io/forecast/${weatherApiKey}/${location}?units=us&exclude=${exclude}`),
     axios.get(`http://southshore.etaspot.net/service.php?service=get_vehicles&includeETAData=1&orderedETAArray=1&token=TESTING`),
-    axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=congestion`)
+    axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=congestion`),
+    ...airportEndpoints
   ])
-  .then(axios.spread((purpleData, weatherData, southshoreData, trafficData) => {
-    const weather = weatherData.data;
+  .then(axios.spread((purpleData, weatherData, southshoreData, trafficData, ...airportsData) => {
     const purple = purpleData.data;
+    const weather = weatherData.data;
     const southshore = southshoreData.data;
     const traffic = trafficData.data;
+    const airportData = [...airportsData].map(r => r.data);
 
+    // PurpleAir/Air Quality
+    // Purple returns 2 results from the two sensors on each device
+    // we read both, and just average them. We do this for PM2.5/10
     const one = purple.results[0];
     const two = purple.results[1];
 
@@ -118,7 +136,8 @@ exports.sync = (req, res) => {
 
     sensors.forEach(function(sensor) {
       const stats = JSON.parse(sensor.Stats);
-      const PM10Measurements = ['pm10_0_atm'];
+
+      // PM 2.5
       const PM25Measurements = ['v', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6'];
       PM25Measurements.forEach(function(measurement) {
         if (typeof PM25Cumulative[measurement] === 'undefined') {
@@ -127,6 +146,8 @@ exports.sync = (req, res) => {
         PM25Cumulative[measurement].push(stats[measurement]);
       });
 
+      // PM 10
+      const PM10Measurements = ['pm10_0_atm'];
       PM10Measurements.forEach(function(measurement) {
         if (typeof PM10Cumulative[measurement] === 'undefined') {
           PM10Cumulative[measurement] = [];
@@ -136,6 +157,7 @@ exports.sync = (req, res) => {
       });
     });
 
+    // average both PM2.5 and PM10 from sensor A & B.
     Object.keys(PM25Cumulative).forEach(function(measurement) {
       PM25Means[measurement] = avg(PM25Cumulative[measurement]);
     });
@@ -144,22 +166,29 @@ exports.sync = (req, res) => {
       PM10Means[measurement] = avg(PM10Cumulative[measurement]);
     });
 
+    // AQI promises
+    const promises = [];
+
+    // We only care about mapping real time. We could
+    // potentially store the others, but it seems
+    // redundant to store them when we could
+    // generate them ourselves if we ever
+    // needed to later, saving DB bloat.
     const PM25Mapping = {
       'PM25REALTIME': 'v',
-      '10MINUTES': 'v1',
-      '30MINUTES': 'v2',
-      '1HOUR': 'v3',
-      '6HOUR': 'v4',
-      '1DAY': 'v5',
-      '1WEEK': 'v6',
+      // '10MINUTES': 'v1',
+      // '30MINUTES': 'v2',
+      // '1HOUR': 'v3',
+      // '6HOUR': 'v4',
+      // '1DAY': 'v5',
+      // '1WEEK': 'v6',
     };
 
     const PM10Mapping = {
       'PM10REALTIME': 'pm10_0_atm',
     };
 
-    const promises = [];
-
+    // PM2.5 AQI
     Object.keys(PM25Mapping).forEach((variable) => {
       const aqi = aqibot.AQICalculator.getAQIResult('PM2.5', PM25Means[PM25Mapping[variable]]).then((result) => {
         results[variable] = result;
@@ -170,6 +199,7 @@ exports.sync = (req, res) => {
       promises.push(aqi);
     });
 
+    // PM2.5 AQI
     Object.keys(PM10Mapping).forEach((variable) => {
       const aqi = aqibot.AQICalculator.getAQIResult('PM10', PM10Means[PM10Mapping[variable]]).then((result) => {
         results[variable] = result;
@@ -180,6 +210,7 @@ exports.sync = (req, res) => {
       promises.push(aqi);
     });
 
+    // Trains
     const trains = southshore.get_vehicles;
 
     const southshoreTravelingOnThru = trains.filter(function(train) {
@@ -195,12 +226,68 @@ exports.sync = (req, res) => {
       }
     });
 
+    // Traffic / Incidents
     const incidents = traffic.incidents.map((incident) => {
       return {
         lat: incident.lat,
         lng: incident.lng,
         distance: incident.distance,
         freeFlowMinDelay: incident.delayFromFreeFlow
+      }
+    });
+
+let flights = airportData.map((airport) => {
+      // If airport doesn't have departing/arriving flights
+      if (airport.error) {
+        return [];
+      }
+
+      // Are planes over the region?
+      const flightsTravelingOnThru = airport.filter((flight) => {
+        const { geography } = flight;
+        const { latitude, longitude } = geography;
+
+        return geo.insidePolygon([latitude, longitude], coordinates);
+      });
+
+      // For each flight in region, map them into a format
+      // we can work with, removing all unnecessary data
+      return flightsTravelingOnThru.map((info) => {
+        const { geography, aircraft, speed, departure, arrival, flight } = info;
+        const { latitude, longitude, altitude, direction } = geography;
+
+        return {
+          alt: altitude,
+          bearing: direction,
+          lat: latitude,
+          lng: longitude,
+          speed: speed.horizontal,
+          flight: flight.iataNumber,
+          reg: aircraft.regNumber,
+          aircraft: aircraft.iataCode,
+          departing: departure.iataCode,
+          arriving: arrival.iataCode
+        }
+      });
+    })
+
+    // concatenate multiple flight arrays into a single array
+    flights = flights.reduce((a, e) => a.concat(e), []);
+
+    // Group both departing and arriving flights by airport
+    const departingFlights = _.groupBy(flights, function(f) { return f.departing});
+    const arrivingFlights = _.groupBy(flights, function(f) { return f.arriving});
+
+    // merge all flights by airport
+    flights = { ...departingFlights, ...arrivingFlights };
+
+    // from all flights by airport, only get the ones
+    // we have defined as nearby
+    const flightsOverRegion = {};
+    airports.forEach((airport) => {
+      flightsOverRegion[airport] = [];
+      if (typeof flights[airport] !== 'undefined') {
+        flightsOverRegion[airport] = flights[airport];
       }
     });
 
@@ -219,7 +306,8 @@ exports.sync = (req, res) => {
           },
           TRAFFIC: {
             INCIDENTS: incidents
-          }
+          },
+          FLIGHTS: flightsOverRegion
         });
 
         shitstamp.save(function (err, response) {
