@@ -11,139 +11,6 @@
 
 // Scaffolding
 // -------------------------
-
-.form-control::placeholder {
-    @extend .text-dark;
-}
-
-.card {
-    &.aqi {
-        &--good {
-            @extend .bg-success;
-
-            @extend .text-white;
-        }
-
-        &--moderate {
-            background-color: #FFDC00;
-
-            @extend .text-dark;
-        }
-
-        &--unhealthy-sensitive {
-            background-color: #FF851B;
-
-            @extend .text-dark;
-        }
-
-        &--unhealthy {
-            background-color: #FF4136;
-
-            @extend .text-dark;
-        }
-
-        &--unhealthy-very {
-            background-color: #85144b;
-
-            @extend .text-white;
-        }
-
-        &--death {
-            background-color: #111111;
-
-            @extend .text-white;
-        }
-    }
-}
-
-.lead {
-    .separator {
-        padding: 0.25rem;
-        display: block;
-    }
-}
-
-sub {
-    &.d-block {
-        padding-bottom: 0.25rem;
-        line-height: inherit;
-    }
-}
-
-.br-0 {
-    border-radius: 0px;
-}
-
-.table {
-    .aqi {
-        .score {
-            text-align: center;
-            display: block;
-            padding: 0.25rem;
-
-            .number {
-                display: block;
-                font-size: 1.5rem;
-            }
-
-            .category {
-                display: block;
-                margin-top: -6px;
-                text-transform: uppercase;
-                letter-spacing: -0.5px;
-            }
-        }
-
-        &--good {
-            span {
-                @extend .bg-success;
-
-                @extend .text-white;
-            }
-        }
-
-        &--moderate {
-            span {
-                background-color: #FFDC00;
-
-                @extend .text-dark;
-            }
-        }
-
-        &--unhealthy-sensitive {
-            span {
-                background-color: #FF851B;
-
-                @extend .text-dark;
-            }
-        }
-
-        &--unhealthy {
-            span {
-                background-color: #FF4136;
-
-                @extend .text-dark;
-            }
-        }
-
-        &--unhealthy-very {
-            span {
-                background-color: #85144b;
-
-                @extend .text-white;
-            }
-        }
-
-        &--death {
-            span {
-                background-color: #111111;
-
-                @extend .text-white;
-            }
-        }
-    }
-}
-
 html {
     position: relative;
     min-height: 100%;
@@ -280,13 +147,135 @@ textarea {
     margin-right: 6px;
 }
 
-// Basic Snapchat Button CSS
-.btn-snapchat {
-    background-color: #fffc00;
-    color: #000 !important;
+.form-control::placeholder {
+    @extend .text-dark;
+}
 
-    &:hover, &:active {
-        background-color: #f1ef00;
+.card {
+    &.aqi {
+        &--good {
+            @extend .bg-success;
+
+            @extend .text-white;
+        }
+
+        &--moderate {
+            background-color: #FFDC00;
+
+            @extend .text-dark;
+        }
+
+        &--unhealthy-sensitive {
+            background-color: #FF851B;
+
+            @extend .text-dark;
+        }
+
+        &--unhealthy {
+            background-color: #FF4136;
+
+            @extend .text-dark;
+        }
+
+        &--unhealthy-very {
+            background-color: #85144b;
+
+            @extend .text-white;
+        }
+
+        &--death {
+            background-color: #111111;
+
+            @extend .text-white;
+        }
+    }
+}
+
+.lead {
+    .separator {
+        padding: 0.25rem;
+        display: block;
+    }
+}
+
+sub {
+    &.d-block {
+        padding-bottom: 0.25rem;
+        line-height: inherit;
+    }
+}
+
+.br-0 {
+    border-radius: 0px;
+}
+
+.table {
+    .aqi {
+        .score {
+            text-align: center;
+            display: block;
+            padding: 0.25rem;
+
+            .number {
+                display: block;
+                font-size: 1.5rem;
+            }
+
+            .category {
+                display: block;
+                margin-top: -6px;
+                text-transform: uppercase;
+                letter-spacing: -0.5px;
+            }
+        }
+
+        &--good {
+            span {
+                @extend .bg-success;
+
+                @extend .text-white;
+            }
+        }
+
+        &--moderate {
+            span {
+                background-color: #FFDC00;
+
+                @extend .text-dark;
+            }
+        }
+
+        &--unhealthy-sensitive {
+            span {
+                background-color: #FF851B;
+
+                @extend .text-dark;
+            }
+        }
+
+        &--unhealthy {
+            span {
+                background-color: #FF4136;
+
+                @extend .text-dark;
+            }
+        }
+
+        &--unhealthy-very {
+            span {
+                background-color: #85144b;
+
+                @extend .text-white;
+            }
+        }
+
+        &--death {
+            span {
+                background-color: #111111;
+
+                @extend .text-white;
+            }
+        }
     }
 }
 
@@ -312,18 +301,26 @@ textarea {
     }
 }
 
+.buy-coffee {
+    font-weight: bold;
+}
+
 .made-with-love {
     color: #666;
     font-size: 12px;
     display: block;
     position: absolute;
-    bottom: -75px;
+    bottom: -175px;
     position: absolute;
     width: 90%;
     left: 50%;
     right: auto;
     transform: translateX(-50%) translateY(-50%);
     text-align: center;
+
+    @media (min-width: 992px) {
+        bottom: -75px;
+    }
 
     a {
         color: #000000;

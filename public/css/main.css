@@ -12931,60 +12931,6 @@ readers do not read off random characters that represent icons */
   right: 0;
   /* add right with 0 or a low pixel value */ }
 
-.card.aqi--moderate {
-  background-color: #FFDC00; }
-
-.card.aqi--unhealthy-sensitive {
-  background-color: #FF851B; }
-
-.card.aqi--unhealthy {
-  background-color: #FF4136; }
-
-.card.aqi--unhealthy-very {
-  background-color: #85144b; }
-
-.card.aqi--death {
-  background-color: #111111; }
-
-.lead .separator {
-  padding: 0.25rem;
-  display: block; }
-
-sub.d-block {
-  padding-bottom: 0.25rem;
-  line-height: inherit; }
-
-.br-0 {
-  border-radius: 0px; }
-
-.table .aqi .score {
-  text-align: center;
-  display: block;
-  padding: 0.25rem; }
-  .table .aqi .score .number {
-    display: block;
-    font-size: 1.5rem; }
-  .table .aqi .score .category {
-    display: block;
-    margin-top: -6px;
-    text-transform: uppercase;
-    letter-spacing: -0.5px; }
-
-.table .aqi--moderate span {
-  background-color: #FFDC00; }
-
-.table .aqi--unhealthy-sensitive span {
-  background-color: #FF851B; }
-
-.table .aqi--unhealthy span {
-  background-color: #FF4136; }
-
-.table .aqi--unhealthy-very span {
-  background-color: #85144b; }
-
-.table .aqi--death span {
-  background-color: #111111; }
-
 html {
   position: relative;
   min-height: 100%; }
@@ -13082,11 +13028,59 @@ textarea {
 .far {
   margin-right: 6px; }
 
-.btn-snapchat {
-  background-color: #fffc00;
-  color: #000 !important; }
-  .btn-snapchat:hover, .btn-snapchat:active {
-    background-color: #f1ef00; }
+.card.aqi--moderate {
+  background-color: #FFDC00; }
+
+.card.aqi--unhealthy-sensitive {
+  background-color: #FF851B; }
+
+.card.aqi--unhealthy {
+  background-color: #FF4136; }
+
+.card.aqi--unhealthy-very {
+  background-color: #85144b; }
+
+.card.aqi--death {
+  background-color: #111111; }
+
+.lead .separator {
+  padding: 0.25rem;
+  display: block; }
+
+sub.d-block {
+  padding-bottom: 0.25rem;
+  line-height: inherit; }
+
+.br-0 {
+  border-radius: 0px; }
+
+.table .aqi .score {
+  text-align: center;
+  display: block;
+  padding: 0.25rem; }
+  .table .aqi .score .number {
+    display: block;
+    font-size: 1.5rem; }
+  .table .aqi .score .category {
+    display: block;
+    margin-top: -6px;
+    text-transform: uppercase;
+    letter-spacing: -0.5px; }
+
+.table .aqi--moderate span {
+  background-color: #FFDC00; }
+
+.table .aqi--unhealthy-sensitive span {
+  background-color: #FF851B; }
+
+.table .aqi--unhealthy span {
+  background-color: #FF4136; }
+
+.table .aqi--unhealthy-very span {
+  background-color: #85144b; }
+
+.table .aqi--death span {
+  background-color: #111111; }
 
 .card {
   overflow: hidden; }
@@ -13103,18 +13097,24 @@ textarea {
       bottom: -10px;
       display: block; }
 
+.buy-coffee {
+  font-weight: bold; }
+
 .made-with-love {
   color: #666;
   font-size: 12px;
   display: block;
   position: absolute;
-  bottom: -75px;
+  bottom: -175px;
   position: absolute;
   width: 90%;
   left: 50%;
   right: auto;
   transform: translateX(-50%) translateY(-50%);
   text-align: center; }
+  @media (min-width: 992px) {
+    .made-with-love {
+      bottom: -75px; } }
   .made-with-love a {
     color: #000000;
     text-decoration: none; }

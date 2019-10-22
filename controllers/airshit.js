@@ -34,25 +34,29 @@ exports.index = (req, res) => {
     (callback) => { // month high
       Airshit.find({createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
     },
+    (callback) => { // year high
+      Airshit.find({createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
+    },
   ], function(err, results) {
+      // Week
       const highestInWeek = Math.max(...results[1].map((airshit) => {
         return calculations.totalAirQuality(airshit);
       }));
       const highestWeekDay = results[1].find((airshit) => {
         return calculations.totalAirQuality(airshit) === highestInWeek;
       });
-
+      // Month
       const highestInMonth = Math.max(...results[2].map((airshit) => {
         return calculations.totalAirQuality(airshit);
       }));
       const highestMonthDay = results[2].find((airshit) => {
         return calculations.totalAirQuality(airshit) === highestInMonth;
       });
-
-      const highestInYear = Math.max(...results[2].map((airshit) => {
+      // Year
+      const highestInYear = Math.max(...results[3].map((airshit) => {
         return calculations.totalAirQuality(airshit);
       }));
-      const highestYearDay = results[2].find((airshit) => {
+      const highestYearDay = results[3].find((airshit) => {
         return calculations.totalAirQuality(airshit) === highestInYear;
       });
 
