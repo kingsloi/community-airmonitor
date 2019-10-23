@@ -326,7 +326,7 @@ let flights = airportData.map((airport) => {
   }))
   .catch((error) => {
     console.log(error);
-    next(error);
+    res.send({ success: false });
   });
 }
 
