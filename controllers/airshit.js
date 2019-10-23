@@ -38,6 +38,9 @@ exports.index = (req, res) => {
       Airshit.find({createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
     },
   ], function(err, results) {
+      // Latest
+      const latest = results[0];
+
       // Week
       const highestInWeek = Math.max(...results[1].map((airshit) => {
         return calculations.totalAirQuality(airshit);
@@ -54,21 +57,26 @@ exports.index = (req, res) => {
       });
       // Year
       const highestInYear = Math.max(...results[3].map((airshit) => {
+        console.log(calculations.totalAirQuality(airshit), typeof calculations.totalAirQuality(airshit));
         return calculations.totalAirQuality(airshit);
       }));
+
       const highestYearDay = results[3].find((airshit) => {
+        // console.log(calculations.totalAirQuality(airshit));
         return calculations.totalAirQuality(airshit) === highestInYear;
       });
+
+      // console.log(highestYearDay);
 
       res.render('home', {
           slug: 'home',
           title: 'Current Miller Beach / NWI Air Quality',
-          airshit: results[0],
           region: region.coordinates(),
           location: {
             lat: process.env.LOCATION_LAT || '41.619829',
             lon: process.env.LOCATION_LON || '-87.245317',
           },
+          airshit: latest,
           highs: {
             week: highestWeekDay,
             month: highestMonthDay,
@@ -165,7 +173,6 @@ exports.sync = (req, res) => {
     Object.keys(PM25Cumulative).forEach(function(measurement) {
       PM25Means[measurement] = avg(PM25Cumulative[measurement]);
     });
-
     Object.keys(PM10Cumulative).forEach(function(measurement) {
       PM10Means[measurement] = avg(PM10Cumulative[measurement]);
     });
@@ -203,7 +210,7 @@ exports.sync = (req, res) => {
       promises.push(aqi);
     });
 
-    // PM2.5 AQI
+    // PM10 AQI
     Object.keys(PM10Mapping).forEach((variable) => {
       const aqi = aqibot.AQICalculator.getAQIResult('PM10', PM10Means[PM10Mapping[variable]]).then((result) => {
         results[variable] = result;
@@ -240,7 +247,8 @@ exports.sync = (req, res) => {
       }
     });
 
-let flights = airportData.map((airport) => {
+    // Flights
+    let flights = airportData.map((airport) => {
       // If airport doesn't have departing/arriving flights
       if (airport.error) {
         return [];

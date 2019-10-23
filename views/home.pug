@@ -55,63 +55,63 @@ block content
               p.small.text-uppercase.text-center No measurements have been taken yet.
 
           if highs.week
-            .col-md-4.text-white
-              .card.br-0.aqi(class={
-                'aqi--good': _.inRange(highs.week.totalAirQuality(), 0, 50),
-                'aqi--moderate': _.inRange(highs.week.totalAirQuality(), 51, 100),
-                'aqi--unhealthy-sensitive': _.inRange(highs.week.totalAirQuality(), 101, 150),
-                'aqi--unhealthy': _.inRange(highs.week.totalAirQuality(), 151, 200),
-                'aqi--unhealthy-very': _.inRange(highs.week.totalAirQuality(), 201, 300),
-                'aqi--death': highs.week.totalAirQuality() >= 301,
-              })
+            .col-md-4
+              .card.br-0
                 .card-header
                   h5.mb-0.card-title.text-uppercase.small
                     | Week High
-                .card-body
+                .card-body.aqi-stat(class={
+                  'aqi-stat--good': _.inRange(highs.week.totalAirQuality(), 0, 50),
+                  'aqi-stat--moderate': _.inRange(highs.week.totalAirQuality(), 51, 100),
+                  'aqi-stat--unhealthy-sensitive': _.inRange(highs.week.totalAirQuality(), 101, 150),
+                  'aqi-stat--unhealthy': _.inRange(highs.week.totalAirQuality(), 151, 200),
+                  'aqi-stat--unhealthy-very': _.inRange(highs.week.totalAirQuality(), 201, 300),
+                  'aqi-stat--death': highs.week.totalAirQuality() >= 301,
+                })
                   .rotate
                     i.fa.fa-signal.fa-5x
-                  small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
-                  p.h4.font-weight-bold.mb-0 #{highs.week.totalAirQuality()}
+                  small.d-block.font-weight-bold.text-uppercase.text-muted PM2.5 + PM10
+                  p.h4.font-weight-bold.mb-0.aqi-stat__stat #{highs.week.totalAirQuality()}
                   p.small.mb-0(title=`${moment(highs.week.createdAt)}`) #{moment(highs.week.createdAt).format('dd Do MMM YY HH:mm.')}
 
           if highs.month
-            .col-md-4.text-white
-              .card.br-0.aqi(class={
-                'aqi--good': _.inRange(highs.month.totalAirQuality(), 0, 50),
-                'aqi--moderate': _.inRange(highs.month.totalAirQuality(), 51, 100),
-                'aqi--unhealthy-sensitive': _.inRange(highs.month.totalAirQuality(), 101, 150),
-                'aqi--unhealthy': _.inRange(highs.month.totalAirQuality(), 151, 200),
-                'aqi--unhealthy-very': _.inRange(highs.month.totalAirQuality(), 201, 300),
-                'aqi--death': highs.month.totalAirQuality() >= 301,
-              })
+            .col-md-4
+              .card.br-0
                 .card-header
                   h5.mb-0.card-title.text-uppercase.small
                     | Month High
-                .card-body
+                .card-body.aqi-stat(class={
+                  'aqi-stat--good': _.inRange(highs.month.totalAirQuality(), 0, 50),
+                  'aqi-stat--moderate': _.inRange(highs.month.totalAirQuality(), 51, 100),
+                  'aqi-stat--unhealthy-sensitive': _.inRange(highs.month.totalAirQuality(), 101, 150),
+                  'aqi-stat--unhealthy': _.inRange(highs.month.totalAirQuality(), 151, 200),
+                  'aqi-stat--unhealthy-very': _.inRange(highs.month.totalAirQuality(), 201, 300),
+                  'aqi-stat--death': highs.month.totalAirQuality() >= 301,
+                })
                   .rotate
                     i.fa.fa-signal.fa-5x
-                  small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
-                  p.h4.font-weight-bold.mb-0 #{highs.month.totalAirQuality()}
+                  small.d-block.font-weight-bold.text-uppercase.text-muted PM2.5 + PM10
+                  p.h4.font-weight-bold.mb-0.aqi-stat__stat #{highs.month.totalAirQuality()}
                   p.small.mb-0(title=`${moment(highs.month.createdAt)}`) #{moment(highs.month.createdAt).format('dd Do MMM YY HH:mm.')}
 
           if highs.year
-            .col-md-4.text-white
-              .card.br-0.aqi(class={
-                'aqi--good': _.inRange(highs.year.totalAirQuality(), 0, 50),
-                'aqi--moderate': _.inRange(highs.year.totalAirQuality(), 51, 100),
-                'aqi--unhealthy-sensitive': _.inRange(highs.year.totalAirQuality(), 101, 150),
-                'aqi--unhealthy': _.inRange(highs.year.totalAirQuality(), 151, 200),
-                'aqi--unhealthy-very': _.inRange(highs.year.totalAirQuality(), 201, 300),
-                'aqi--death': highs.year.totalAirQuality() >= 301,
-              })
+            .col-md-4
+              .card.br-0
                 .card-header
                   h5.mb-0.card-title.text-uppercase.small
                     | Year High
-                .card-body
+                .card-body.aqi-stat(class={
+                  'aqi-stat--good': _.inRange(highs.year.totalAirQuality(), 0, 50),
+                  'aqi-stat--moderate': _.inRange(highs.year.totalAirQuality(), 51, 100),
+                  'aqi-stat--unhealthy-sensitive': _.inRange(highs.year.totalAirQuality(), 101, 150),
+                  'aqi-stat--unhealthy': _.inRange(highs.year.totalAirQuality(), 151, 200),
+                  'aqi-stat--unhealthy-very': _.inRange(highs.year.totalAirQuality(), 201, 300),
+                  'aqi-stat--death': highs.year.totalAirQuality() >= 301,
+                })
                   .rotate
                     i.fa.fa-signal.fa-5x
-                  small.d-block.font-weight-bold.text-uppercase PM2.5 + PM10
-                  p.h4.font-weight-bold.mb-0 #{highs.year.totalAirQuality()}
+                  small.d-block.font-weight-bold.text-uppercase.text-muted PM2.5 + PM10
+                  p.h4.font-weight-bold.mb-0.aqi-stat__stat #{highs.year.totalAirQuality()}
                   p.small.mb-0(title=`${moment(highs.year.createdAt)}`) #{moment(highs.year.createdAt).format('dd Do MMM YY HH:mm.')}
 
         p.lead.text-right.text-uppercase
@@ -224,7 +224,7 @@ block content
                     br
                     | Region:
                     - var coordinates = region.map((array) => array.reverse()).join("\r\n");
-                    | #[a.pl-1(href=`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(coordinates)}` target="_blank" title=`${coordinates}`)= "map"]
+                    | #[a.pl-1(href=`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(coordinates)}` target="_blank" title=`${coordinates}`)= "coordinates"]
                     br
                     span.d-block
                       | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
@@ -259,11 +259,17 @@ block content
           li Beth
           li Megan
 
+        p.lead.aviation-edge.mb-5.mb-md-0
+          | Flight tracking provided by:
+          | #[a(href="https://aviation-edge.com/" role="button" target="_blank") #[img.d-block.mt-2(src='/images/aviation-edge-logo-small-medium.png')]]
+
       .col-md-6
         h2.h4.text-uppercase.font-weight-light News / Links / Sources
         ul
+          li Website: #[a(href="https://waqi.info/" target="_blank")= "World's Air Pollution: Real-time Air Quality Index"]
+          li Website: #[a(href="https://aqicn.org/city/usa/indiana/gary-iitri/" target="_blank")= "IIT Research Institute's Gary, IN Air Quality Monitor"]
           li Website: #[a(href="https://www.in.gov/idem/airquality/pages/monitoring_data/pm25.html" target="_blank")= "IDEM PM2.5 Monitoring Locations"]
-          li Website: #[a(href="https://www.wunderground.com/wundermap?lat=41.602&lon=-87.337" target="_blank")= "Wunderground"]
+          li Website: #[a(href="https://www.wunderground.com/wundermap?lat=41.602&lon=-87.337" target="_blank")= "Wunderground Weather"]
           li Website: #[a(href="https://airnow.gov/index.cfm?action=airnow.local_city&cityid=58" target="_blank")= "GOV/EPA Gary/Hammond Air Quality"]
           li Website: #[a(href="https://echo.epa.gov/facilities/facility-search" target="_blank")= "EPA Facility Lookup"]
             ul
@@ -271,4 +277,5 @@ block content
           li Website: #[a(href="https://www.lung.org/our-initiatives/healthy-air/sota/city-rankings/states/indiana/lake.html" target="_blank")= "Lake County, IN Air Quality | lung.org"]
           li Lawsuit: #[a(href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank")= "ELPC vs. ArcelorMittalLawsuit"]
           li Study / Whitepaper: #[a(href="https://www.sciencedirect.com/science/article/pii/S0160412019301941" target="_blank")= "The first pollution investigation of road sediment in Gary, Indiana: Anthropogenic metals and possible health implications for a socioeconomically disadvantaged area"]
+
 

@@ -151,6 +151,44 @@ textarea {
     @extend .text-dark;
 }
 
+.aqi-stat {
+    &--good {
+        .aqi-stat__stat {
+            color: $brand-success;
+        }
+    }
+
+    &--moderate {
+        .aqi-stat__stat {
+            color: #FFDC00;
+        }
+    }
+
+    &--unhealthy-sensitive {
+        .aqi-stat__stat {
+            color: #FF851B;
+        }
+    }
+
+    &--unhealthy {
+        .aqi-stat__stat {
+            color: #FF4136;
+        }
+    }
+
+    &--unhealthy-very {
+        .aqi-stat__stat {
+            color: #85144b;
+        }
+    }
+
+    &--death {
+        .aqi-stat__stat {
+            color: #111111;
+        }
+    }
+}
+
 .card {
     &.aqi {
         &--good {
@@ -345,5 +383,18 @@ sub {
 @keyframes pound {
     to {
         transform: scale(1.1);
+    }
+}
+
+.aviation-edge {
+    &:hover {
+        img {
+            filter: grayscale(0%);
+        }
+    }
+
+    img {
+        filter: grayscale(100%);
+        max-width: 200px;
     }
 }

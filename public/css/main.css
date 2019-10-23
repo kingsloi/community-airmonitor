@@ -13028,6 +13028,24 @@ textarea {
 .far {
   margin-right: 6px; }
 
+.aqi-stat--good .aqi-stat__stat {
+  color: #60bf60; }
+
+.aqi-stat--moderate .aqi-stat__stat {
+  color: #FFDC00; }
+
+.aqi-stat--unhealthy-sensitive .aqi-stat__stat {
+  color: #FF851B; }
+
+.aqi-stat--unhealthy .aqi-stat__stat {
+  color: #FF4136; }
+
+.aqi-stat--unhealthy-very .aqi-stat__stat {
+  color: #85144b; }
+
+.aqi-stat--death .aqi-stat__stat {
+  color: #111111; }
+
 .card.aqi--moderate {
   background-color: #FFDC00; }
 
@@ -13132,3 +13150,10 @@ sub.d-block {
 @keyframes pound {
   to {
     transform: scale(1.1); } }
+
+.aviation-edge:hover img {
+  filter: grayscale(0%); }
+
+.aviation-edge img {
+  filter: grayscale(100%);
+  max-width: 200px; }
