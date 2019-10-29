@@ -91,8 +91,7 @@ app.use((req, res, next) => {
     lusca.csrf()(req, res, next);
   }
 });
-// app.use(lusca.xframe('SAMEORIGIN'));
-// app.use(lusca.xssProtection(true));
+
 app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.locals.user = req.user;
@@ -140,6 +139,7 @@ app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawes
  */
 app.get('/', airShirtController.index);
 app.get('/past', airShirtController.past);
+app.get('/graphs', airShirtController.graphs);
 app.get('/history-and-updates', airShirtController.history);
 app.get('/sync', airShirtController.sync);
 // app.get('/login', userController.getLogin);

@@ -57,16 +57,12 @@ exports.index = (req, res) => {
       });
       // Year
       const highestInYear = Math.max(...results[3].map((airshit) => {
-        console.log(calculations.totalAirQuality(airshit), typeof calculations.totalAirQuality(airshit));
         return calculations.totalAirQuality(airshit);
       }));
 
       const highestYearDay = results[3].find((airshit) => {
-        // console.log(calculations.totalAirQuality(airshit));
         return calculations.totalAirQuality(airshit) === highestInYear;
       });
-
-      // console.log(highestYearDay);
 
       res.render('home', {
           slug: 'home',
@@ -384,6 +380,13 @@ exports.past = (req, res) => {
     console.log(err);
     return res.send('Error Contacting the database or Some Trouble happened while exec Pagination Script');
   })
+};
+
+exports.graphs = (req, res) => {
+  return res.render('graphs', {
+    slug: 'graphs',
+    title: "Graphs Miller Beach / NWI Air Quality",
+  });
 };
 
 exports.history = (req, res) => {

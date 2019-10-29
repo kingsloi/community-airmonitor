@@ -14,7 +14,7 @@ block content
               p.small.text-uppercase.text-center No measurements have been taken yet.
 
           if airshit && airshit.PM25REALTIME
-            .col-md-6.py-2
+            .col-6.py-2
               .card.h-100.aqi(class={
                 'aqi--good': airshit.PM25REALTIME['category'] === 'Good',
                 'aqi--moderate': airshit.PM25REALTIME['category'] === 'Moderate',
@@ -31,7 +31,7 @@ block content
                   h4.lead.mb-0.pl-2 #{airshit.PM25REALTIME['category']}
 
           if airshit && airshit.PM10REALTIME
-            .col-md-6.py-2
+            .col-6.py-2
               .card.h-100.aqi(class={
                 'aqi--good': airshit.PM10REALTIME['category'] === 'Good',
                 'aqi--moderate': airshit.PM10REALTIME['category'] === 'Moderate',
@@ -55,7 +55,7 @@ block content
               p.small.text-uppercase.text-center No measurements have been taken yet.
 
           if highs.week
-            .col-md-4
+            .col-4
               .card.br-0
                 .card-header
                   h5.mb-0.card-title.text-uppercase.small
@@ -69,13 +69,13 @@ block content
                   'aqi-stat--death': highs.week.totalAirQuality() >= 301,
                 })
                   .rotate
-                    i.fa.fa-signal.fa-5x
+                    i.fa.fa-signal.fa-3x
                   small.d-block.font-weight-bold.text-uppercase.text-muted PM2.5 + PM10
                   p.h4.font-weight-bold.mb-0.aqi-stat__stat #{highs.week.totalAirQuality()}
                   p.small.mb-0(title=`${moment(highs.week.createdAt)}`) #{moment(highs.week.createdAt).format('dd Do MMM YY HH:mm.')}
 
           if highs.month
-            .col-md-4
+            .col-4
               .card.br-0
                 .card-header
                   h5.mb-0.card-title.text-uppercase.small
@@ -89,13 +89,13 @@ block content
                   'aqi-stat--death': highs.month.totalAirQuality() >= 301,
                 })
                   .rotate
-                    i.fa.fa-signal.fa-5x
+                    i.fa.fa-signal.fa-3x
                   small.d-block.font-weight-bold.text-uppercase.text-muted PM2.5 + PM10
                   p.h4.font-weight-bold.mb-0.aqi-stat__stat #{highs.month.totalAirQuality()}
                   p.small.mb-0(title=`${moment(highs.month.createdAt)}`) #{moment(highs.month.createdAt).format('dd Do MMM YY HH:mm.')}
 
           if highs.year
-            .col-md-4
+            .col-4
               .card.br-0
                 .card-header
                   h5.mb-0.card-title.text-uppercase.small
@@ -109,7 +109,7 @@ block content
                   'aqi-stat--death': highs.year.totalAirQuality() >= 301,
                 })
                   .rotate
-                    i.fa.fa-signal.fa-5x
+                    i.fa.fa-signal.fa-3x
                   small.d-block.font-weight-bold.text-uppercase.text-muted PM2.5 + PM10
                   p.h4.font-weight-bold.mb-0.aqi-stat__stat #{highs.year.totalAirQuality()}
                   p.small.mb-0(title=`${moment(highs.year.createdAt)}`) #{moment(highs.year.createdAt).format('dd Do MMM YY HH:mm.')}
@@ -127,7 +127,7 @@ block content
 
       .col-xl-6
         div.table-responsive
-          table.table
+          table.table.text-monospace
             tbody
               if ! airshit
                 tr
@@ -143,6 +143,14 @@ block content
                     p.lead.font-weight-bold.mb-0 Dew Point
                   td()
                     p.lead.mb-0 #{airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)} &deg;F
+                tr
+                  td
+                    p.lead.font-weight-bold.mb-0 Wind
+                  td()
+                    p.lead.mb-0
+                      span.mr-3 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] /
+                      span.d-inline-block.lead.mb-0(title=`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`, style=`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`)
+                        | &#x2191;
                 tr
                   td
                     p.lead.font-weight-bold.mb-0 Cloud Coverage
@@ -180,20 +188,12 @@ block content
                     p.lead.mb-0 #{airshit.REPORTED_WEATHER['visibility'].toFixed(0)} #[sub miles]
                 tr
                   td
-                    p.lead.font-weight-bold.mb-0 Wind Speed
-                  td()
-                    p.lead.mb-0
-                      span.mr-3 #{airshit.REPORTED_WEATHER['windSpeed'].toFixed(0)} - #{airshit.REPORTED_WEATHER['windGust'].toFixed(0)} #[sub mph] /
-                      span.d-inline-block.lead.mb-0(title=`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`, style=`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`)
-                        | &#x2191;
-                tr
-                  td
-                    p.lead.font-weight-bold.mb-0 Trains in #[abbr(title="See 'Region' below for coordinates") Region]
+                    p.lead.font-weight-bold.mb-0 #[abbr(title="See 'Region' below for coordinates") Region] Trains
                   td()
                     p.lead.mb-0 #{airshit.TRAINS.SOUTHSHORE.length} #[small.small.font-weight-light southshore]
                 tr
                   td
-                    p.lead.font-weight-bold.mb-0 Traffic in #[abbr(title="See 'Region' below for coordinates") Region]
+                    p.lead.font-weight-bold.mb-0 #[abbr(title="See 'Region' below for coordinates") Region] Traffic
                   td()
                     p.lead.mb-0
                       span.separator
@@ -204,7 +204,7 @@ block content
                         | #{airshit.congestionTime()} #[small.small.font-weight-light minutes of congestion]
                 tr
                   td
-                    p.lead.font-weight-bold.mb-0 Flights over #[abbr(title="See 'Region' below for coordinates") Region]
+                    p.lead.font-weight-bold.mb-0 #[abbr(title="See 'Region' below for coordinates") Region] Flights
                   td()
                     p.lead.mb-0
                       span.separator
@@ -216,7 +216,7 @@ block content
 
             tfoot
               tr
-                th(colspan="2" class="small text-uppercase text-right")
+                th.pt-5(colspan="2" class="small text-uppercase text-right")
                   p.mb-0
                     | Temperature, humidity, pressure recorded at sensor
                     br
@@ -227,27 +227,27 @@ block content
                     | #[a.pl-1(href=`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(coordinates)}` target="_blank" title=`${coordinates}`)= "coordinates"]
                     br
                     span.d-block
-                      | Weather by: #[a(href=`https://darksky.net/forecast/${location.lat},${location.lon}/us12/en` target="_blank")= "darksky.net"]
+                      | Weather by: #[a(href=`https://darksky.net/poweredby/` target="_blank")= "darksky.net"]
                     span.d-block
                       | Trains by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "southshore.etaspot.net"]
                     span.d-block
                       | Traffic by: #[a(href=`http://southshore.etaspot.net` target="_blank")= "mapquest.com"]
                     span.d-block
-                      | Flight Tracking by: #[a(href=`https://aviation-edge.com` target="_blank")= "aviation-edge.com"]
+                      | Flight Tracking by: #[a(href=`https://aviation-edge.com/?gary-indiana-opensource-air-monitor-footer` target="_blank")= "aviation-edge.com"]
                     br
                     if airshit
                       | Last Updated #{timestampToHuman(airshit.LAST_READ_AT)} ago
 
         //=JSON.stringify(airshit)
 
-    hr.my-5.pb-4
+    hr.my-4.pb-4
     .row
       .col-md-6
-        h2.h4.text-uppercase.font-weight-light Special Thanks / Contributions
-        p.mb-2(style="font-size:2rem;") 👏👏👏👏👏
-        p.lead #[a(href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" role="button" target="_blank")= "PurpleAir sensor"] crowd funded by:
+        h2.h4.text-uppercase.font-weight-light.text-center.text-md-left Special Thanks / Contributions
+        p.mb-2.text-center.text-md-left(style="font-size:2rem;") 👏👏👏👏👏
+        p.lead.text-center.text-md-left #[a(href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" role="button" target="_blank")= "PurpleAir sensor"] crowd funded by:
 
-        ul.lead.mb-4
+        ul.lead.mb-4.sponsors
           li Mary
           li Adam
           li Sloan
@@ -259,23 +259,41 @@ block content
           li Beth
           li Megan
 
-        p.lead.aviation-edge.mb-5.mb-md-0
+        p.lead.aviation-edge.mb-5.mb-md-0.text-center.text-md-left
           | Flight tracking provided by:
-          | #[a(href="https://aviation-edge.com/" role="button" target="_blank") #[img.d-block.mt-2(src='/images/aviation-edge-logo-small-medium.png')]]
+          | #[a.d-block(href="https://aviation-edge.com/?gary-indiana-opensource-air-monitor-footer" role="button" target="_blank") #[img.d-block.mt-2.mx-auto.mx-md-0(src='/images/aviation-edge-logo-small-medium.png')]]
 
-      .col-md-6
-        h2.h4.text-uppercase.font-weight-light News / Links / Sources
+      .col-md-6.sources
+        h2.h4.text-uppercase.font-weight-light.text-center.text-md-left News / Links / Sources
         ul
-          li Website: #[a(href="https://waqi.info/" target="_blank")= "World's Air Pollution: Real-time Air Quality Index"]
-          li Website: #[a(href="https://aqicn.org/city/usa/indiana/gary-iitri/" target="_blank")= "IIT Research Institute's Gary, IN Air Quality Monitor"]
-          li Website: #[a(href="https://www.in.gov/idem/airquality/pages/monitoring_data/pm25.html" target="_blank")= "IDEM PM2.5 Monitoring Locations"]
-          li Website: #[a(href="https://www.wunderground.com/wundermap?lat=41.602&lon=-87.337" target="_blank")= "Wunderground Weather"]
-          li Website: #[a(href="https://airnow.gov/index.cfm?action=airnow.local_city&cityid=58" target="_blank")= "GOV/EPA Gary/Hammond Air Quality"]
-          li Website: #[a(href="https://echo.epa.gov/facilities/facility-search" target="_blank")= "EPA Facility Lookup"]
+          li.source
+            span.source__type Website:
+            | #[a(href="https://waqi.info/" target="_blank")= "World's Air Pollution: Real-time Air Quality Index"]
+          li.source
+            span.source__type Website:
+            | #[a(href="https://aqicn.org/city/usa/indiana/gary-iitri/" target="_blank")= "IIT Research Institute's Gary, IN Air Quality Monitor"]
+          li.source
+            span.source__type Website:
+            | #[a(href="https://www.in.gov/idem/airquality/pages/monitoring_data/pm25.html" target="_blank")= "IDEM PM2.5 Monitoring Locations"]
+          li.source
+            span.source__type Website:
+            | #[a(href="https://www.wunderground.com/wundermap?lat=41.602&lon=-87.337" target="_blank")= "Wunderground Weather"]
+          li
+            span.source__type Website:
+            | #[a(href="https://airnow.gov/index.cfm?action=airnow.local_city&cityid=58" target="_blank")= "GOV/EPA Gary/Hammond Air Quality"]
+          li.source
+            span.source__type Website:
+            | #[a(href="https://echo.epa.gov/facilities/facility-search" target="_blank")= "EPA Facility Lookup"]
             ul
               li e.g. #[a(href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank")= "ARCELORMITTAL BURNS HARBOR"]
-          li Website: #[a(href="https://www.lung.org/our-initiatives/healthy-air/sota/city-rankings/states/indiana/lake.html" target="_blank")= "Lake County, IN Air Quality | lung.org"]
-          li Lawsuit: #[a(href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank")= "ELPC vs. ArcelorMittalLawsuit"]
-          li Study / Whitepaper: #[a(href="https://www.sciencedirect.com/science/article/pii/S0160412019301941" target="_blank")= "The first pollution investigation of road sediment in Gary, Indiana: Anthropogenic metals and possible health implications for a socioeconomically disadvantaged area"]
+          li.source
+            span.source__type Website:
+            | #[a(href="https://www.lung.org/our-initiatives/healthy-air/sota/city-rankings/states/indiana/lake.html" target="_blank")= "Lake County, IN Air Quality | lung.org"]
+          li.source
+            span.source__type Lawsuit:
+            | #[a(href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank")= "ELPC vs. ArcelorMittalLawsuit"]
+          li.source
+            span.source__type Study / Whitepaper:
+            | #[a(href="https://www.sciencedirect.com/science/article/pii/S0160412019301941" target="_blank")= "The first pollution investigation of road sediment in Gary, Indiana: Anthropogenic metals and possible health implications for a socioeconomically disadvantaged area"]
 
 
