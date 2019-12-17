@@ -1,0 +1,472 @@
+@import "themes/default/_variables.scss";
+@import "~bootstrap/scss/bootstrap.scss";
+
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+
+@import "../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/brands";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/regular";
+@import "../node_modules/@fortawesome/fontawesome-free/scss/solid";
+
+@import "themes/default/_default";
+
+// Scaffolding
+// -------------------------
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    padding-top: 80px;
+    margin-bottom: 75px;
+    font-size: 14px;
+}
+
+footer {
+    p, ul {
+        margin-bottom: 0;
+    }
+}
+
+// Input Fields
+// -------------------------
+
+textarea {
+    resize: vertical;
+}
+
+// Navbar
+// -------------------------
+
+.navbar-nav img {
+    width: 30px;
+    min-height: 30px;
+    margin: -15px 15px -15px;
+}
+
+.navbar {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.navbar-brand {
+    font-size: 18px;
+    float: left;
+}
+
+.navbar-toggler {
+    position: relative;
+    float: right;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
+.navbar-toggler-icon {
+    font-size: 16px;
+}
+
+.dropdown-menu {
+    left: initial;
+    right: 0;
+}
+
+/*
+* Solves Bootstrap 4 issue
+* https://github.com/twbs/bootstrap/issues/25654
+*/
+/* Styles in sm disposition and up */
+@media (min-width: 576px) and (max-width: 767px) {
+    /* Solves bs4 bug */
+    .navbar-expand-md > .container,
+    .navbar-expand-lg > .container,
+    .navbar-expand-xl > .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+}
+
+/* Styles in md disposition and up */
+@media (min-width: 768px) and (max-width: 991px) {
+    /* Solves bs4 bug */
+    .navbar-expand-lg > .container,
+    .navbar-expand-xl > .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+}
+
+/* Styles in lg disposition and up */
+@media (min-width: 992px) and (max-width: 1199px) {
+    /* Solves bs4 bug */
+    .navbar-expand-xl > .container {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+}
+
+// Alerts
+// -------------------------
+
+.alert {
+    margin-top: 20px;
+}
+
+// Thumbnails
+// -------------------------
+
+.thumbnail {
+    padding: 0;
+    border-radius: 0;
+    box-shadow: 0 0 5px #ccc, inset 0 0 0 #000;
+}
+
+// Font Icons
+// -------------------------
+
+.fa {
+    margin-right: 6px;
+}
+
+.fab {
+    margin-right: 6px;
+}
+
+.fas {
+    margin-right: 6px;
+}
+
+.far {
+    margin-right: 6px;
+}
+
+.form-control::placeholder {
+    @extend .text-dark;
+}
+
+.aqi-stat {
+    &--good {
+        .aqi-stat__stat {
+            color: $brand-success;
+        }
+    }
+
+    &--moderate {
+        .aqi-stat__stat {
+            color: #FFDC00;
+        }
+    }
+
+    &--unhealthy-sensitive {
+        .aqi-stat__stat {
+            color: #FF851B;
+        }
+    }
+
+    &--unhealthy {
+        .aqi-stat__stat {
+            color: #FF4136;
+        }
+    }
+
+    &--unhealthy-very {
+        .aqi-stat__stat {
+            color: #85144b;
+        }
+    }
+
+    &--death {
+        .aqi-stat__stat {
+            color: #111111;
+        }
+    }
+}
+
+.card {
+    &.aqi {
+        &--good {
+            @extend .bg-success;
+
+            @extend .text-white;
+        }
+
+        &--moderate {
+            background-color: #FFDC00;
+
+            @extend .text-dark;
+        }
+
+        &--unhealthy-sensitive {
+            background-color: #FF851B;
+
+            @extend .text-dark;
+        }
+
+        &--unhealthy {
+            background-color: #FF4136;
+
+            @extend .text-dark;
+        }
+
+        &--unhealthy-very {
+            background-color: #85144b;
+
+            @extend .text-white;
+        }
+
+        &--death {
+            background-color: #111111;
+
+            @extend .text-white;
+        }
+    }
+}
+
+.lead {
+    .separator {
+        padding: 0.25rem;
+        display: block;
+    }
+}
+
+sub {
+    &.d-block {
+        padding-bottom: 0.25rem;
+        line-height: inherit;
+    }
+}
+
+.pb-45 {
+    padding-bottom: 1.75rem;
+}
+
+.br-0 {
+    border-radius: 0px;
+}
+
+.table {
+    .aqi {
+        .score {
+            text-align: center;
+            display: block;
+            padding: 0.25rem;
+
+            .number {
+                display: block;
+                font-size: 1.5rem;
+            }
+
+            .category {
+                display: block;
+                margin-top: -6px;
+                text-transform: uppercase;
+                letter-spacing: -0.5px;
+            }
+        }
+
+        &--good {
+            span {
+                @extend .bg-success;
+
+                @extend .text-white;
+            }
+        }
+
+        &--moderate {
+            span {
+                background-color: #FFDC00;
+
+                @extend .text-dark;
+            }
+        }
+
+        &--unhealthy-sensitive {
+            span {
+                background-color: #FF851B;
+
+                @extend .text-dark;
+            }
+        }
+
+        &--unhealthy {
+            span {
+                background-color: #FF4136;
+
+                @extend .text-dark;
+            }
+        }
+
+        &--unhealthy-very {
+            span {
+                background-color: #85144b;
+
+                @extend .text-white;
+            }
+        }
+
+        &--death {
+            span {
+                background-color: #111111;
+
+                @extend .text-white;
+            }
+        }
+    }
+}
+
+.card {
+    overflow: hidden;
+
+    .card-body {
+        .rotate {
+            z-index: 8;
+            float: right;
+            height: 100%;
+
+            i {
+                color: rgba(20, 20, 20, 0.15);
+                position: absolute;
+                left: 0;
+                left: auto;
+                right: -10px;
+                bottom: -10px;
+                display: block;
+            }
+        }
+    }
+}
+
+.buy-coffee {
+    font-weight: bold;
+}
+
+.made-with-love {
+    padding-bottom: 0.5rem;
+    color: #666;
+    font-size: 12px;
+    display: block;
+    position: absolute;
+    bottom: 0px;
+    position: absolute;
+    width: 90%;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(-50%);
+    text-align: center;
+
+    @media (min-width: 992px) {
+        bottom: -20px;
+    }
+
+    a {
+        color: #000000;
+        text-decoration: none;
+    }
+
+    .fa {
+        color: #E90606;
+        padding: 0 3px;
+        margin: 0 4px;
+        font-size: 10px;
+        animation: pound 0.35s infinite alternate;
+        -webkit-animation: pound 0.35s infinite alternate;
+    }
+}
+
+@-webkit-keyframes pound {
+    to {
+        transform: scale(1.5);
+    }
+}
+
+@keyframes pound {
+    to {
+        transform: scale(1.5);
+    }
+}
+
+.sources {
+    .source {
+        &__type {
+            padding-right: 4px;
+            text-transform: uppercase;
+
+            @extend .small;
+
+            @extend .d-block;
+
+            @extend .d-md-inline;
+        }
+    }
+}
+
+.funded-by-list {
+    list-style-type: none;
+    text-align: center;
+
+    @media (min-width: 768px) {
+        text-align: left;
+        list-style-type: circle;
+    }
+}
+
+.partner-logo {
+    &:hover {
+        img {
+            filter: grayscale(0%);
+        }
+    }
+
+    img {
+        filter: grayscale(100%);
+        max-width: 150px;
+    }
+}
+
+.notes-list {
+    li {
+        counter-increment: section;
+        display: table-row;
+
+        &::before {
+            @extend .btn-link;
+
+            content: "[" counter(section) "]";
+            padding-right: 7.5px;
+        }
+
+        &::after {
+            content: "";
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        + li {
+            &::after {
+                display: none;
+            }
+        }
+    }
+}
+
+.number--blurred {
+    filter: blur(5px);
+
+    &:after {
+        content: "0";
+    }
+}
+
+.text--blurred {
+    filter: blur(5px);
+
+    &:after {
+        content: "LOADING";
+    }
+}
+
+.text--smushed {
+    letter-spacing: -1px;
+}

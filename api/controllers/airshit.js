@@ -3,11 +3,12 @@ const moment = require('moment');
 const axios = require('axios');
 const aqibot = require('aqi-bot');
 const geo = require('geolocation-utils');
-const region = require('../config/region');
+const regionArea = require('../config/region');
 const { generatePageRange } = require('../helpers/pagination');
 const async = require('async');
 const calculations = require('../helpers/calculations');
 const _ = require('lodash');
+const fs = require('fs');
 
 /**
  * GET /
@@ -64,20 +65,24 @@ exports.index = (req, res) => {
         return calculations.totalAirQuality(airshit) === highestInYear;
       });
 
-      res.render('home', {
-          slug: 'home',
-          title: 'Current Miller Beach / NWI Air Quality',
-          region: region.coordinates(),
-          location: {
-            lat: process.env.LOCATION_LAT || '41.619829',
-            lon: process.env.LOCATION_LON || '-87.245317',
+      res.json({
+        airshit: latest,
+        geography: {
+          sensor: {
+            lat: process.env.LOCATION_LAT,
+            lon: process.env.LOCATION_LON,
           },
-          airshit: latest,
-          highs: {
-            week: highestWeekDay,
-            month: highestMonthDay,
-            year: highestYearDay,
+          region: {
+            land_polygon: regionArea.landPolygon(),
+            land_square: regionArea.landSquare(),
+            lake: regionArea.lakePolygon(),
           }
+        },
+        highs: {
+          week: highestWeekDay,
+          month: highestMonthDay,
+          year: highestYearDay,
+        }
       });
   });
 };
@@ -86,25 +91,28 @@ exports.sync = (req, res) => {
   const hash = req.query.hash;
 
   // https://www.keene.edu/campus/maps/tool/
-  const coordinates = region.coordinates();
+  const regionAsPolygon = regionArea.landPolygon();
+  const regionAsSquare = regionArea.landSquare();
+  const lakeAsPolygon = regionArea.lakePolygon();
 
   if (hash !== process.env.SYNC_SECRET_HASH) {
     res.status(400).end();
   }
 
-  const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length
+  const avg = arr => arr.reduce((a,b) => a + parseInt(b, 10), 0) / arr.length;
 
-  const purpleId = process.env.PURPLE_AIR_ID;
+  const purpleId        = process.env.PURPLE_AIR_ID;
 
-  const airportEndpoints = [];
-  const flightsApiKey = process.env.AVIATION_EDGE_API_KEY;
-  const airports = process.env.NEARBY_AIRPORTS_IATAS.split(',');
+  const airportEndpoints  = [];
+  const flightsApiKey     = process.env.AVIATION_EDGE_API_KEY;
+  const airports          = process.env.NEARBY_AIRPORTS_IATAS.split(',');
 
-  const location = `${process.env.LOCATION_LAT || '41.619829'},${process.env.LOCATION_LON || '-87.245317'}`;
-  const weatherApiKey   = process.env.FORCASTIO_API_KEY;
-  const exclude  = 'minutely,hourly,daily,alerts,flags';
-  const trafficApiKey   = process.env.MAPQUEST_API_KEY;
-  const trafficBounds = coordinates.join(',');
+  const location          = `${process.env.LOCATION_LAT},${process.env.LOCATION_LON}`;
+  const weatherApiKey     = process.env.FORCASTIO_API_KEY;
+  const exclude           = 'minutely,hourly,daily,alerts,flags';
+  const trafficApiKey     = process.env.MAPQUEST_API_KEY;
+  const trafficBounds     = regionAsSquare.join(',');
+  const shippingApiKey    = process.env.FLEETMON_API_KEY;
 
   // Each nearby airport
   // get the arr-iving and dep-arting flights at the airport
@@ -118,14 +126,16 @@ exports.sync = (req, res) => {
     axios.get(`https://www.purpleair.com/json?show=${purpleId}`),
     axios.get(`https://api.forecast.io/forecast/${weatherApiKey}/${location}?units=us&exclude=${exclude}`),
     axios.get(`http://southshore.etaspot.net/service.php?service=get_vehicles&includeETAData=1&orderedETAArray=1&token=TESTING`),
-    axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=congestion`),
+    axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=incidents,congestion`),
+    axios.get(`https://apiv2.fleetmon.com/regional_ais/?apikey=${shippingApiKey}`),
     ...airportEndpoints
   ])
-  .then(axios.spread((purpleData, weatherData, southshoreData, trafficData, ...airportsData) => {
+  .then(axios.spread((purpleData, weatherData, trainData, trafficData, shippingData, ...airportsData) => {
     const purple = purpleData.data;
     const weather = weatherData.data;
-    const southshore = southshoreData.data;
+    const southshore = trainData.data;
     const traffic = trafficData.data;
+    const shipping = shippingData.data;
     const airportData = [...airportsData].map(r => r.data);
 
     // PurpleAir/Air Quality
@@ -217,11 +227,36 @@ exports.sync = (req, res) => {
       promises.push(aqi);
     });
 
+    // Shipping / Vessels
+    const vessels = shipping.vessels;
+    const runningVessels = vessels.filter(function(vessel) {
+      return vessel.position.nav_status === 'under way using engine';
+    });
+
+    const runningShips = _.map(runningVessels, function(vessel) {
+      return {
+        id: vessel.mmsi_number,
+        name: vessel.name,
+        callsign: vessel.callsign,
+        country: vessel.country,
+        type: vessel.type,
+        width: vessel.width,
+        length: vessel.length,
+        deadweight: vessel.dwt,
+        destination: vessel.voyage.destination,
+        draught: vessel.voyage.draught,
+        lat: vessel.position.latitude,
+        lng: vessel.position.longitude,
+        status: vessel.position.nav_status,
+        direction: vessel.position.true_heading
+      }
+    });
+
     // Trains
     const trains = southshore.get_vehicles;
 
     const southshoreTravelingOnThru = trains.filter(function(train) {
-      return geo.insidePolygon([train.lat, train.lng], coordinates) && train.inService;
+      return geo.insidePolygon([train.lat, train.lng], regionAsPolygon) && train.inService;
     });
 
     const southshoreTrains = southshoreTravelingOnThru.map(function(train) {
@@ -255,7 +290,7 @@ exports.sync = (req, res) => {
         const { geography } = flight;
         const { latitude, longitude } = geography;
 
-        return geo.insidePolygon([latitude, longitude], coordinates);
+        return geo.insidePolygon([latitude, longitude], regionAsPolygon);
       });
 
       // For each flight in region, map them into a format
@@ -315,7 +350,8 @@ exports.sync = (req, res) => {
           TRAFFIC: {
             INCIDENTS: incidents
           },
-          FLIGHTS: flightsOverRegion
+          FLIGHTS: flightsOverRegion,
+          VESSELS: runningShips,
         });
 
         shitstamp.save(function (err, response) {

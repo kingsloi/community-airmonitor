@@ -44,7 +44,8 @@ const airshitSchema = new mongoose.Schema({
       ORD: Array,
       MDW: Array,
       GYY: Array
-  }
+  },
+  VESSELS: [],
 }, { timestamps: true });
 
 airshitSchema.plugin(mongoosePaginate);
