@@ -405,7 +405,7 @@
                                                 Vessel Tracking by: <a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon.com</a>
                                             </span>
 
-                                            <br>Last Updated {{ formatTimestampDiffToLocalHuman(airshit.LAST_READ_AT) }} ago
+                                            <br>Last Updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago
 
                                         </p>
                                     </th>
@@ -647,13 +647,13 @@ export default {
         return pm25 + pm10;
     },
 
-    formatDateTimeToLocal(date, format = 'dd Do MMM YY HH:mm.') {
-        return moment.utc(date).local().format(format);
+    formatDateTimeToLocal(datetime, format = 'dd Do MMM YY HH:mm.') {
+        return moment.utc(datetime).local().format(format);
     },
 
-    formatTimestampDiffToLocalHuman(timestamp) {
-        const moment1 = moment.unix(timestamp);
-        const moment2 = moment();
+    formatDateTimeDiffToLocalHuman(datetime) {
+        const moment1 = moment.utc(datetime);
+        const moment2 = moment().utc();
         return moment.duration(moment1.diff(moment2)).humanize();
     },
 
