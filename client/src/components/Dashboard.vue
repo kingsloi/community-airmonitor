@@ -672,6 +672,7 @@ export default {
     })
     .catch(e => {
         alert('error!');
+        alert(e);
         console.log(e); // eslint-disable-line no-console
     })
   }
