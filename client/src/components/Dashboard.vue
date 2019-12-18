@@ -540,7 +540,7 @@
                     </li>
                     <li class="d-xs-block d-lg-inline-block pl-md-5 py-3 py-lg-0">
                         <a class="buy-coffee" href="https://www.buymeacoffee.com/kingsloi" target="_blank">
-                            <img class="mr-1" src="http://localhost:8080/images/buy-coffee.svg">Buy me a coffee</a>
+                            <img class="mr-1" src="/images/buy-coffee.svg">Buy me a coffee</a>
                     </li>
                 </ul>
             </div>
