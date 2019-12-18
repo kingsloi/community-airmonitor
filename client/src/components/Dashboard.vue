@@ -672,7 +672,7 @@ export default {
 
   methods: {
     initMaps() {
-        const map = L.map('map', {attributionControl: false, scrollWheelZoom: false}).setView([
+        const map = L.map('map', {scrollWheelZoom: false}).setView([
             this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
         ], 9);
 
