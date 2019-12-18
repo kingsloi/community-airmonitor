@@ -70,7 +70,7 @@ exports.index = (req, res) => {
         geography: {
           sensor: {
             lat: process.env.LOCATION_LAT,
-            lon: process.env.LOCATION_LON,
+            lng: process.env.LOCATION_LON,
           },
           region: {
             land_polygon: regionArea.landPolygon(),
@@ -270,11 +270,15 @@ exports.sync = (req, res) => {
 
     // Traffic / Incidents
     const incidents = traffic.incidents.map((incident) => {
+      console.log(incident);
       return {
         lat: incident.lat,
         lng: incident.lng,
         distance: incident.distance,
-        freeFlowMinDelay: incident.delayFromFreeFlow
+        freeFlowMinDelay: incident.delayFromFreeFlow,
+        shortDesc: incident.shortDesc,
+        startTime: incident.startTime,
+        endTime: incident.endTime
       }
     });
 

@@ -3,10 +3,6 @@ import PageNotFound from './components/PageNotFound.vue';
 
 const routes = [
     {
-        path: '/login',
-        component: DashboardView
-    },
-    {
         path: '/',
         component: DashboardView,
         auth: true,

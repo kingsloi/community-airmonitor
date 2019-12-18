@@ -5,7 +5,7 @@
                 <div class="col-xl-6">
                     <h1 class="h3 pb-45 font-weight-bold text-uppercase">
                         <small class="d-block h6 font-weight-light">How's our Air Quality in</small>
-                        Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr>
+                        <span class="site-heading">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr></span>
                     </h1>
                     <h2 class="small text-uppercase mb-0 text-dark">Currently</h2>
                     <div class="row mb-3">
@@ -136,20 +136,82 @@
                         </div>
                     </div>
 
-                    <p class="lead text-right text-uppercase">
-                        <a href="/past" role="button">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
-                    </p>
+                    <div class="">
+                        <p class="mb-0 lead text-right text-uppercase">
+                            <a href="#" role="button" class="mb-2 d-inline-block" @click.prevent="showAqiMeanings()">
+                                what do these numbers mean?<i class="fa pl-1" aria-hidden="true"
+                                    :class="{
+                                        'fa-chevron-down': isAqiMeaningsVisible === true,
+                                        'fa-chevron-right': isAqiMeaningsVisible === false,
+                                    }"
+                                ></i>
+                            </a>
+                        </p>
+                        <div v-if="isAqiMeaningsVisible">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Score</th>
+                                        <th>Health Impacts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(0)">
+                                            <span class="aqi-stat__stat">Good (0-50)</span>
+                                        </td>
+                                        <td>Minimal impact</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(51)">
+                                            <span class="aqi-stat__stat">Satisfactory (51–100)</span>
+                                        </td>
+                                        <td>May cause minor breathing discomfort to sensitive people.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(101)">
+                                            <span class="aqi-stat__stat">Moderately polluted (101–200)</span>
+                                        </td>
+                                        <td>May cause breathing discomfort to people with lung disease such as asthma, and discomfort to people with heart disease, children and older adults.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
+                                            <span class="aqi-stat__stat">Poor (201–300)</span>
+                                        </td>
+                                        <td>May cause breathing discomfort to people on prolonged exposure, and discomfort to people with heart disease.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(301)">
+                                            <span class="aqi-stat__stat">Very poor (301–400)</span>
+                                        </td>
+                                        <td>May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(401)">
+                                            <span class="aqi-stat__stat">Severe (401–500)</span>
+                                        </td>
+                                        <td>May cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease. The health impacts may be experienced even during light physical activity.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="lead text-right text-uppercase">
+                            <a href="/past" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
+                        </p>
+                    </div>
 
                     <p class="lead">We track <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>, temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), so we can (hopefully) determine who, where, what, and how the weather affects the quality of the air we breathe, from a community-funded air sensor in the scenic Miller Beach neighborhood of Gary, Indiana.</p>
 
-                    <p class="lead">In the future, depending on what data is openly available, we may be able to also gather data from the many industries around in the Region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
+                    <p class="lead">Depending on what data is openly available in the future, we may be able to gather additional data from the many industries around the Region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
 
                     <p class="lead">There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood, we'll track it and add it to our data.</p>
+
+                    <p class="lead">Not limiting our tracking to air, as soon as affordable community water quality testing becomes available for Lake Michigan, we'll track it and add that to our data, too.</p>
                 </div>
 
                 <div class="col-xl-6">
                     <div class="table-responsive">
-                        <table class="table text-monospace">
+                        <table class="table text-monospace mb-0">
                             <tbody>
                                 <tr>
                                     <td colspan="2">
@@ -372,13 +434,15 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="pt-5 small text-uppercase text-right" colspan="2">
-                                        <p class="mb-0" v-if="geography.region">
-                                            Region (polygon):<a class="pl-1" target="_blank"
+                                    <th class="pb-0 pt-5 small text-uppercase text-right" colspan="2">
+
+                                        <p class="mb-0" v-if="Object.keys(geography).length > 0">
+                                            Sensor located at: <code>{{ geography.sensor.lat }},{{ geography.sensor.lng }}</code><br>
+                                            Region (polygon): <a class="pl-1" target="_blank"
                                                 :title="getReversedCoordinates(geography.region.land_polygon)"
                                                 :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_polygon))}`"
                                             >coordinates</a><br>
-                                            Region (square):<a class="pl-1" target="_blank"
+                                            Region (square): <a class="pl-1" target="_blank"
                                                 :title="getReversedCoordinates(geography.region.land_square)"
                                                 :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_square))}`"
                                             >coordinates</a><br>
@@ -405,7 +469,7 @@
                                                 Vessel Tracking by: <a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon.com</a>
                                             </span>
 
-                                            <br>Last Updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago
+                                            <br><span :title="formatDateTimeToLocal(airshit.createdAt, null)"> Last Updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
 
                                         </p>
                                     </th>
@@ -419,7 +483,10 @@
             </div>
         </div>
 
-        <hr class="my-4 pb-4">
+        <div class="map-container py-5">
+            <div id="map"></div>
+            <small class="text-center px-5 w-100 d-block mt-2"><a target="_blank" href="/icons/set/train">Train</a>, <a target="_blank" href="/icons/set/fishing-boat">Fishing Boat</a> and other icons by <a target="_blank" href="https://icons8.com">Icons8</a></small>
+        </div>
 
         <div class="container">
             <div class="row">
@@ -493,7 +560,7 @@
                             EPA Facility Lookup
                             </a>
                             <ul>
-                                <li>e.g. <a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank">ARCELORMITTAL BURNS HARBOR</a></li>
+                                <li>e.g. <a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank">Arcelormittal Burns Harbor</a></li>
                             </ul>
                         </li>
                         <li class="source">
@@ -505,7 +572,7 @@
                         <li class="source">
                             <span class="source__type">Lawsuit:</span>
                             <a href="http://elpc.org/newsroom/press-releases/60-day-notice-clean-water-act-lawsuit-arcelormittal-100-violations-permit-since-2015/" target="_blank">
-                            ELPC vs. ArcelorMittalLawsuit
+                            ELPC vs. ArcelorMittal Lawsuit
                             </a>
                         </li>
                         <li class="source">
@@ -552,6 +619,9 @@
 </template>
 
 <script>
+/*global L*/
+
+require('leaflet-rotatedmarker');
 import { API } from '@/api';
 import moment from 'moment';
 import _ from 'lodash';
@@ -595,10 +665,93 @@ export default {
   },
 
   data() {
-    return {}
+    return {
+        isAqiMeaningsVisible: false,
+    }
   },
 
   methods: {
+    initMaps() {
+        const map = L.map('map', {attributionControl: false, scrollWheelZoom: false}).setView([
+            this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
+        ], 9);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+        const LeafIcon = L.Icon.extend({
+            options: {
+                iconSize:     [20, 20],
+                iconAnchor:   [0, 0],
+                popupAnchor:  [0, 0]
+            }
+        });
+
+        const sensorIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-radio-tower-50.png'});
+        const trainIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-train-50.png'});
+        const aircraftIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-airport-50.png'});
+        const boatIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-fishing-boat-50.png'});
+        const trafficIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-traffic-jam-50.png'});
+
+        L.marker([this.geography.sensor.lat, this.geography.sensor.lng], {icon: sensorIcon}).addTo(map);
+
+        for (const airport in this.$store.state.airshit.FLIGHTS) {
+            const flights = this.$store.state.airshit.FLIGHTS[airport];
+            flights.forEach((flight) => {
+                L.marker([flight.lat, flight.lng], {icon: aircraftIcon, rotationAngle: flight.bearing}).bindPopup(`
+                    Aircraft: ${flight.aircraft}<br>
+                    Flight: ${flight.flight}<br>
+                    Departing: ${flight.departing}, Arriving: ${flight.arriving}<br>
+                    Speed: ${flight.speed}<br>
+                    Bearing: ${flight.bearing}<br>
+                    Altitude: ${flight.alt}<br>
+                `).addTo(map);
+            });
+        }
+
+        for (const line in this.$store.state.airshit.TRAINS) {
+            const trains = this.$store.state.airshit.TRAINS[line];
+            trains.forEach((train) => {
+                const trainAngle = (train.direction === 'East' ? 90 : 270);
+                L.marker([train.lat, train.lng], {icon: trainIcon, rotationAngle: trainAngle}).bindPopup(`
+                    ID: ${train.id}<br>
+                    Direction: ${train.direction}
+                `).addTo(map);
+            });
+        }
+
+        this.$store.state.airshit.VESSELS.forEach((vessel) => {
+            const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
+            L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
+                Name: ${vessel.name}<br>
+                Callsign: ${vessel.callsign}<br>
+                Country: ${vessel.country}<br>
+                Type: ${vessel.type}<br>
+                Length: ${vessel.length}<br>
+                Width: ${vessel.width}<br>
+                Deadweight: ${vessel.deadweight}<br>
+                Destination: ${vessel.destination}<br>
+                Draught: ${vessel.draught}<br>
+                Status: ${vessel.status}<br>
+                Bearing: ${vessel.direction}<br>
+            `).addTo(map);
+        });
+
+        this.$store.state.airshit.TRAFFIC.INCIDENTS.forEach((incident) => {
+            L.marker([incident.lat, incident.lng], {icon: trafficIcon}).bindPopup(`
+                ${incident.shortDesc}<br>
+                <br>
+                Distance: ${incident.distance}<br>
+                Minute Delay: ${incident.freeFlowMinDelay}<br>
+                Started: ${incident.startTime}<br>
+                Ending: ${incident.endTime}<br>
+            `).addTo(map);
+        });
+    },
+
     degeesToRotation(angle) {
         return (angle + 180) % 360;
     },
@@ -661,20 +814,28 @@ export default {
         return region.map((coordinates) => {
             return [...coordinates].reverse();
         }).join('\r\n');
+    },
+
+    showAlert(msg) {
+        return alert(msg);
+    },
+
+    showAqiMeanings() {
+        this.isAqiMeaningsVisible = ! this.isAqiMeaningsVisible;
     }
   },
 
-  created() {
+  mounted() {
     API.get(`currently`).then(response => {
         this.$store.commit('setAirshit', response.data.airshit);
         this.$store.commit('setGeography', response.data.geography);
         this.$store.commit('setHistoricalHighs', response.data.highs);
+        this.initMaps()
     })
     .catch(e => {
         alert('error!');
-        alert(e);
         console.log(e); // eslint-disable-line no-console
-    })
+    });
   }
 }
 </script>
