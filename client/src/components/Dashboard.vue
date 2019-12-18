@@ -690,11 +690,11 @@ export default {
             }
         });
 
-        const sensorIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-radio-tower-50.png'});
-        const trainIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-train-50.png'});
-        const aircraftIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-airport-50.png'});
-        const boatIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-fishing-boat-50.png'});
-        const trafficIcon = new LeafIcon({iconUrl: 'http://localhost:8080/images/maps/icons8-traffic-jam-50.png'});
+        const sensorIcon = new LeafIcon({iconUrl: '/images/maps/icons8-radio-tower-50.png'});
+        const trainIcon = new LeafIcon({iconUrl: '/images/maps/icons8-train-50.png'});
+        const aircraftIcon = new LeafIcon({iconUrl: '/images/maps/icons8-airport-50.png'});
+        const boatIcon = new LeafIcon({iconUrl: '/images/maps/icons8-fishing-boat-50.png'});
+        const trafficIcon = new LeafIcon({iconUrl: '/images/maps/icons8-traffic-jam-50.png'});
 
         L.marker([this.geography.sensor.lat, this.geography.sensor.lng], {icon: sensorIcon}).addTo(map);
 
