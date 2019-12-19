@@ -27,6 +27,10 @@
 <script>
 export default {
   name: 'App',
+  metaInfo: {
+    title: 'Miller Beach / Gary / NWI Air Quality',
+    titleTemplate: '%s | Miller Beach / Gary / NWI Air Quality'
+  }
 };
 </script>
 

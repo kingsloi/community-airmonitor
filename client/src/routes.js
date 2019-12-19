@@ -5,11 +5,19 @@ const routes = [
     {
         path: '/',
         component: DashboardView,
-        auth: true,
-        children: [
-            { path: '', component: DashboardView, name: 'Dashboard' },
-            { path: '/tables', component: DashboardView, name: 'Tables' },
-        ]
+        auth: false,
+        children: [{
+            path: '',
+            component: DashboardView,
+            name: 'Dashboard'
+        }],
+        metaTags: [{
+            name: 'description',
+            content: 'The home page of our example app.'
+        }, {
+            property: 'og:description',
+            content: 'The home page of our example app.'
+        }]
     },
     {
         path: '*',

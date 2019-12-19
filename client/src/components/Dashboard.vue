@@ -164,31 +164,31 @@
                                     </tr>
                                     <tr>
                                         <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(51)">
-                                            <span class="aqi-stat__stat">Satisfactory (51–100)</span>
+                                            <span class="aqi-stat__stat">Moderate (51–100)</span>
                                         </td>
                                         <td>May cause minor breathing discomfort to sensitive people.</td>
                                     </tr>
                                     <tr>
                                         <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(101)">
-                                            <span class="aqi-stat__stat">Moderately polluted (101–200)</span>
+                                            <span class="aqi-stat__stat">Unhealthy for Sensitive Groups (101–200)</span>
                                         </td>
                                         <td>May cause breathing discomfort to people with lung disease such as asthma, and discomfort to people with heart disease, children and older adults.</td>
                                     </tr>
                                     <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
-                                            <span class="aqi-stat__stat">Poor (201–300)</span>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(151)">
+                                            <span class="aqi-stat__stat">Unhealthy (201–300)</span>
                                         </td>
                                         <td>May cause breathing discomfort to people on prolonged exposure, and discomfort to people with heart disease.</td>
                                     </tr>
                                     <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(301)">
-                                            <span class="aqi-stat__stat">Very poor (301–400)</span>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
+                                            <span class="aqi-stat__stat">Very Unhealthy (301-400)</span>
                                         </td>
                                         <td>May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases.</td>
                                     </tr>
                                     <tr>
                                         <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(401)">
-                                            <span class="aqi-stat__stat">Severe (401–500)</span>
+                                            <span class="aqi-stat__stat">Hazardous (401–500)</span>
                                         </td>
                                         <td>May cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease. The health impacts may be experienced even during light physical activity.</td>
                                     </tr>
@@ -196,7 +196,7 @@
                             </table>
                         </div>
                         <p class="lead text-right text-uppercase">
-                            <a href="/past" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
+                            <a href="#" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
                         </p>
                     </div>
 
@@ -450,7 +450,7 @@
                                                 :title="getReversedCoordinates(geography.region.lake)"
                                                 :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.lake))}`"
                                             >coordinates</a><br>
-                                            Temperature, humidity, pressure recorded at sensor<br>
+                                            PM2.5/PM10, AIS, temperature, humidity, pressure recorded at sensor<br>
                                             Traffic uses square region, trains/flights use polygon region<br>
                                             <br>
                                             <span class="d-block">
@@ -512,12 +512,12 @@
                     </ul>
                     <p class="lead partner-logo mb-5 mb-md-0 text-center text-md-left">
                         Flight tracking provided by: <a class="d-block" href="https://aviation-edge.com?utm_source=gary-indiana-opensource-air-monitor-footer" role="button" target="_blank">
-                            <img class="d-block mt-2 mx-auto mx-md-0" src="/images/aviation-edge-logo-small-medium.png">
+                            <img class="d-block mt-2 mx-auto mx-md-0" src="/images/aviation-edge-logo-small-medium.png" alt="Aviation Edge">
                         </a>
                     </p>
                     <p class="lead partner-logo mb-5 mt-4 mt-xs-0 mb-md-0 text-center text-md-left">
                         Vessel tracking provided by: <a class="d-block" href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" role="button" target="_blank">
-                            <img class="d-block mt-2 mx-auto mx-md-0" src="/images/FleetMon-logo-medium-large.png">
+                            <img class="d-block mt-2 mx-auto mx-md-0" src="/images/FleetMon-logo-medium-large.png" alt="FleetMon">
                         </a>
                     </p>
                 </div>
@@ -607,7 +607,7 @@
                     </li>
                     <li class="d-xs-block d-lg-inline-block pl-md-5 py-3 py-lg-0">
                         <a class="buy-coffee" href="https://www.buymeacoffee.com/kingsloi" target="_blank">
-                            <img class="mr-1" src="/images/buy-coffee.svg">Buy me a coffee</a>
+                            <img class="mr-1" src="/images/buy-coffee.svg" alt="Buy me a Coffee">Buy me a coffee</a>
                     </li>
                 </ul>
             </div>
@@ -627,216 +627,249 @@ import moment from 'moment';
 import _ from 'lodash';
 
 export default {
-  computed: {
-    airshit() {
-        return this.$store.state.airshit;
+    metaInfo: {
+        title: 'Miller Beach / Gary / NWI Air Quality',
+        titleTemplate: null,
+        meta: [
+          { name: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place." },
+
+            {property: 'og:title', content: 'Miller Beach / Gary / NWI Air Quality'},
+            {property: 'og:site_name', content: 'How\'s OUR Air Quality?'},
+            // The list of types is available here: http://ogp.me/#types
+            {property: 'og:type', content: 'website'},
+            // Should the the same as your canonical link, see below.
+            {property: 'og:url', content: 'https://millerbeach-air.com/'},
+            {property: 'og:image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.png'},
+            // Often the same as your meta description, but not always.
+            {property: 'og:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place."},
+
+            // Twitter card
+            {name: 'twitter:card', content: 'summary'},
+            {name: 'twitter:site', content: 'https://millerbeach-air.com'},
+            {name: 'twitter:title', content: 'Miller Beach / Gary / NWI Air Quality'},
+            {name: 'twitter:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place."},
+            // Your twitter handle, if you have one.
+            {name: 'twitter:image:src', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.png'},
+
+            // Google / Schema.org markup:
+            {itemprop: 'name', content: 'Miller Beach / Gary / NWI Air Quality'},
+            {itemprop: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place."},
+            {itemprop: 'image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.png'}
+        ]
     },
-    highs() {
-        return this.$store.state.highs;
+    computed: {
+        airshit() {
+            return this.$store.state.airshit;
+        },
+        highs() {
+            return this.$store.state.highs;
+        },
+        geography() {
+            return this.$store.state.geography;
+        },
+        congestionMiles() {
+          let total = 0;
+          const incidents = this.$store.state.airshit.TRAFFIC.INCIDENTS;
+
+          incidents.map((incident) => {
+            total += incident.distance;
+          });
+
+          return total.toFixed(0);
+        },
+        congestionTime() {
+            let total = 0;
+            const incidents = this.$store.state.airshit.TRAFFIC.INCIDENTS;
+
+            incidents.map((incident) => {
+                total += incident.freeFlowMinDelay;
+            });
+
+            return total.toFixed(0);
+        },
+        vesselsByType() {
+            const vessels = this.$store.state.airshit.VESSELS;
+
+            return _.groupBy(vessels, 'type');
+        },
     },
-    geography() {
-        return this.$store.state.geography;
+
+    data() {
+        return {
+            isAqiMeaningsVisible: false,
+        }
     },
-    congestionMiles() {
-      let total = 0;
-      const incidents = this.$store.state.airshit.TRAFFIC.INCIDENTS;
 
-      incidents.map((incident) => {
-        total += incident.distance;
-      });
+    methods: {
+        initMaps() {
+            const map = L.map('map', {scrollWheelZoom: false}).setView([
+                this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
+            ], 9);
 
-      return total.toFixed(0);
-    },
-    congestionTime() {
-        let total = 0;
-        const incidents = this.$store.state.airshit.TRAFFIC.INCIDENTS;
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
 
-        incidents.map((incident) => {
-            total += incident.freeFlowMinDelay;
-        });
+            const LeafIcon = L.Icon.extend({
+                options: {
+                    iconSize:     [20, 20],
+                    iconAnchor:   [10, 10],
+                    popupAnchor:  [0, 0]
+                }
+            });
 
-        return total.toFixed(0);
-    },
-    vesselsByType() {
-        const vessels = this.$store.state.airshit.VESSELS;
+            const root = process.env.VUE_APP_API_URL;
+            const sensorIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-radio-tower-50.png`});
+            const trainIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-train-50.png`});
+            const aircraftIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-airport-50.png`});
+            const boatIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-fishing-boat-50.png`});
+            const trafficIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-traffic-jam-50.png`});
 
-        return _.groupBy(vessels, 'type');
-    },
-  },
+            L.marker([this.geography.sensor.lat, this.geography.sensor.lng], {icon: sensorIcon}).bindPopup(`
+                PM2.5/PM10 sensor, AIS antenna, and reported weather are recorded from this location.
+            `).addTo(map);
 
-  data() {
-    return {
-        isAqiMeaningsVisible: false,
-    }
-  },
-
-  methods: {
-    initMaps() {
-        const map = L.map('map', {scrollWheelZoom: false}).setView([
-            this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
-        ], 9);
-
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd',
-            maxZoom: 19
-        }).addTo(map);
-
-        const LeafIcon = L.Icon.extend({
-            options: {
-                iconSize:     [20, 20],
-                iconAnchor:   [0, 0],
-                popupAnchor:  [0, 0]
+            for (const airport in this.$store.state.airshit.FLIGHTS) {
+                const flights = this.$store.state.airshit.FLIGHTS[airport];
+                flights.forEach((flight) => {
+                    L.marker([flight.lat, flight.lng], {icon: aircraftIcon, rotationAngle: flight.bearing}).bindPopup(`
+                        Aircraft: ${flight.aircraft}<br>
+                        Flight: ${flight.flight}<br>
+                        Departing: ${flight.departing}, Arriving: ${flight.arriving}<br>
+                        Speed: ${flight.speed}<br>
+                        Bearing: ${flight.bearing}<br>
+                        Altitude: ${flight.alt}<br>
+                    `).addTo(map);
+                });
             }
-        });
 
-        const sensorIcon = new LeafIcon({iconUrl: '/images/maps/icons8-radio-tower-50.png'});
-        const trainIcon = new LeafIcon({iconUrl: '/images/maps/icons8-train-50.png'});
-        const aircraftIcon = new LeafIcon({iconUrl: '/images/maps/icons8-airport-50.png'});
-        const boatIcon = new LeafIcon({iconUrl: '/images/maps/icons8-fishing-boat-50.png'});
-        const trafficIcon = new LeafIcon({iconUrl: '/images/maps/icons8-traffic-jam-50.png'});
+            for (const line in this.$store.state.airshit.TRAINS) {
+                const trains = this.$store.state.airshit.TRAINS[line];
+                trains.forEach((train) => {
+                    const trainAngle = (train.direction === 'East' ? 90 : 270);
+                    L.marker([train.lat, train.lng], {icon: trainIcon, rotationAngle: trainAngle}).bindPopup(`
+                        ID: ${train.id}<br>
+                        Direction: ${train.direction}
+                    `).addTo(map);
+                });
+            }
 
-        L.marker([this.geography.sensor.lat, this.geography.sensor.lng], {icon: sensorIcon}).addTo(map);
-
-        for (const airport in this.$store.state.airshit.FLIGHTS) {
-            const flights = this.$store.state.airshit.FLIGHTS[airport];
-            flights.forEach((flight) => {
-                L.marker([flight.lat, flight.lng], {icon: aircraftIcon, rotationAngle: flight.bearing}).bindPopup(`
-                    Aircraft: ${flight.aircraft}<br>
-                    Flight: ${flight.flight}<br>
-                    Departing: ${flight.departing}, Arriving: ${flight.arriving}<br>
-                    Speed: ${flight.speed}<br>
-                    Bearing: ${flight.bearing}<br>
-                    Altitude: ${flight.alt}<br>
+            this.$store.state.airshit.VESSELS.forEach((vessel) => {
+                const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
+                L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
+                    Name: ${vessel.name}<br>
+                    Callsign: ${vessel.callsign}<br>
+                    Country: ${vessel.country}<br>
+                    Type: ${vessel.type}<br>
+                    Length: ${vessel.length}<br>
+                    Width: ${vessel.width}<br>
+                    Deadweight: ${vessel.deadweight}<br>
+                    Destination: ${vessel.destination}<br>
+                    Draught: ${vessel.draught}<br>
+                    Status: ${vessel.status}<br>
+                    Bearing: ${vessel.direction}<br>
                 `).addTo(map);
             });
-        }
 
-        for (const line in this.$store.state.airshit.TRAINS) {
-            const trains = this.$store.state.airshit.TRAINS[line];
-            trains.forEach((train) => {
-                const trainAngle = (train.direction === 'East' ? 90 : 270);
-                L.marker([train.lat, train.lng], {icon: trainIcon, rotationAngle: trainAngle}).bindPopup(`
-                    ID: ${train.id}<br>
-                    Direction: ${train.direction}
+            this.$store.state.airshit.TRAFFIC.INCIDENTS.forEach((incident) => {
+                L.marker([incident.lat, incident.lng], {icon: trafficIcon}).bindPopup(`
+                    ${incident.shortDesc}<br>
+                    <br>
+                    Distance: ${incident.distance}<br>
+                    Minute Delay: ${incident.freeFlowMinDelay}<br>
+                    Started: ${incident.startTime}<br>
+                    Ending: ${incident.endTime}<br>
                 `).addTo(map);
             });
-        }
+        },
 
-        this.$store.state.airshit.VESSELS.forEach((vessel) => {
-            const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
-            L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
-                Name: ${vessel.name}<br>
-                Callsign: ${vessel.callsign}<br>
-                Country: ${vessel.country}<br>
-                Type: ${vessel.type}<br>
-                Length: ${vessel.length}<br>
-                Width: ${vessel.width}<br>
-                Deadweight: ${vessel.deadweight}<br>
-                Destination: ${vessel.destination}<br>
-                Draught: ${vessel.draught}<br>
-                Status: ${vessel.status}<br>
-                Bearing: ${vessel.direction}<br>
-            `).addTo(map);
+        degeesToRotation(angle) {
+            return (angle + 180) % 360;
+        },
+
+        getAqiScoreStatClassname(total) {
+            if (_.inRange(total, 0, 50)) {
+                return 'aqi-stat--good';
+            } else if (_.inRange(total, 51, 100)) {
+                return 'aqi-stat--moderate';
+            } else if (_.inRange(total, 101, 150)) {
+                return 'aqi-stat--unhealthy-sensitive';
+            } else if (_.inRange(total, 151, 200)) {
+                return 'aqi-stat--unhealthy';
+            } else if (_.inRange(total, 201, 300)) {
+                return 'aqi-stat--unhealthy-very';
+            } else if (total >= 301) {
+                return 'aqi-stat--death';
+            }
+        },
+
+        getAqiScoreClassname(measurement) {
+            switch(measurement) {
+                case 'Good':
+                    return 'aqi--good';
+                case 'Moderate':
+                    return 'aqi--moderate';
+                case 'Unhealthy for Sensitive Groups':
+                    return 'aqi--unhealthy-sensitive';
+                case 'Unhealthy':
+                    return 'aqi--unhealthy';
+                case 'Very Unhealthy':
+                    return 'aqi--unhealthy-very';
+                case 'Hazardous':
+                    return 'aqi--death';
+            }
+        },
+
+        getTotalAirQualityAqiScore(airshit) {
+            if (! airshit || ! airshit.PM25REALTIME || ! airshit.PM10REALTIME) {
+                return 0;
+            }
+
+            const pm25 = airshit.PM25REALTIME.aqi || 0;
+            const pm10 = airshit.PM10REALTIME.aqi || 0;
+
+            return pm25 + pm10;
+        },
+
+        formatDateTimeToLocal(datetime, format = 'dd Do MMM YY HH:mm.') {
+            return moment.utc(datetime).local().format(format);
+        },
+
+        formatDateTimeDiffToLocalHuman(datetime) {
+            const moment1 = moment.utc(datetime);
+            const moment2 = moment().utc();
+            return moment.duration(moment1.diff(moment2)).humanize();
+        },
+
+        getReversedCoordinates(region) {
+            return region.map((coordinates) => {
+                return [...coordinates].reverse();
+            }).join('\r\n');
+        },
+
+        showAlert(msg) {
+            return alert(msg);
+        },
+
+        showAqiMeanings() {
+            this.isAqiMeaningsVisible = ! this.isAqiMeaningsVisible;
+        }
+    },
+
+    mounted() {
+        API.get(`/currently`).then(response => {
+            this.$store.commit('setAirshit', response.data.airshit);
+            this.$store.commit('setGeography', response.data.geography);
+            this.$store.commit('setHistoricalHighs', response.data.highs);
+            this.initMaps()
+        })
+        .catch(e => {
+            alert('error!');
+            console.log(e); // eslint-disable-line no-console
         });
-
-        this.$store.state.airshit.TRAFFIC.INCIDENTS.forEach((incident) => {
-            L.marker([incident.lat, incident.lng], {icon: trafficIcon}).bindPopup(`
-                ${incident.shortDesc}<br>
-                <br>
-                Distance: ${incident.distance}<br>
-                Minute Delay: ${incident.freeFlowMinDelay}<br>
-                Started: ${incident.startTime}<br>
-                Ending: ${incident.endTime}<br>
-            `).addTo(map);
-        });
-    },
-
-    degeesToRotation(angle) {
-        return (angle + 180) % 360;
-    },
-
-    getAqiScoreStatClassname(total) {
-        if (_.inRange(total, 0, 50)) {
-            return 'aqi-stat--good';
-        } else if (_.inRange(total, 51, 100)) {
-            return 'aqi-stat--moderate';
-        } else if (_.inRange(total, 101, 150)) {
-            return 'aqi-stat--unhealthy-sensitive';
-        } else if (_.inRange(total, 151, 200)) {
-            return 'aqi-stat--unhealthy';
-        } else if (_.inRange(total, 201, 300)) {
-            return 'aqi-stat--unhealthy-very';
-        } else if (total >= 301) {
-            return 'aqi-stat--death';
-        }
-    },
-
-    getAqiScoreClassname(measurement) {
-        switch(measurement) {
-            case 'Good':
-                return 'aqi--good';
-            case 'Moderate':
-                return 'aqi--moderate';
-            case 'Unhealthy for Sensitive Groups':
-                return 'aqi--unhealthy-sensitive';
-            case 'Unhealthy':
-                return 'aqi--unhealthy';
-            case 'Very Unhealthy':
-                return 'aqi--unhealthy-very';
-            case 'Hazardous':
-                return 'aqi--death';
-        }
-    },
-
-    getTotalAirQualityAqiScore(airshit) {
-        if (! airshit || ! airshit.PM25REALTIME || ! airshit.PM10REALTIME) {
-            return 0;
-        }
-
-        const pm25 = airshit.PM25REALTIME.aqi || 0;
-        const pm10 = airshit.PM10REALTIME.aqi || 0;
-
-        return pm25 + pm10;
-    },
-
-    formatDateTimeToLocal(datetime, format = 'dd Do MMM YY HH:mm.') {
-        return moment.utc(datetime).local().format(format);
-    },
-
-    formatDateTimeDiffToLocalHuman(datetime) {
-        const moment1 = moment.utc(datetime);
-        const moment2 = moment().utc();
-        return moment.duration(moment1.diff(moment2)).humanize();
-    },
-
-    getReversedCoordinates(region) {
-        return region.map((coordinates) => {
-            return [...coordinates].reverse();
-        }).join('\r\n');
-    },
-
-    showAlert(msg) {
-        return alert(msg);
-    },
-
-    showAqiMeanings() {
-        this.isAqiMeaningsVisible = ! this.isAqiMeaningsVisible;
     }
-  },
-
-  mounted() {
-    API.get(`currently`).then(response => {
-        this.$store.commit('setAirshit', response.data.airshit);
-        this.$store.commit('setGeography', response.data.geography);
-        this.$store.commit('setHistoricalHighs', response.data.highs);
-        this.initMaps()
-    })
-    .catch(e => {
-        alert('error!');
-        console.log(e); // eslint-disable-line no-console
-    });
-  }
 }
 </script>
 
