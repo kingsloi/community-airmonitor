@@ -631,7 +631,7 @@ export default {
         title: 'Miller Beach / Gary / NWI Air Quality',
         titleTemplate: null,
         meta: [
-          { name: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place." },
+          { name: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place." },
 
             {property: 'og:title', content: 'Miller Beach / Gary / NWI Air Quality'},
             {property: 'og:site_name', content: 'How\'s OUR Air Quality?'},
@@ -639,22 +639,22 @@ export default {
             {property: 'og:type', content: 'website'},
             // Should the the same as your canonical link, see below.
             {property: 'og:url', content: 'https://millerbeach-air.com/'},
-            {property: 'og:image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.png'},
+            {property: 'og:image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'},
             // Often the same as your meta description, but not always.
-            {property: 'og:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place."},
+            {property: 'og:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place."},
 
             // Twitter card
             {name: 'twitter:card', content: 'summary'},
             {name: 'twitter:site', content: 'https://millerbeach-air.com'},
             {name: 'twitter:title', content: 'Miller Beach / Gary / NWI Air Quality'},
-            {name: 'twitter:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place."},
+            {name: 'twitter:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place."},
             // Your twitter handle, if you have one.
-            {name: 'twitter:image:src', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.png'},
+            {name: 'twitter:image:src', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'},
 
             // Google / Schema.org markup:
             {itemprop: 'name', content: 'Miller Beach / Gary / NWI Air Quality'},
-            {itemprop: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region. Updated frequently, citizens of The Region can check the quality of the air they are breathing, ships on Lake Michigan, flights to/from Gary/GYY, O'Hare/ORD, Midway/MDW, South Shore trains, traffic accidents & congestion, all in one place."},
-            {itemprop: 'image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.png'}
+            {itemprop: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place."},
+            {itemprop: 'image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'}
         ]
     },
     computed: {
