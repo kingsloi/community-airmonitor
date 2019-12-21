@@ -9,6 +9,7 @@ const async = require('async');
 const calculations = require('../helpers/calculations');
 const _ = require('lodash');
 const fs = require('fs');
+const cache = require('express-redis-cache')();
 
 /**
  * GET /
@@ -38,32 +39,104 @@ exports.index = (req, res) => {
     (callback) => { // year high
       Airshit.find({createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
     },
+    (callback) => { // vessels high
+      Airshit.aggregate([
+        {
+          $project: {
+            count: {
+              $max: { $size: { $ifNull: [ "$VESSELS", [] ] } }
+            },
+            createdAt: '$createdAt'
+          },
+        },
+        { "$sort": { "count": -1 }},
+        { "$limit": 1 }
+      ]).exec(callback);
+    },
+    (callback) => { // flights high
+      Airshit.aggregate([
+        {
+          $project: {
+            count: {
+              $add: [
+                { $max: { $size: { $ifNull: [ "$FLIGHTS.GYY", [] ] } } },
+                { $max: { $size: { $ifNull: [ "$FLIGHTS.ORD", [] ] } } },
+                { $max: { $size: { $ifNull: [ "$FLIGHTS.MDW", [] ] } } },
+              ]
+            },
+            createdAt: '$createdAt'
+          },
+        },
+        { "$sort": { "count": -1 }},
+        { "$limit": 1 }
+      ]).exec(callback);
+    },
+    (callback) => { // trains high
+      Airshit.aggregate([
+        {
+          $project: {
+            count: {
+              $add: [
+                { $max: { $size: { $ifNull: [ "$TRAINS.SOUTHSHORE", [] ] } } },
+              ]
+            },
+            createdAt: '$createdAt'
+          },
+        },
+        { "$sort": { "count": -1 }},
+        { "$limit": 1 }
+      ]).exec(callback);
+    },
+    (callback) => { // traffic high
+      Airshit.aggregate([
+        {
+          $project: {
+            sum: {
+              $add: [
+                { $max: { $sum: { $ifNull: [ "$TRAFFIC.INCIDENTS.distance", [] ] } } },
+              ]
+            },
+            createdAt: '$createdAt'
+          },
+        },
+        { "$sort": { "sum": -1 }},
+        { "$limit": 1 }
+      ]).exec(callback);
+    },
   ], function(err, results) {
       // Latest
       const latest = results[0];
 
-      // Week
+      // AQI Week
       const highestInWeek = Math.max(...results[1].map((airshit) => {
         return calculations.totalAirQuality(airshit);
       }));
       const highestWeekDay = results[1].find((airshit) => {
         return calculations.totalAirQuality(airshit) === highestInWeek;
       });
-      // Month
+      // AQI Month
       const highestInMonth = Math.max(...results[2].map((airshit) => {
         return calculations.totalAirQuality(airshit);
       }));
       const highestMonthDay = results[2].find((airshit) => {
         return calculations.totalAirQuality(airshit) === highestInMonth;
       });
-      // Year
+      // AQIYear
       const highestInYear = Math.max(...results[3].map((airshit) => {
         return calculations.totalAirQuality(airshit);
       }));
-
       const highestYearDay = results[3].find((airshit) => {
         return calculations.totalAirQuality(airshit) === highestInYear;
       });
+
+      // Vessels
+      const highestVessels = results[4][0];
+      // Flights
+      const highestFlights = results[5][0];
+      // Trains
+      const highestTrains = results[6][0];
+      // Traffic
+      const highestTraffic = results[7][0];
 
       res.json({
         airshit: latest,
@@ -82,6 +155,10 @@ exports.index = (req, res) => {
           week: highestWeekDay,
           month: highestMonthDay,
           year: highestYearDay,
+          vessels: highestVessels,
+          flights: highestFlights,
+          trains: highestTrains,
+          traffic: highestTraffic
         }
       });
   });
@@ -270,7 +347,6 @@ exports.sync = (req, res) => {
 
     // Traffic / Incidents
     const incidents = traffic.incidents.map((incident) => {
-      console.log(incident);
       return {
         lat: incident.lat,
         lng: incident.lng,
@@ -360,6 +436,10 @@ exports.sync = (req, res) => {
 
         shitstamp.save(function (err, response) {
           if (err) return console.error(err);
+          cache.del('/currently', function (error, deleted) {
+            if (error) throw error;
+          });
+
           res.send({ success: true });
         });
       })

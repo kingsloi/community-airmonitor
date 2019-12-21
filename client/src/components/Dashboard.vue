@@ -15,7 +15,7 @@
                             >
                                 <div class="card-body">
                                     <div class="rotate">
-                                        <i class="fa fa-signal fa-5x"></i>
+                                        <i class="fa fa-tachometer-alt fa-5x"></i>
                                     </div>
                                     <h3 class="h6 text-uppercase">PM2.5</h3>
                                     <p class="display-4 font-weight-bold mb-0">
@@ -35,7 +35,7 @@
                             >
                                 <div class="card-body">
                                     <div class="rotate">
-                                        <i class="fa fa-signal fa-5x"></i>
+                                        <i class="fa fa-tachometer-alt fa-5x"></i>
                                     </div>
                                     <h3 class="h6 text-uppercase">PM10</h3>
                                     <p class="display-4 font-weight-bold mb-0">
@@ -50,155 +50,270 @@
                             </div>
                         </div>
                     </div>
-                    <h2 class="small text-uppercase mb-2 text-dark">Historical Highs</h2>
 
-                    <div class="row mb-3 no-gutters">
-                        <div class="col-4">
-                            <div class="card br-0">
-                                <div class="card-header">
-                                    <h5 class="mb-0 card-title text-uppercase small">Week High</h5>
-                                </div>
-                                <div class="card-body aqi-stat"
-                                    :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.week))"
-                                >
-                                    <div class="rotate">
-                                        <i class="fa fa-signal fa-3x"></i>
+
+                    <div class="highs mb-3">
+                        <h2 class="small text-uppercase mb-2 text-dark">Historical Air Quality Highs</h2>
+
+                        <div class="row no-gutters mb-2">
+                            <div class="col-4">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Week High</h5>
                                     </div>
-                                    <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
-                                    <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                    <div class="card-body aqi-stat"
+                                        :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.week))"
+                                    >
+                                        <div class="rotate">
+                                            <i class="fa fa-signal fa-3x"></i>
+                                        </div>
+                                        <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.week"></span>
+                                            <span v-else>
+                                                {{ getTotalAirQualityAqiScore(highs.week) }}
+                                            </span>
+                                        </p>
                                         <span class="number--blurred" v-if="! highs.week"></span>
-                                        <span v-else>
-                                            {{ getTotalAirQualityAqiScore(highs.week) }}
-                                        </span>
-                                    </p>
-                                    <span class="number--blurred" v-if="! highs.week"></span>
-                                    <p v-else class="small mb-0"
-                                        :title="formatDateTimeToLocal(highs.week.createdAt, null)"
-                                    >
-                                        {{ formatDateTimeToLocal(highs.week.createdAt) }}
-                                    </p>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.week.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.week.createdAt) }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="card br-0">
-                                <div class="card-header">
-                                    <h5 class="mb-0 card-title text-uppercase small">Month High</h5>
-                                </div>
-                                <div class="card-body aqi-stat"
-                                    :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.month))"
-                                >
-                                    <div class="rotate">
-                                        <i class="fa fa-signal fa-3x"></i>
+                            <div class="col-4">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Month High</h5>
                                     </div>
-                                    <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
-                                    <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                    <div class="card-body aqi-stat"
+                                        :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.month))"
+                                    >
+                                        <div class="rotate">
+                                            <i class="fa fa-signal fa-3x"></i>
+                                        </div>
+                                        <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.month"></span>
+                                            <span v-else>
+                                                {{ getTotalAirQualityAqiScore(highs.month) }}
+                                            </span>
+                                        </p>
                                         <span class="number--blurred" v-if="! highs.month"></span>
-                                        <span v-else>
-                                            {{ getTotalAirQualityAqiScore(highs.month) }}
-                                        </span>
-                                    </p>
-                                    <span class="number--blurred" v-if="! highs.month"></span>
-                                    <p v-else class="small mb-0"
-                                        :title="formatDateTimeToLocal(highs.month.createdAt, null)"
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.month.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.month.createdAt) }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Year High</h5>
+                                    </div>
+                                    <div class="card-body aqi-stat"
+                                        :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.year))"
                                     >
-                                        {{ formatDateTimeToLocal(highs.month.createdAt) }}
-                                    </p>
+                                        <div class="rotate">
+                                            <i class="fa fa-signal fa-3x"></i>
+                                        </div>
+                                        <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.year"></span>
+                                            <span v-else>
+                                                {{ getTotalAirQualityAqiScore(highs.year) }}
+                                            </span>
+                                        </p>
+                                        <span class="number--blurred" v-if="! highs.year"></span>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.year.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.year.createdAt) }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-4">
-                            <div class="card br-0">
-                                <div class="card-header">
-                                    <h5 class="mb-0 card-title text-uppercase small">Year High</h5>
-                                </div>
-                                <div class="card-body aqi-stat"
-                                    :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.year))"
-                                >
-                                    <div class="rotate">
-                                        <i class="fa fa-signal fa-3x"></i>
+
+                    <p class="mb-0 small text-right text-uppercase">
+                        <a href="#" role="button" class="mb-2 d-inline-block" @click.prevent="showAqiMeanings()">
+                            what do these numbers mean?<i class="fa pl-1" aria-hidden="true"
+                                :class="{
+                                    'fa-chevron-down': isAqiMeaningsVisible === true,
+                                    'fa-chevron-right': isAqiMeaningsVisible === false,
+                                }"
+                            ></i>
+                        </a>
+                    </p>
+                    <div v-if="isAqiMeaningsVisible">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Score</th>
+                                    <th>Health Impacts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(0)">
+                                        <span class="aqi-stat__stat">Good (0-50)</span>
+                                    </td>
+                                    <td>Minimal impact</td>
+                                </tr>
+                                <tr>
+                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(51)">
+                                        <span class="aqi-stat__stat">Moderate (51–100)</span>
+                                    </td>
+                                    <td>May cause minor breathing discomfort to sensitive people.</td>
+                                </tr>
+                                <tr>
+                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(101)">
+                                        <span class="aqi-stat__stat">Unhealthy for Sensitive Groups (101–200)</span>
+                                    </td>
+                                    <td>May cause breathing discomfort to people with lung disease such as asthma, and discomfort to people with heart disease, children and older adults.</td>
+                                </tr>
+                                <tr>
+                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(151)">
+                                        <span class="aqi-stat__stat">Unhealthy (201–300)</span>
+                                    </td>
+                                    <td>May cause breathing discomfort to people on prolonged exposure, and discomfort to people with heart disease.</td>
+                                </tr>
+                                <tr>
+                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
+                                        <span class="aqi-stat__stat">Very Unhealthy (301-400)</span>
+                                    </td>
+                                    <td>May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases.</td>
+                                </tr>
+                                <tr>
+                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(401)">
+                                        <span class="aqi-stat__stat">Hazardous (401–500)</span>
+                                    </td>
+                                    <td>May cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease. The health impacts may be experienced even during light physical activity.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                        <h2 class="small text-uppercase mb-2 text-dark">Historical Industry Highs</h2>
+
+                        <div class="row no-gutters">
+                            <div class="col-3">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Ships High</h5>
                                     </div>
-                                    <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
-                                    <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                        <span class="number--blurred" v-if="! highs.year"></span>
-                                        <span v-else>
-                                            {{ getTotalAirQualityAqiScore(highs.year) }}
-                                        </span>
-                                    </p>
-                                    <span class="number--blurred" v-if="! highs.year"></span>
-                                    <p v-else class="small mb-0"
-                                        :title="formatDateTimeToLocal(highs.year.createdAt, null)"
+                                    <div class="card-body aqi-stat"
                                     >
-                                        {{ formatDateTimeToLocal(highs.year.createdAt) }}
-                                    </p>
+                                        <div class="rotate">
+                                            <i class="fa fa-ship fa-3x"></i>
+                                        </div>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.vessels"></span>
+                                            <span v-else>
+                                                {{ highs.vessels.count }}
+                                                <small style="font-size:0.5rem;">total</small>
+                                            </span>
+                                        </p>
+                                        <span class="number--blurred" v-if="! highs.vessels"></span>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.vessels.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.vessels.createdAt) }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Flights High</h5>
+                                    </div>
+                                    <div class="card-body aqi-stat"
+                                    >
+                                        <div class="rotate">
+                                            <i class="fa fa-plane fa-3x"></i>
+                                        </div>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.flights"></span>
+                                            <span v-else>
+                                                {{ highs.flights.count }}
+                                                <small style="font-size:0.5rem;">total</small>
+                                            </span>
+                                        </p>
+                                        <span class="number--blurred" v-if="! highs.flights"></span>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.flights.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.flights.createdAt) }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Trains High</h5>
+                                    </div>
+                                    <div class="card-body aqi-stat"
+                                    >
+                                        <div class="rotate">
+                                            <i class="fa fa-train fa-3x"></i>
+                                        </div>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.trains"></span>
+                                            <span v-else>
+                                                {{ highs.trains.count }}
+                                                <small style="font-size:0.5rem;">total</small>
+                                            </span>
+                                        </p>
+                                        <span class="number--blurred" v-if="! highs.trains"></span>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.trains.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.trains.createdAt) }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-3">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Traffic High</h5>
+                                    </div>
+                                    <div class="card-body aqi-stat"
+                                    >
+                                        <div class="rotate">
+                                            <i class="fa fa-car fa-3x"></i>
+                                        </div>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.traffic"></span>
+                                            <span v-else>
+                                                {{ highs.traffic.sum.toFixed(2) }}
+                                                <small style="font-size:0.5rem;">miles</small>
+                                            </span>
+                                        </p>
+                                        <span class="number--blurred" v-if="! highs.traffic"></span>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.traffic.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.traffic.createdAt) }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="">
-                        <p class="mb-0 lead text-right text-uppercase">
-                            <a href="#" role="button" class="mb-2 d-inline-block" @click.prevent="showAqiMeanings()">
-                                what do these numbers mean?<i class="fa pl-1" aria-hidden="true"
-                                    :class="{
-                                        'fa-chevron-down': isAqiMeaningsVisible === true,
-                                        'fa-chevron-right': isAqiMeaningsVisible === false,
-                                    }"
-                                ></i>
-                            </a>
-                        </p>
-                        <div v-if="isAqiMeaningsVisible">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Score</th>
-                                        <th>Health Impacts</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(0)">
-                                            <span class="aqi-stat__stat">Good (0-50)</span>
-                                        </td>
-                                        <td>Minimal impact</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(51)">
-                                            <span class="aqi-stat__stat">Moderate (51–100)</span>
-                                        </td>
-                                        <td>May cause minor breathing discomfort to sensitive people.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(101)">
-                                            <span class="aqi-stat__stat">Unhealthy for Sensitive Groups (101–200)</span>
-                                        </td>
-                                        <td>May cause breathing discomfort to people with lung disease such as asthma, and discomfort to people with heart disease, children and older adults.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(151)">
-                                            <span class="aqi-stat__stat">Unhealthy (201–300)</span>
-                                        </td>
-                                        <td>May cause breathing discomfort to people on prolonged exposure, and discomfort to people with heart disease.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
-                                            <span class="aqi-stat__stat">Very Unhealthy (301-400)</span>
-                                        </td>
-                                        <td>May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(401)">
-                                            <span class="aqi-stat__stat">Hazardous (401–500)</span>
-                                        </td>
-                                        <td>May cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease. The health impacts may be experienced even during light physical activity.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <p class="lead text-right text-uppercase">
-                            <a href="#" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
-                        </p>
-                    </div>
+                    <p class="lead text-right text-uppercase">
+                        <a href="#" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
+                    </p>
 
                     <p class="lead">We track <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>, temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), so we can (hopefully) determine who, where, what, and how the weather affects the quality of the air we breathe, from a community-funded air sensor in the scenic Miller Beach neighborhood of Gary, Indiana.</p>
 
@@ -346,7 +461,7 @@
                                 <tr>
                                     <td colspan="2">
                                         <span class="small text-uppercase mb-0 text-dark">
-                                            Industry
+                                            Industry <a href="#map">view on map</a>
                                         </span>
                                     </td>
                                 </tr>
@@ -591,36 +706,11 @@
                 </div>
             </div>
         </div>
-
-        <footer class="pt-0 pt-md-5">
-            <div class="container">
-                <ul class="float-lg-raight list-inline text-center">
-                    <li class="d-xs-block d-lg-inline-block py-3 py-lg-0">
-                        <a href="https://github.com/kingsloi/community-airmonitor" target="_blank">
-                            I'm open source, fork your own!
-                        </a>
-                    </li>
-                    <li class="d-xs-block d-lg-inline-block pl-md-5 py-3 py-lg-0">
-                        <a href="https://github.com/kingsloi/community-airmonitor/issues" target="_blank">
-                            Issues
-                        </a>
-                    </li>
-                    <li class="d-xs-block d-lg-inline-block pl-md-5 py-3 py-lg-0">
-                        <a class="buy-coffee" href="https://www.buymeacoffee.com/kingsloi" target="_blank">
-                            <img class="mr-1" src="/images/buy-coffee.svg" alt="Buy me a Coffee">Buy me a coffee</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="container">
-                <p class="made-with-love">Made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a></p>
-            </div>
-        </footer>
     </div>
 </template>
 
 <script>
-/*global L*/
-
+import L from 'leaflet';
 require('leaflet-rotatedmarker');
 import { API } from '@/api';
 import moment from 'moment';
@@ -657,6 +747,7 @@ export default {
             {itemprop: 'image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'}
         ]
     },
+
     computed: {
         airshit() {
             return this.$store.state.airshit;
@@ -700,8 +791,33 @@ export default {
         }
     },
 
+    created () {
+        this.getLatestValues();
+    },
+
+    watch: {
+        '$route': 'getLatestValues'
+    },
+
     methods: {
+        getLatestValues() {
+            API.get(`/currently`).then(response => {
+                this.$store.commit('setAirshit', response.data.airshit);
+                this.$store.commit('setGeography', response.data.geography);
+                this.$store.commit('setHistoricalHighs', response.data.highs);
+                this.initMaps()
+            })
+            .catch(e => {
+                alert('error!');
+                console.log(e); // eslint-disable-line no-console
+            });
+        },
+
         initMaps() {
+            if (! document.getElementById('map')) {
+                return;
+            }
+
             const map = L.map('map', {scrollWheelZoom: false}).setView([
                 this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
             ], 9);
@@ -833,7 +949,7 @@ export default {
             return pm25 + pm10;
         },
 
-        formatDateTimeToLocal(datetime, format = 'dd Do MMM YY HH:mm.') {
+        formatDateTimeToLocal(datetime, format = 'Do MMM YY HH:mm') {
             return moment.utc(datetime).local().format(format);
         },
 
@@ -859,16 +975,6 @@ export default {
     },
 
     mounted() {
-        API.get(`/currently`).then(response => {
-            this.$store.commit('setAirshit', response.data.airshit);
-            this.$store.commit('setGeography', response.data.geography);
-            this.$store.commit('setHistoricalHighs', response.data.highs);
-            this.initMaps()
-        })
-        .catch(e => {
-            alert('error!');
-            console.log(e); // eslint-disable-line no-console
-        });
     }
 }
 </script>

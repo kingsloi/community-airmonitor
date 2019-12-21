@@ -20,7 +20,8 @@ const sass = require('node-sass-middleware');
 const multer = require('multer');
 const _ = require('lodash');
 const cors = require('cors');
-const history = require('connect-history-api-fallback')
+const history = require('connect-history-api-fallback');
+const cache = require('express-redis-cache')();
 
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
@@ -111,10 +112,7 @@ app.use('/webfonts', express.static(path.join(__dirname, 'node_modules/@fortawes
 const publicPath = path.resolve(path.join(__dirname, '../', 'client', 'dist'));
 app.use(express.static(publicPath, { maxAge: '1y', etag: false }))
 
-// app.get('/past', airShirtController.past);
-app.get('/currently', airShirtController.index);
-// app.get('/graphs', airShirtController.graphs);
-// app.get('/history-and-updates', airShirtController.history);
+app.get('/currently', cache.route(), airShirtController.index);
 app.get('/sync', airShirtController.sync);
 
 app.use(history());
