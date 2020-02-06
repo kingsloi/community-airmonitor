@@ -246,6 +246,16 @@ sub {
     border-radius: 0px;
 }
 
+#introduction {
+    .lead {
+        font-size: 1.05rem;
+
+        &:first-child {
+            font-weight: 400;
+        }
+    }
+}
+
 .table {
     .aqi {
         .score {

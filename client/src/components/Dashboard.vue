@@ -53,13 +53,13 @@
 
 
                     <div class="highs mb-3">
-                        <h2 class="small text-uppercase mb-2 text-dark">Historical Air Quality Highs</h2>
+                        <h2 class="small text-uppercase mb-2 text-dark">Historical Air Quality Highs <sup><a href="#note-3">[3]</a></sup></h2>
 
                         <div class="row no-gutters mb-2">
                             <div class="col-4">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Week High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">Week</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
                                         :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.week))"
@@ -86,7 +86,7 @@
                             <div class="col-4">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Month High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">Month</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
                                         :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.month))"
@@ -113,98 +113,98 @@
                             <div class="col-4">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Year High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">All Time</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
-                                        :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.year))"
+                                        :class="getAqiScoreStatClassname((highs.alltime) ? highs.alltime.sum : 0)"
                                     >
                                         <div class="rotate">
                                             <i class="fa fa-signal fa-3x"></i>
                                         </div>
                                         <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
                                         <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                            <span class="number--blurred" v-if="! highs.year"></span>
+                                            <span class="number--blurred" v-if="! highs.alltime"></span>
                                             <span v-else>
-                                                {{ getTotalAirQualityAqiScore(highs.year) }}
+                                                {{ highs.alltime.sum }}
                                             </span>
                                         </p>
-                                        <span class="number--blurred" v-if="! highs.year"></span>
+                                        <span class="number--blurred" v-if="! highs.alltime"></span>
                                         <p v-else class="small mb-0"
-                                            :title="formatDateTimeToLocal(highs.year.createdAt, null)"
+                                            :title="formatDateTimeToLocal(highs.alltime.createdAt, null)"
                                         >
-                                            {{ formatDateTimeToLocal(highs.year.createdAt) }}
+                                            {{ formatDateTimeToLocal(highs.alltime.createdAt) }}
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                    <p class="mb-0 small text-right text-uppercase">
-                        <a href="#" role="button" class="mb-2 d-inline-block" @click.prevent="showAqiMeanings()">
-                            what do these numbers mean?<i class="fa pl-1" aria-hidden="true"
-                                :class="{
-                                    'fa-chevron-down': isAqiMeaningsVisible === true,
-                                    'fa-chevron-right': isAqiMeaningsVisible === false,
-                                }"
-                            ></i>
-                        </a>
-                    </p>
-                    <div v-if="isAqiMeaningsVisible">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Score</th>
-                                    <th>Health Impacts</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(0)">
-                                        <span class="aqi-stat__stat">Good (0-50)</span>
-                                    </td>
-                                    <td>Minimal impact</td>
-                                </tr>
-                                <tr>
-                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(51)">
-                                        <span class="aqi-stat__stat">Moderate (51–100)</span>
-                                    </td>
-                                    <td>May cause minor breathing discomfort to sensitive people.</td>
-                                </tr>
-                                <tr>
-                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(101)">
-                                        <span class="aqi-stat__stat">Unhealthy for Sensitive Groups (101–200)</span>
-                                    </td>
-                                    <td>May cause breathing discomfort to people with lung disease such as asthma, and discomfort to people with heart disease, children and older adults.</td>
-                                </tr>
-                                <tr>
-                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(151)">
-                                        <span class="aqi-stat__stat">Unhealthy (201–300)</span>
-                                    </td>
-                                    <td>May cause breathing discomfort to people on prolonged exposure, and discomfort to people with heart disease.</td>
-                                </tr>
-                                <tr>
-                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
-                                        <span class="aqi-stat__stat">Very Unhealthy (301-400)</span>
-                                    </td>
-                                    <td>May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases.</td>
-                                </tr>
-                                <tr>
-                                    <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(401)">
-                                        <span class="aqi-stat__stat">Hazardous (401–500)</span>
-                                    </td>
-                                    <td>May cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease. The health impacts may be experienced even during light physical activity.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                        <p class="mb-0 small text-right text-uppercase">
+                            <a href="#" role="button" class="mb-2 d-inline-block" @click.prevent="showAqiMeanings()">
+                                what do these numbers mean?<i class="fa pl-1" aria-hidden="true"
+                                    :class="{
+                                        'fa-chevron-down': isAqiMeaningsVisible === true,
+                                        'fa-chevron-right': isAqiMeaningsVisible === false,
+                                    }"
+                                ></i>
+                            </a>
+                        </p>
+                        <div v-if="isAqiMeaningsVisible">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Score</th>
+                                        <th>Health Impacts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(0)">
+                                            <span class="aqi-stat__stat">Good (0-50)</span>
+                                        </td>
+                                        <td>Minimal impact</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(51)">
+                                            <span class="aqi-stat__stat">Moderate (51–100)</span>
+                                        </td>
+                                        <td>May cause minor breathing discomfort to sensitive people.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(101)">
+                                            <span class="aqi-stat__stat">Unhealthy for Sensitive Groups (101–200)</span>
+                                        </td>
+                                        <td>May cause breathing discomfort to people with lung disease such as asthma, and discomfort to people with heart disease, children and older adults.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(151)">
+                                            <span class="aqi-stat__stat">Unhealthy (201–300)</span>
+                                        </td>
+                                        <td>May cause breathing discomfort to people on prolonged exposure, and discomfort to people with heart disease.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(201)">
+                                            <span class="aqi-stat__stat">Very Unhealthy (301-400)</span>
+                                        </td>
+                                        <td>May cause respiratory illness to the people on prolonged exposure. Effect may be more pronounced in people with lung and heart diseases.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="aqi-stat font-weight-bold text-uppercase" :class="getAqiScoreStatClassname(401)">
+                                            <span class="aqi-stat__stat">Hazardous (401–500)</span>
+                                        </td>
+                                        <td>May cause respiratory impact even on healthy people, and serious health impacts on people with lung/heart disease. The health impacts may be experienced even during light physical activity.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <h2 class="small text-uppercase mb-2 text-dark">Historical Industry Highs</h2>
 
-                        <div class="row no-gutters">
+                        <div class="row no-gutters mb-4">
                             <div class="col-3">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Ships High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">Ships</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
                                     >
@@ -231,7 +231,7 @@
                             <div class="col-3">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Flights High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">Flights</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
                                     >
@@ -258,7 +258,7 @@
                             <div class="col-3">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Trains High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">Trains</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
                                     >
@@ -285,7 +285,7 @@
                             <div class="col-3">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Traffic High</h5>
+                                        <h5 class="mb-0 card-title text-uppercase small">Traffic</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
                                     >
@@ -311,17 +311,21 @@
                         </div>
                     </div>
 
-                    <p class="lead text-right text-uppercase">
+                    <p class="lead text-right text-uppercase mb-3">
                         <a href="#" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
                     </p>
 
-                    <p class="lead">We track <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>, temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), so we can (hopefully) determine who, where, what, and how the weather affects the quality of the air we breathe, from a community-funded air sensor in the scenic Miller Beach neighborhood of Gary, Indiana.</p>
+                    <div id="introduction">
+                        <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">ArcelorMittal leaked Cyanide into tributary of Lake Michigan</a>. Suspected the source was likely from one of the many steel mills in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">Purple Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, hopefully bringing awareness to how the local industry affects the air residents and tourists breathe.</p>
 
-                    <p class="lead">Depending on what data is openly available in the future, we may be able to gather additional data from the many industries around the Region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
+                        <p class="lead">Tracking <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a> (<a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">AQI</a>), temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), as to (hopefully) determine who, where, what, and how the weather affects the quality of the air quality.</p>
 
-                    <p class="lead">There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood, we'll track it and add it to our data.</p>
+                        <p class="lead">Depending on what data is openly available in the future, it may be possible to gather additional data from the many industries other around the Region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>ORD/MDY/GYY air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
 
-                    <p class="lead">Not limiting our tracking to air, as soon as affordable community water quality testing becomes available for Lake Michigan, we'll track it and add that to our data, too.</p>
+                        <p class="lead">There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood, we'll track it and add it to our data.</p>
+
+                        <p class="lead">Not limiting our tracking to air, as soon as affordable community water quality testing becomes available for Lake Michigan, we'll track it and add that to our data, too.</p>
+                    </div>
                 </div>
 
                 <div class="col-xl-6">
@@ -365,9 +369,9 @@
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                                             <template v-else>
                                                 <span class="mr-3">
-                                                    {{ airshit.REPORTED_WEATHER['windSpeed'].toFixed(0) }} - {{ airshit.REPORTED_WEATHER['windGust'].toFixed(0) }} <sub>mph</sub> /
+                                                    {{ airshit.REPORTED_WEATHER['windSpeed'].toFixed(0) }}-{{ airshit.REPORTED_WEATHER['windGust'].toFixed(0) }} <sub>mph</sub>
                                                 </span>
-                                                <span class="d-inline-block lead mb-0" :title="`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`" style="`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`">
+                                                <span class="d-inline-block lead mb-0" :title="`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`" :style="`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`">
                                                     ↑
                                                 </span>
                                             </template>
@@ -458,10 +462,11 @@
                                         </p>
                                     </td>
                                 </tr>
+
                                 <tr>
                                     <td colspan="2">
                                         <span class="small text-uppercase mb-0 text-dark">
-                                            Industry <a href="#map">view on map</a>
+                                            Industry <a href="#map" class="pt-1 float-right">view on map</a>
                                         </span>
                                     </td>
                                 </tr>
@@ -575,7 +580,7 @@
                                                 Trains by: <a href="http://southshore.etaspot.net" target="_blank">southshore.etaspot.net</a>
                                             </span>
                                             <span class="d-block">
-                                                Traffic by: <a href="http://southshore.etaspot.net" target="_blank">mapquest.com</a>
+                                                Traffic by: <a href="http://mapquest.com" target="_blank">mapquest.com</a>
                                             </span>
                                             <span class="d-block">
                                                 Flight Tracking by: <a href="https://aviation-edge.com?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">aviation-edge.com</a>
@@ -698,10 +703,19 @@
                         </li>
                     </ul>
 
+                    <h2 class="h4 text-uppercase font-weight-light text-center text-md-left mt-4">Support Us / Contribute</h2>
+                    <ul class="">
+                        <li>Support us by purchasing more <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">Purple Air Quality Sensors</a>, placing them throughout NWI and adding the sensor to our data to track the air quality in the greater region, and not just localised to Miller Beach.</li>
+                        <li>We use the free version for both the <a href="https://darksky.net/dev" target="_blank">weather</a> and <a href="https://developer.mapquest.com/plans" target="_blank">traffic</a> services, limiting how many times we can check the air quality, support us by providing a premium key so we can increase how frequently we can check.</li>
+                        <li><a href="https://www.buymeacoffee.com/kingsloi" target="_blank">Buy me a coffee</a>.</li>
+                        <li><a href="https://github.com/kingsloi/community-airmonitor" target="_blank">Fork your own version</a> customise it for your community, and host it. Bring awareness to how industry affects your community.</li>
+                    </ul>
+
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left mt-4">Notes</h2>
-                    <ol class="notes-list small">
+                    <ol class="notes-list small pl-0">
                         <li id="note-1">There is no single API or company who offer train/crossing tracking. Considering most of the industry in the region is powered by the railroads, it is unfortunate that we're not able to track all trains, especially the most pollutant coal-transporting cargo trains. Only the NICD provides a free tracking API of their commuter trains.</li>
                         <li id="note-2">NICD/Southshore Line trains are electrically powered.</li>
+                        <li id="note-3">Historical highs show both PM2.5 and PM10 combined together to represent the total air quality.</li>
                     </ol>
                 </div>
             </div>
