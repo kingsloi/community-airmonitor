@@ -3,11 +3,11 @@
         <div class="container">
             <div class="row">
                 <div class="col-xl-6">
-                    <h1 class="h3 pb-45 font-weight-bold text-uppercase">
-                        <small class="d-block h6 font-weight-light">How's our Air Quality in</small>
+                    <h1 class="h3 pb-0 font-weight-bold text-uppercase mb-4">
+                        <small class="d-block h6 font-weight-light">How's the current air quality in</small>
                         <span class="site-heading">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr></span>
                     </h1>
-                    <h2 class="small text-uppercase mb-0 text-dark">Currently</h2>
+
                     <div class="row mb-3">
                         <div class="col-6 py-2">
                             <div class="card h-100 aqi"
@@ -17,12 +17,13 @@
                                     <div class="rotate">
                                         <i class="fa fa-tachometer-alt fa-5x"></i>
                                     </div>
-                                    <h3 class="h6 text-uppercase">PM2.5</h3>
+                                    <h3 class="h6 text-uppercase font-weight-bold">PM2.5</h3>
+                                    <p class="small">sources include all combustion including vehicles, some industrial processes, etc.</p>
                                     <p class="display-4 font-weight-bold mb-0">
                                         <span class="number--blurred" v-if="! airshit.PM25REALTIME"></span>
                                         <span v-else>{{ airshit.PM25REALTIME['aqi'] }}</span>
                                     </p>
-                                    <h4 class="lead mb-0 pl-2">
+                                    <h4 class="lead mb-0 text-uppercase font-weight-bold">
                                         <span class="text--blurred" v-if="! airshit.PM25REALTIME"></span>
                                         <span v-else>{{ airshit.PM25REALTIME['category'] }}</span>
                                     </h4>
@@ -37,12 +38,13 @@
                                     <div class="rotate">
                                         <i class="fa fa-tachometer-alt fa-5x"></i>
                                     </div>
-                                    <h3 class="h6 text-uppercase">PM10</h3>
+                                    <h3 class="h6 text-uppercase font-weight-bold">PM10</h3>
+                                    <p class="small">sources include dust from construction sites, landfills and agriculture, industrial sources, pollen, bacteria, etc.</p>
                                     <p class="display-4 font-weight-bold mb-0">
                                         <span class="number--blurred" v-if="! airshit.PM10REALTIME"></span>
                                         <span v-else>{{ airshit.PM10REALTIME['aqi'] }}</span>
                                     </p>
-                                    <h4 class="lead mb-0 pl-2">
+                                    <h4 class="lead mb-0 text-uppercase font-weight-bold">
                                         <span class="text--blurred" v-if="! airshit.PM10REALTIME"></span>
                                         <span v-else>{{ airshit.PM10REALTIME['category'] }}</span>
                                     </h4>
@@ -316,11 +318,11 @@
                     </p>
 
                     <div id="introduction">
-                        <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">ArcelorMittal leaked Cyanide into tributary of Lake Michigan</a>. Suspected the source was likely from one of the many steel mills in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">Purple Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, hopefully bringing awareness to how the local industry affects the air residents and tourists breathe.</p>
+                        <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">ArcelorMittal leaked Cyanide into a tributary of Lake Michigan</a>. Suspected the source was likely from one of the many mills/refineries in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, available for all to see, with the aim of bringing awareness to how the local industry affects the air both residents and tourists of Miller Beach breathe.</p>
 
-                        <p class="lead">Tracking <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a> (<a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">AQI</a>), temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), as to (hopefully) determine who, where, what, and how the weather affects the quality of the air quality.</p>
+                        <p class="lead">Tracking the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a> (<a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>), temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), as to (hopefully) determine who, where, what, and how the weather and local industry affects the local air quality.</p>
 
-                        <p class="lead">Depending on what data is openly available in the future, it may be possible to gather additional data from the many industries other around the Region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>ORD/MDY/GYY air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
+                        <p class="lead">Depending on what data is openly available in the future, it may be possible to gather additional data from the many other air quality impacting industries around the region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>ORD/MDY/GYY air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
 
                         <p class="lead">There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood, we'll track it and add it to our data.</p>
 
@@ -705,10 +707,11 @@
 
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left mt-4">Support Us / Contribute</h2>
                     <ul class="">
-                        <li>Support us by purchasing more <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">Purple Air Quality Sensors</a>, placing them throughout NWI and adding the sensor to our data to track the air quality in the greater region, and not just localised to Miller Beach.</li>
-                        <li>We use the free version for both the <a href="https://darksky.net/dev" target="_blank">weather</a> and <a href="https://developer.mapquest.com/plans" target="_blank">traffic</a> services, limiting how many times we can check the air quality, support us by providing a premium key so we can increase how frequently we can check.</li>
-                        <li><a href="https://www.buymeacoffee.com/kingsloi" target="_blank">Buy me a coffee</a>.</li>
-                        <li><a href="https://github.com/kingsloi/community-airmonitor" target="_blank">Fork your own version</a> customise it for your community, and host it. Bring awareness to how industry affects your community.</li>
+                        <li>Host more <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">Purple Air Quality Sensors</a> throughout NWI, adding the sensors to our data to track the air quality in the greater region, and not just localised to Miller Beach.</li>
+                        <li>We use the free version for both the <a href="https://darksky.net/dev" target="_blank">weather</a> and <a href="https://developer.mapquest.com/plans" target="_blank">traffic</a> services, limiting how many times we can check the air quality per month, support us by providing a premium key so we can increase how frequently we can check.</li>
+                        <li><a href="https://github.com/kingsloi/community-airmonitor" target="_blank">Fork your own version</a>, customise it for your community, and host it. Help bring awareness to your neighbourhoods air quality</li>
+                        <li>Help get more accurate weather (from the same location as the sensors) <a href="https://www.indiegogo.com/projects/tempest-a-revolutionary-personal-weather-system#/" target="_blank">by purchasing this weather station kickstarter</a> for us.</li>
+                        <li>Keep this website up and running by <a href="https://www.buymeacoffee.com/kingsloi" target="_blank">buying me a coffee</a>.</li>
                     </ul>
 
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left mt-4">Notes</h2>
