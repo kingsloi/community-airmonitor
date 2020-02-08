@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-xl-6">
                     <h1 class="h3 pb-0 font-weight-bold text-uppercase mb-4">
-                        <small class="d-block h6 font-weight-light">How's the current air quality in</small>
+                        <small class="d-block h6 font-weight-light">current air quality in</small>
                         <span class="site-heading">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr></span>
                     </h1>
 
@@ -297,7 +297,7 @@
                                         <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
                                             <span class="number--blurred" v-if="! highs.traffic"></span>
                                             <span v-else>
-                                                {{ highs.traffic.sum.toFixed(2) }}
+                                                {{ highs.traffic.sum.toFixed(0) }}
                                                 <small style="font-size:0.5rem;">miles</small>
                                             </span>
                                         </p>
@@ -318,7 +318,8 @@
                     </p>
 
                     <div id="introduction">
-                        <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">ArcelorMittal leaked Cyanide into a tributary of Lake Michigan</a>. Suspected the source was likely from one of the many mills/refineries in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, available for all to see, with the aim of bringing awareness to how the local industry affects the air both residents and tourists of Miller Beach breathe.</p>
+                        <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after ArcelorMittal had <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">violated the daily maximum limit for total cyanide and ammonia-nitrogen</a>, releasing a<a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank"> considerable</a> amount of both chemicals into a tributary of Lake Michigan which went <a href="https://chicago.cbslocal.com/2019/08/20/arcelormittal-spill-indiana-state/" target="_blank">unreported</a> for days, <a href="https://www.epa.gov/in/arcelormittal-burns-harbor-llc-portage-indiana" target="_blank">killing</a> 1000s of fish, <a href="https://apnews.com/bd9de73946954208b93cf5c9406c83c7" target="_blank">restricting</a> intake of a water filtration plant <a href="https://www.washingtonpost.com/climate-environment/2019/08/19/cyanide-steel-plant-trickled-into-lake-michigan-days-before-public-was-notified/" target="_blank">closing</a> local beaches and portions of the <a href="https://www.nps.gov/indu/learn/news/chemical-spill-indu-20190814.htm">Indiana Dunes National Park</a>.
+                        <p class="lead">Suspected the source was likely from one of the many mills/refineries in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, available for all to see, with the aim of bringing awareness to how the local industry affects the air both residents and tourists of Miller Beach breathe.</p>
 
                         <p class="lead">Tracking the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a> (<a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>), temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), as to (hopefully) determine who, where, what, and how the weather and local industry affects the local air quality.</p>
 
@@ -332,27 +333,27 @@
 
                 <div class="col-xl-6">
                     <div class="table-responsive">
-                        <table class="table text-monospace mb-0">
+                        <table class="table text-monospace mb-5">
                             <tbody>
                                 <tr>
                                     <td colspan="2">
                                         <span class="small text-uppercase mb-0 text-dark">
-                                            Weather
+                                            Weather <span :title="formatDateTimeToLocal(airshit.createdAt, null)"> as reported {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago was</span>
                                         </span>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
-                                        <p class="lead text-center font-weight-bold mb-0 p-2">
+                                        <h2 class="h4 text-center font-weight-bold mb-0 p-2">
                                             <span class="text--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                                             <span v-else>{{ airshit.REPORTED_WEATHER['summary'] }} - {{ airshit.TEMP_F }}</span>
                                             &nbsp;&deg;F
-                                        </p>
+                                        </h2>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Dew Point</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Dew Point</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -364,7 +365,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Wind</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Wind</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -382,7 +383,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Cloud Coverage</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Cloud Coverage</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -394,7 +395,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">UV Index</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">UV Index</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -405,7 +406,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Pressure</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Pressure</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -417,7 +418,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Rain Intensity</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Rain Intensity</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -429,7 +430,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Humidity</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Humidity</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -441,7 +442,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">OZone</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">OZone</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -455,7 +456,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">Visibility</p>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">Visibility</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
@@ -464,7 +465,10 @@
                                         </p>
                                     </td>
                                 </tr>
-
+                            </tbody>
+                        </table>
+                        <table class="table text-monospace mb-0">
+                            <tbody>
                                 <tr>
                                     <td colspan="2">
                                         <span class="small text-uppercase mb-0 text-dark">
@@ -474,8 +478,8 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">
-                                            Traffic in <abbr title="See 'Region' below for coordinates">Region</abbr>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                            <abbr title="See 'Region' below for coordinates">Region</abbr> Traffic
                                         </p>
                                     </td>
                                     <td>
@@ -500,8 +504,8 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">
-                                            Flights over <abbr title="See 'Region' below for coordinates">Region</abbr>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                            <abbr title="See 'Region' below for coordinates">Region</abbr> Flights
                                         </p>
                                     </td>
                                     <td>
@@ -526,8 +530,8 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">
-                                            Ships on <abbr title="See 'Lake' below for coordinates">Lake</abbr>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                            <abbr title="See 'Lake' below for coordinates">Lake</abbr> Ships
                                         </p>
                                     </td>
                                     <td>
@@ -541,8 +545,8 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0">
-                                            Trains in <abbr title="See 'Region' below for coordinates">Region</abbr>
+                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                            <abbr title="See 'Region' below for coordinates">Region</abbr> Trains
                                         </p>
                                     </td>
                                     <td>
@@ -711,7 +715,8 @@
                         <li>We use the free version for both the <a href="https://darksky.net/dev" target="_blank">weather</a> and <a href="https://developer.mapquest.com/plans" target="_blank">traffic</a> services, limiting how many times we can check the air quality per month, support us by providing a premium key so we can increase how frequently we can check.</li>
                         <li><a href="https://github.com/kingsloi/community-airmonitor" target="_blank">Fork your own version</a>, customise it for your community, and host it. Help bring awareness to your neighbourhoods air quality</li>
                         <li>Help get more accurate weather (from the same location as the sensors) <a href="https://www.indiegogo.com/projects/tempest-a-revolutionary-personal-weather-system#/" target="_blank">by purchasing this weather station kickstarter</a> for us.</li>
-                        <li>Keep this website up and running by <a href="https://www.buymeacoffee.com/kingsloi" target="_blank">buying me a coffee</a>.</li>
+                        <li>Contribute to the codebase, by submitting a <a href="https://github.com/kingsloi/community-airmonitor" target="_blank">pull request</a> with your edits. It's written in Node.js & Vue.js.</li>
+                        <li>Keep this website up and running by <a href="https://www.buymeacoffee.com/kingsloi" target="_blank">buying the host a coffee</a>.</li>
                     </ul>
 
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left mt-4">Notes</h2>

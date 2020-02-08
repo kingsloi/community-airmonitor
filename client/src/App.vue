@@ -44,12 +44,12 @@
                 </li>
                 <li class="d-xs-block d-lg-inline-block pl-md-5 py-3 py-lg-0">
                     <a class="buy-coffee" href="https://www.buymeacoffee.com/kingsloi" target="_blank">
-                        <img class="mr-1" src="/images/buy-coffee.svg" alt="Buy me a Coffee">Show your Support</a>
+                        <img class="mr-1" src="/images/buy-coffee.svg" alt="Buy the host a Coffee">Show your Support</a>
                 </li>
             </ul>
         </div>
         <div class="container">
-            <p class="made-with-love">Made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a></p>
+            <p class="made-with-love">Made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a> by <a href="mailto:kingsley.raspe@protonmail.ch">Kingsley</a></p>
         </div>
     </footer>
   </div>
