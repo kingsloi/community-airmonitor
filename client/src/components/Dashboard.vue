@@ -612,6 +612,7 @@
         <div class="map-container py-5">
             <div id="map"></div>
             <small class="text-center px-5 w-100 d-block mt-2"><a target="_blank" href="/icons/set/train">Train</a>, <a target="_blank" href="/icons/set/fishing-boat">Fishing Boat</a> and other icons by <a target="_blank" href="https://icons8.com">Icons8</a></small>
+            <small class="text-center px-5 w-100 d-block mt-2">Factories listed are <a href="https://www.in.gov/idem/airquality/files/monitoring_criteria_trend_northwest.pdf" target="_blank">Northwest Indiana's Top Ten Emission Sources</a></small>
         </div>
 
         <div class="container">
@@ -864,6 +865,49 @@ export default {
             const aircraftIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-airport-50.png`});
             const boatIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-fishing-boat-50.png`});
             const trafficIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-traffic-jam-50.png`});
+            const shitIcon = new LeafIcon({iconUrl: `${root}/images/maps/icons8-factory-50.png`});
+
+            [{
+                'lat': '41.607175',
+                'lng': '-87.337602',
+                'name': 'U .S. STEEL CO. GARY WORKS',
+            },{
+                'lat': '41.622735',
+                'lng': '-87.116998',
+                'name': 'ARCELORMITTAL BURNS HARBOR, INC',
+            },{
+                'lat': '41.652604',
+                'lng': '-87.457297',
+                'name': 'INDIANA HARBOR EAST ',
+            },{
+                'lat': '41.218647',
+                'lng': '-87.023819',
+                'name': 'NIPSCO - R.M. SCHAHFER GENERATING STATION',
+            },{
+                'lat': '41.708132',
+                'lng': '-87.521315',
+                'name': 'DOMINION RESOURCES - STATE LINE ENERGY, LLC',
+            },{
+                'lat': '41.720852',
+                'lng': '-86.906901',
+                'name': 'NIPSCO - MICHIGAN CITY GENERATING STATION ',
+            },{
+                'lat': '41.662580',
+                'lng': '-87.482625',
+                'name': 'BP PRODUCTS NORTH AMERICA, INC.',
+            },{
+                'lat': '41.679816',
+                'lng': '-87.417311',
+                'name': 'COKENERGY, INC.',
+            },{
+                'lat': '41.655465',
+                'lng': '-87.450172',
+                'name': 'ARCELORMITTAL INDIANA HARBOR, INC.',
+            }].forEach((shit) => {
+                L.marker([shit.lat, shit.lng], {icon: shitIcon}).bindPopup(`
+                    ${shit.name}
+                `).addTo(map);
+            });
 
             L.marker([this.geography.sensor.lat, this.geography.sensor.lng], {icon: sensorIcon}).bindPopup(`
                 PM2.5/PM10 sensor, AIS antenna, and reported weather are recorded from this location.
