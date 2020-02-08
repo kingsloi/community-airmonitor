@@ -717,6 +717,7 @@
                         <li><a href="https://github.com/kingsloi/community-airmonitor" target="_blank">Fork your own version</a>, customise it for your community, and host it. Help bring awareness to your neighbourhoods air quality</li>
                         <li>Help get more accurate weather (from the same location as the sensors) <a href="https://www.indiegogo.com/projects/tempest-a-revolutionary-personal-weather-system#/" target="_blank">by purchasing this weather station kickstarter</a> for us.</li>
                         <li>Contribute to the codebase, by submitting a <a href="https://github.com/kingsloi/community-airmonitor" target="_blank">pull request</a> with your edits. It's written in Node.js & Vue.js.</li>
+                        <li>Storing data is expensive, support our efforts in longer-term air quality tracking by donating cloud MongoDB hosting.</li>
                         <li>Keep this website up and running by <a href="https://www.buymeacoffee.com/kingsloi" target="_blank">buying the host a coffee</a>.</li>
                     </ul>
 
