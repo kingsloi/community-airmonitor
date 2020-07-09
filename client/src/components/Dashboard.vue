@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-xl-6">
                     <h1 class="h3 pb-0 font-weight-bold text-uppercase mb-4">
-                        <small class="d-block h6 font-weight-light">current air quality in</small>
+                        <small class="d-block h6 font-weight-light">current air quality &amp; weather in</small>
                         <span class="site-heading">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr></span>
                     </h1>
 
@@ -61,33 +61,6 @@
                             <div class="col-4">
                                 <div class="card br-0">
                                     <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Week</h5>
-                                    </div>
-                                    <div class="card-body aqi-stat"
-                                        :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.week))"
-                                    >
-                                        <div class="rotate">
-                                            <i class="fa fa-signal fa-3x"></i>
-                                        </div>
-                                        <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
-                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                            <span class="number--blurred" v-if="! highs.week"></span>
-                                            <span v-else>
-                                                {{ getTotalAirQualityAqiScore(highs.week) }}
-                                            </span>
-                                        </p>
-                                        <span class="number--blurred" v-if="! highs.week"></span>
-                                        <p v-else class="small mb-0"
-                                            :title="formatDateTimeToLocal(highs.week.createdAt, null)"
-                                        >
-                                            {{ formatDateTimeToLocal(highs.week.createdAt) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="card br-0">
-                                    <div class="card-header">
                                         <h5 class="mb-0 card-title text-uppercase small">Month</h5>
                                     </div>
                                     <div class="card-body aqi-stat"
@@ -108,6 +81,33 @@
                                             :title="formatDateTimeToLocal(highs.month.createdAt, null)"
                                         >
                                             {{ formatDateTimeToLocal(highs.month.createdAt) }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="card br-0">
+                                    <div class="card-header">
+                                        <h5 class="mb-0 card-title text-uppercase small">Year</h5>
+                                    </div>
+                                    <div class="card-body aqi-stat"
+                                        :class="getAqiScoreStatClassname(getTotalAirQualityAqiScore(highs.year))"
+                                    >
+                                        <div class="rotate">
+                                            <i class="fa fa-signal fa-3x"></i>
+                                        </div>
+                                        <small class="d-block font-weight-bold text-uppercase text-muted">PM2.5 + PM10</small>
+                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
+                                            <span class="number--blurred" v-if="! highs.year"></span>
+                                            <span v-else>
+                                                {{ getTotalAirQualityAqiScore(highs.year) }}
+                                            </span>
+                                        </p>
+                                        <span class="number--blurred" v-if="! highs.year"></span>
+                                        <p v-else class="small mb-0"
+                                            :title="formatDateTimeToLocal(highs.year.createdAt, null)"
+                                        >
+                                            {{ formatDateTimeToLocal(highs.year.createdAt) }}
                                         </p>
                                     </div>
                                 </div>
@@ -319,7 +319,7 @@
 
                     <div id="introduction">
                         <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after ArcelorMittal had <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">violated the daily maximum limit for total cyanide and ammonia-nitrogen</a>, releasing a<a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank"> considerable</a> amount of both chemicals into a tributary of Lake Michigan which went <a href="https://chicago.cbslocal.com/2019/08/20/arcelormittal-spill-indiana-state/" target="_blank">unreported</a> for days, <a href="https://www.epa.gov/in/arcelormittal-burns-harbor-llc-portage-indiana" target="_blank">killing</a> 1000s of fish, <a href="https://apnews.com/bd9de73946954208b93cf5c9406c83c7" target="_blank">restricting</a> intake of a water filtration plant, <a href="https://www.washingtonpost.com/climate-environment/2019/08/19/cyanide-steel-plant-trickled-into-lake-michigan-days-before-public-was-notified/" target="_blank">closing</a> local beaches and portions of the <a href="https://www.nps.gov/indu/learn/news/chemical-spill-indu-20190814.htm">Indiana Dunes National Park</a>.
-                        <p class="lead">Suspected the source was likely from one of the many mills/refineries in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, available for all to see, with the aim of bringing awareness to how the local industry affects the air that both residents and tourists of Miller Beach breathe.</p>
+                        <p class="lead">Suspected the source was likely from one of the many mills/refineries in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, available for all to see, with the aim of bringing awareness to how the local industry affects the air that both residents and tourists of Miller Beach / Gary breathe.</p>
 
                         <p class="lead">Tracking the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a> (<a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>), temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), as to (hopefully) determine who, where, what, and how the weather and local industry affects the local air quality.</p>
 
@@ -331,44 +331,25 @@
                     </div>
                 </div>
 
-                <div class="col-xl-6">
+                <div class="col-xl-5 offset-xl-1">
                     <div class="table-responsive">
                         <table class="table text-monospace mb-5">
                             <tbody>
                                 <tr>
-                                    <td colspan="2">
-                                        <span class="small text-uppercase mb-0 text-dark">
-                                            Weather <span :title="formatDateTimeToLocal(airshit.createdAt, null)"> as reported {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago was</span>
-                                        </span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                        <h2 class="h4 text-center font-weight-bold mb-0 p-2">
+                                    <td colspan="2" style="border-top:0;" class="pt-3 pb-4">
+                                        <h2 class="h5 text-left mb-0 p-2">
                                             <span class="text--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else>{{ airshit.REPORTED_WEATHER['summary'] }} - {{ airshit.TEMP_F }}</span>
-                                            &nbsp;&deg;F
+                                            <span v-else><span class="font-weight-bold">{{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }}</span> ago it was <span class="font-weight-bold">{{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}</span> and <span class="font-weight-bold">{{ airshit.TEMP_F }}</span>
+                                            &nbsp;&deg;F</span>
                                         </h2>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Dew Point</p>
+                                        <p class="lead mb-0 text-lowercase">Wind</p>
                                     </td>
                                     <td>
-                                        <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else>{{ airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)}}</span>
-                                            &nbsp;&deg;F
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Wind</p>
-                                    </td>
-                                    <td>
-                                        <p class="lead mb-0">
+                                        <p class="lead mb-0  font-weight-bold">
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                                             <template v-else>
                                                 <span class="mr-3">
@@ -383,57 +364,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Cloud Coverage</p>
+                                        <p class="lead mb-0 text-lowercase">Humidity</p>
                                     </td>
                                     <td>
-                                        <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else>{{ (airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(0) }}</span>
-                                            &nbsp; %
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">UV Index</p>
-                                    </td>
-                                    <td>
-                                        <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else>{{ airshit.REPORTED_WEATHER['uvIndex'].toFixed(0) }}</span>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Pressure</p>
-                                    </td>
-                                    <td>
-                                        <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.PRESSURE_BAR"></span>
-                                            <span v-else>{{ (airshit.PRESSURE_BAR * 0.02953).toFixed(2) }}</span>
-                                            &nbsp;<sub>in Hg</sub>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Rain Intensity</p>
-                                    </td>
-                                    <td>
-                                        <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else>{{ airshit.REPORTED_WEATHER['precipIntensity'] }}</span>
-                                            &nbsp;<sub>in of liquid water</sub>
-                                        </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Humidity</p>
-                                    </td>
-                                    <td>
-                                        <p class="lead mb-0">
+                                        <p class="lead mb-0 font-weight-bold">
                                             <span class="number--blurred" v-if="! airshit.HUMIDITY_PERCENT"></span>
                                             <span v-else>{{ airshit.HUMIDITY_PERCENT }}</span>
                                             &nbsp;<sub>%</sub>
@@ -442,10 +376,70 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">OZone</p>
+                                        <p class="lead mb-0 text-lowercase">Dew Point</p>
+                                    </td>
+                                    <td>
+                                        <p class="lead mb-0 font-weight-bold">
+                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                                            <span v-else>{{ airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)}}</span>
+                                            &nbsp;&deg;F
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <p class="lead mb-0 text-lowercase">Cloud Coverage</p>
+                                    </td>
+                                    <td>
+                                        <p class="lead mb-0 font-weight-bold">
+                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                                            <span v-else>{{ (airshit.REPORTED_WEATHER['cloudCover'] * 100).toFixed(0) }}</span>
+                                            &nbsp; %
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="lead mb-0 text-lowercase">UV Index</p>
+                                    </td>
+                                    <td>
+                                        <p class="lead mb-0 font-weight-bold">
+                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                                            <span v-else>{{ airshit.REPORTED_WEATHER['uvIndex'].toFixed(0) }}</span>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="lead mb-0 text-lowercase">Pressure</p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
+                                            <span class="number--blurred" v-if="! airshit.PRESSURE_BAR"></span>
+                                            <span v-else class="font-weight-bold">{{ (airshit.PRESSURE_BAR * 0.02953).toFixed(2) }}</span>
+                                            &nbsp;<sub>in Hg</sub>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="lead mb-0 text-lowercase">Rain Intensity</p>
+                                    </td>
+                                    <td>
+                                        <p class="lead mb-0">
+                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                                            <span v-else class="font-weight-bold">{{ airshit.REPORTED_WEATHER['precipIntensity'] }}</span>
+                                            &nbsp;<sub>in of liquid water</sub>
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="lead mb-0 text-lowercase">OZone</p>
+                                    </td>
+                                    <td>
+                                        <p class="lead mb-0 font-weight-bold">
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                                             <span v-else>
                                                 {{ airshit.REPORTED_WEATHER['ozone'].toFixed(0) }}
@@ -456,10 +450,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">Visibility</p>
+                                        <p class="lead  mb-0 text-lowercase">Visibility</p>
                                     </td>
                                     <td>
-                                        <p class="lead mb-0">
+                                        <p class="lead mb-0 font-weight-bold">
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                                             <span v-else>{{ airshit.REPORTED_WEATHER['visibility'].toFixed(0) }}</span> <sub>miles</sub>
                                         </p>
@@ -470,33 +464,33 @@
                         <table class="table text-monospace mb-0">
                             <tbody>
                                 <tr>
-                                    <td colspan="2">
-                                        <span class="small text-uppercase mb-0 text-dark">
-                                            Industry <a href="#map" class="pt-1 float-right">view on map</a>
-                                        </span>
+                                    <td colspan="2" style="border-top:0;" class="pt-0 pb-4">
+                                        <h2 class="h5 text-left mb-0 p-2">
+                                            <span class="font-weight-bold">Industry</span>
+                                        </h2>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                        <p class="lead mb-0 text-lowercase">
                                             <abbr title="See 'Region' below for coordinates">Region</abbr> Traffic
                                         </p>
                                     </td>
                                     <td>
-                                        <p class="lead mb-0">
+                                        <p class="lead mb-0 ">
                                             <span class="separator">
                                                 <span class="number--blurred" v-if="! airshit.TRAFFIC"></span>
-                                                <span v-else>{{ airshit.TRAFFIC.INCIDENTS.length }}</span>
+                                                <span v-else class="font-weight-bold">{{ airshit.TRAFFIC.INCIDENTS.length }}</span>
                                                 &nbsp;<small class="small font-weight-light">incidents</small>
                                             </span>
                                             <span class="separator">
                                                 <span class="number--blurred" v-if="! airshit.TRAFFIC"></span>
-                                                <span v-else>{{ congestionMiles }}</span>
+                                                <span v-else class="font-weight-bold">{{ congestionMiles }}</span>
                                                 &nbsp;<small class="small font-weight-light">miles of congestion</small>
                                             </span>
                                             <span class="separator">
                                                 <span class="number--blurred" v-if="! airshit.TRAFFIC"></span>
-                                                <span v-else>{{ congestionTime }}</span>
+                                                <span v-else class="font-weight-bold">{{ congestionTime }}</span>
                                                 &nbsp;<small class="small font-weight-light">minutes of congestion</small>
                                             </span>
                                         </p>
@@ -504,7 +498,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                        <p class="lead mb-0 text-lowercase">
                                             <abbr title="See 'Region' below for coordinates">Region</abbr> Flights
                                         </p>
                                     </td>
@@ -512,17 +506,17 @@
                                         <p class="lead mb-0">
                                             <span class="separator">
                                                 <span class="number--blurred" v-if="! airshit.FLIGHTS"></span>
-                                                <span v-else>{{ airshit.FLIGHTS.GYY.length }}</span>
+                                                <span v-else class="font-weight-bold">{{ airshit.FLIGHTS.GYY.length }}</span>
                                                 &nbsp;<small class="small font-weight-light">to/from Gary/GYY</small>
                                             </span>
                                             <span class="separator">
                                                 <span class="number--blurred" v-if="! airshit.FLIGHTS"></span>
-                                                <span v-else>{{ airshit.FLIGHTS.MDW.length }}</span>
+                                                <span v-else class="font-weight-bold">{{ airshit.FLIGHTS.MDW.length }}</span>
                                                 &nbsp;<small class="small font-weight-light">to/from Midway/MDW</small>
                                             </span>
                                             <span class="separator">
                                                 <span class="number--blurred" v-if="! airshit.FLIGHTS"></span>
-                                                <span v-else>{{ airshit.FLIGHTS.ORD.length }}</span>
+                                                <span v-else class="font-weight-bold">{{ airshit.FLIGHTS.ORD.length }}</span>
                                                 &nbsp;<small class="small font-weight-light">to/from O'Hare/ORD</small>
                                             </span>
                                         </p>
@@ -530,7 +524,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                        <p class="lead mb-0 text-lowercase">
                                             <abbr title="See 'Lake' below for coordinates">Lake</abbr> Ships
                                         </p>
                                     </td>
@@ -538,21 +532,21 @@
                                         <p class="lead mb-0">
                                             <span class="number--blurred" v-if="! airshit.VESSELS"></span>
                                             <span v-else class="separator" v-for="(vessels, type) in vesselsByType" v-bind:key="type">
-                                                {{ vessels.length }} <small class="small font-weight-light">{{ type }}(s)</small>
+                                                <span class="font-weight-bold">{{ vessels.length }}</span> <small class="small font-weight-light">{{ type }}(s)</small>
                                             </span>
                                         </p>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
-                                        <p class="lead font-weight-bold mb-0 text-uppercase">
+                                        <p class="lead mb-0 text-lowercase">
                                             <abbr title="See 'Region' below for coordinates">Region</abbr> Trains
                                         </p>
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
                                             <span class="number--blurred" v-if="! airshit.TRAINS"></span>
-                                            <span v-else>{{ airshit.TRAINS.SOUTHSHORE.length }}</span>
+                                            <span v-else class="font-weight-bold">{{ airshit.TRAINS.SOUTHSHORE.length }}</span>
                                             &nbsp;<small class="small font-weight-light">southshore<sup><a href="#note-2">[2]</a></sup></small>
                                         </p>
                                     </td>
@@ -564,20 +558,19 @@
 
                                         <p class="mb-0" v-if="Object.keys(geography).length > 0">
                                             Sensor located at: <code>{{ geography.sensor.lat }},{{ geography.sensor.lng }}</code><br>
-                                            Region (polygon): <a class="pl-1" target="_blank"
-                                                :title="getReversedCoordinates(geography.region.land_polygon)"
-                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_polygon))}`"
-                                            >coordinates</a><br>
-                                            Region (square): <a class="pl-1" target="_blank"
-                                                :title="getReversedCoordinates(geography.region.land_square)"
-                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_square))}`"
-                                            >coordinates</a><br>
                                             Lake:<a class="pl-1" target="_blank"
                                                 :title="getReversedCoordinates(geography.region.lake)"
                                                 :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.lake))}`"
                                             >coordinates</a><br>
-                                            PM2.5/PM10, AIS, temperature, humidity, pressure recorded at sensor<br>
-                                            Traffic uses square region, trains/flights use polygon region<br>
+                                            Trains/Flights Region: <a class="pl-1" target="_blank"
+                                                :title="getReversedCoordinates(geography.region.land_polygon)"
+                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_polygon))}`"
+                                            >coordinates</a><br>
+                                            Traffic Region: <a class="pl-1" target="_blank"
+                                                :title="getReversedCoordinates(geography.region.land_square)"
+                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_square))}`"
+                                            >coordinates</a><br><br>
+                                            PM2.5/PM10, AIS, temperature, humidity, <br>pressure recorded at sensor<br><br>
                                             <br>
                                             <span class="d-block">
                                                 Weather by: <a href="https://darksky.net/poweredby/" target="_blank">darksky.net</a>
@@ -619,9 +612,8 @@
             <div class="row">
                 <div class="col-md-6">
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left">
-                        Special Thanks / Contributions
+                        Special Thanks 👏
                     </h2>
-                    <p class="mb-2 text-center text-md-left" style="font-size:2rem;">👏👏👏👏👏</p>
                     <p class="lead text-center text-md-left">
                         <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" role="button" target="_blank">PurpleAir sensor</a> crowd funded by:
                     </p>

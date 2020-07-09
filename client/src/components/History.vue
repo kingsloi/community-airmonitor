@@ -36,7 +36,7 @@
                     }, {
                         from: new Date(2019, 9),
                         title: 'This Website Launched 🎉🎉🎉!',
-                        description: `Kingsley, a resident of Miller Beach, set up this website to provide his local community with an easy way to view their current air quality, and also the weather to see if the wind speed/direction had any affect on our air. Nestled in the middle of the largest steelmaking complex in the US, Miller Beach/Gary's air and water are greatly affected by the local industry, and after the Cyanide leak in August, awareness is the biggest tool in our fight against mass pollution in our community.`
+                        description: `A resident of Miller Beach, set up this website to provide his local community with an easy way to view their current air quality, and also the weather to see if the wind speed/direction had any affect on our air. Nestled in the middle of the largest steelmaking complex in the US, Miller Beach/Gary's air and water are greatly affected by the local industry, and after the Cyanide leak in August, awareness is the biggest tool in our fight against mass pollution in our community.`
                     }, {
                         from: new Date(2019, 9),
                         title: 'Neighbours Crowdfunded Air Quality Monitor',
@@ -48,7 +48,8 @@
                     }, {
                         from: new Date(2019, 7),
                         title: '<a href="https://www.in.gov/idem/cleanwater/2576.htm">ArcelorMittal leak Cyanide into tributary of Lake Michigan</a>',
-                        description: 'https://www.in.gov/idem/cleanwater/2576.htm'
+                        description: `<blockquote>The Indiana Department of Environmental Management (IDEM) and Department of Natural Resources (DNR) are currently responding to a reported fish kill in the East Branch of the Little Calumet River in Portage, Ind.
+                            <br/> IDEM has learned that ArcelorMittal experienced exceedances of the daily maximum limit for total cyanide and ammonia-nitrogen. These exceedances appear to be the cause or a significant contributing factor to the mortality of the fish observed on the East Arm of the Little Calumet River. IDEM has requested that the facility initiate a spill response along with increased monitoring of its outfalls to the Little Calumet River. IDEM and DNR ask residents to continue to avoid this area while cleanup and mitigation efforts are ongoing.</blockquote>`
                     }]
             }
         }

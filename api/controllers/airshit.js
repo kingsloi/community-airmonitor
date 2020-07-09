@@ -18,9 +18,6 @@ const cache = require('express-redis-cache')();
 exports.index = (req, res) => {
   const today = moment();
 
-  const startWeek = today.startOf('isoWeek').format('YYYY-MM-DD HH:mm:ss');
-  const endWeek = moment(startWeek).endOf('isoWeek').format('YYYY-MM-DD HH:mm:ss');
-
   const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
   const endMonth = moment(startMonth).endOf('month').format('YYYY-MM-DD HH:mm:ss');
 
@@ -31,11 +28,11 @@ exports.index = (req, res) => {
     (callback) => { // latest
       Airshit.findOne({}, {}, { sort: { _id: -1 } }).exec(callback);
     },
-    (callback) => { // week high
-      Airshit.find({createdAt: {'$gte': startWeek, '$lte': endWeek}}).exec(callback);
-    },
     (callback) => { // month high
       Airshit.find({createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
+    },
+    (callback) => { // year high
+      Airshit.find({createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
     },
     (callback) => { // all time high
       Airshit.aggregate([
@@ -131,21 +128,22 @@ exports.index = (req, res) => {
     // Latest
     const latest = results[0];
 
-    // AQI Week
-    const highestInWeek = Math.max(...results[1].map((airshit) => {
-      return calculations.totalAirQuality(airshit);
-    }));
-    const highestWeekDay = results[1].find((airshit) => {
-      return calculations.totalAirQuality(airshit) === highestInWeek;
-    });
-
     // AQI Month
-    const highestInMonth = Math.max(...results[2].map((airshit) => {
+    const highestInMonth = Math.max(...results[1].map((airshit) => {
       return calculations.totalAirQuality(airshit);
     }));
-    const highestMonthDay = results[2].find((airshit) => {
+    const highestMonthDay = results[1].find((airshit) => {
       return calculations.totalAirQuality(airshit) === highestInMonth;
     });
+
+    // AQI Year
+    const highestInYear = Math.max(...results[2].map((airshit) => {
+      return calculations.totalAirQuality(airshit);
+    }));
+    const highestYearDay = results[2].find((airshit) => {
+      return calculations.totalAirQuality(airshit) === highestInYear;
+    });
+
 
     // All Time
     const highestAllTimeDay = results[3][0];
@@ -173,8 +171,8 @@ exports.index = (req, res) => {
         },
       },
       highs: {
-        week: highestWeekDay,
         month: highestMonthDay,
+        year: highestYearDay,
         alltime: highestAllTimeDay,
 
         vessels: highestVessels,

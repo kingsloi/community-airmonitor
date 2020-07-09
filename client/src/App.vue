@@ -4,22 +4,20 @@
       <div class="container">
         <a class="navbar-brand text--smushed" href="/">
           <i class="fas fa-air-freshener pr-1"></i>
-          How's <strong class="text-uppercase">our</strong> Air Quality?
+          How's <strong class="text-uppercase">our</strong> air quality?
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-              <li class="nav-item">
-                <router-link to="/" class="nav-link">Currently</router-link>
-              </li>
-          </ul>
           <ul class="nav navbar-nav ml-auto">
-              <li class="nav-item">
-                <router-link to="/history" class="nav-link">Updates</router-link>
-              </li>
+            <li class="nav-item">
+              <router-link to="/" class="nav-link">Currently</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/history" class="nav-link">Updates</router-link>
+            </li>
           </ul>
         </div>
       </div>
@@ -49,7 +47,7 @@
             </ul>
         </div>
         <div class="container">
-            <p class="made-with-love">Made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a> by <a href="mailto:kingsley.raspe@protonmail.ch">Kingsley</a></p>
+            <p class="made-with-love">made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a> by <a href="mailto:kingsley.raspe@protonmail.ch">kingsley</a></p>
         </div>
     </footer>
   </div>
