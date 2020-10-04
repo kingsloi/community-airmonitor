@@ -515,11 +515,36 @@ sub {
 #map {
     width: 100%;
     height: 600px;
+
+    &__mask{
+            position: absolute;
+            z-index: 100000;
+            height: 100%;
+            width: 100%;
+
+            color: rgba(255,255,255,0);
+            padding-top: 50%;
+            text-align: center;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+        &:hover{
+            text-decoration: none;
+            color: rgba(255,255,255,1);
+            background-color: rgba(0,0,0,0.5);
+        }
+    }
 }
 
+
 .site-heading {
-    letter-spacing: -5px;
+    letter-spacing: -1px;
 }
+#visuals {
+    .site-heading {
+        letter-spacing: -5px;
+    }
+}
+
 
 .timeline {
     text-align: left;

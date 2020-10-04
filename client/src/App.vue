@@ -47,7 +47,9 @@
                 </li>
                 <li class="d-xs-block d-lg-inline-block pl-md-5 py-3 py-lg-0">
                     <a class="buy-coffee" href="https://www.buymeacoffee.com/kingsloi" target="_blank">
-                        <img class="mr-1" src="/images/buy-coffee.svg" alt="Buy the host a Coffee">Show your Support</a>
+                        <img class="mr-1" src="/images/buy-coffee.svg" alt="Buy the host a Coffee">
+                      <span class="w-xl-75 d-xl-block mx-xl-auto">help keep me online, buy me a coffee</span>
+                    </a>
                 </li>
             </ul>
         </div>

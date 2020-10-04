@@ -21,7 +21,11 @@
                 </div>
 
                 <div class="col-xl-6 mt-5 mt-xl-2">
-                    <div id="map"></div>
+                    <div id="map">
+                        <a href="#" id="map__mask" @click.prevent="removeMapMask()" v-if="mapMaskActive === true">
+                            Click/Tap to interact
+                        </a>
+                    </div>
 
                     <p class="text-center mt-2">
                         <small class="px-5 w-100 d-block"><a target="_blank" href="/icons/set/train">Train</a>, <a target="_blank" href="/icons/set/fishing-boat">Fishing Boat</a> and other icons by <a target="_blank" href="https://icons8.com">Icons8</a></small>
@@ -865,6 +869,7 @@ export default {
     data() {
         return {
             isAqiMeaningsVisible: false,
+            mapMaskActive: true,
         }
     },
 
@@ -877,6 +882,9 @@ export default {
     },
 
     methods: {
+        removeMapMask() {
+            this.mapMaskActive = false;
+        },
         getLatestValues() {
             API.get(`/currently`).then(response => {
                 this.$store.commit('setAirshit', response.data.airshit);
