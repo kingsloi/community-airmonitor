@@ -4,7 +4,7 @@
 
             <header>
                 <h1 class="display-4 pb-0 font-weight-bold text-uppercase mb-4">
-                    <small class="d-block h6 font-weight-light mb-0">current weather, air quality, &amp; industry in</small>
+                    <small class="site-sub-heading d-block h6 font-weight-light mb-0">current weather, air quality, &amp; industry in/around</small>
                     <span class="site-heading mt-n1 d-block">Miller Beach, Gary, Indiana</span>
                 </h1>
             </header>

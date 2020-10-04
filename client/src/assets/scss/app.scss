@@ -540,8 +540,21 @@ sub {
     letter-spacing: -1px;
 }
 #visuals {
+    .site-sub-heading{
+        width: 85%;
+        @media (min-width: 991px) {
+            width: 100%;
+        }
+    }
     .site-heading {
-        letter-spacing: -5px;
+        font-size: 2.5rem;
+        width: 65%;
+        @media (min-width: 991px) {
+            width: 100%;
+            font-size: 3.5rem;
+            letter-spacing: -5px;
+            line-height: 0.95;
+        }
     }
 }
 
