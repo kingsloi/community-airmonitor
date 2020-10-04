@@ -144,7 +144,6 @@ exports.index = (req, res) => {
       return calculations.totalAirQuality(airshit) === highestInYear;
     });
 
-
     // All Time
     const highestAllTimeDay = results[3][0];
 

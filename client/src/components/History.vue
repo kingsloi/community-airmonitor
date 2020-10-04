@@ -25,7 +25,12 @@
         data() {
             return {
                 messageWhenNoItems: 'There are not items.',
-                timelineItems: [{
+                timelineItems: [
+                    {
+                        from: new Date(2020, 9),
+                        title: 'Launched as <a href="https://millerbeach.community" target="_blank">millerbeach.community</a> - a new fresh look & feel!',
+                        description: `More features coming soon!`
+                    },{
                         from: new Date(2019, 10),
                         title: '<a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon</a> Provide AIS/Ship Tracking 🙏',
                         description: `Located at the southernmost point of Lake Michigan, tankers, pushers/tugs can be seen constantly traversing across Lake Michigan (and beyond), making deliveries to/from the local industry. <a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon</a>, a database of ships and ports world-wide, provided a ship-tracking (AIS) antenna and developer access to ships and their routes, on our Lake/in our community.`

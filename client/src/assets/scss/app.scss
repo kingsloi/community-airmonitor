@@ -229,6 +229,9 @@ textarea {
         padding: 0.25rem;
         display: block;
     }
+    sub {
+        font-size: 55%;
+    }
 }
 
 sub {
@@ -247,11 +250,40 @@ sub {
 }
 
 #introduction {
-    .lead {
-        font-size: 1rem;
-
+    margin: 7rem auto;
+    .inner {
+        @media (min-width: 992px) {
+            width: 60%;
+            margin: 0 auto;
+        }
+    }
+    p {
+        @extend .lead;
         &:first-child {
+            font-size: 1.5rem;
             font-weight: 500;
+        }
+    }
+}
+
+#historical-highs {
+    .aqi-stat {
+        &__stat {
+            span {
+                font-weight: bold;
+                @extend .display-4;
+            }
+        }
+    }
+}
+
+#results {
+    margin: 4rem auto 0rem;
+    #airquality {
+        margin-bottom: 5rem !important;
+        @media (min-width: 992px) {
+            width: 60%;
+            margin: 0 auto;
         }
     }
 }
@@ -482,11 +514,11 @@ sub {
 
 #map {
     width: 100%;
-    height: 500px;
+    height: 600px;
 }
 
 .site-heading {
-    letter-spacing: -1px;
+    letter-spacing: -5px;
 }
 
 .timeline {
@@ -565,4 +597,15 @@ sub {
 // vue-router
 .router-link-exact-active {
     @extend .active;
+}
+
+#poweredby {
+    @media (min-width: 1199px) {
+        position: absolute;
+        top: 335px;
+        left: -250px;
+        z-index: 1000;
+        background: #fff;
+        padding:0.5rem;
+    }
 }

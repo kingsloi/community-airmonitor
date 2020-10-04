@@ -1,60 +1,121 @@
 <template>
     <div id="dashboard">
-        <div class="container">
-            <div class="row">
-                <div class="col-xl-6">
-                    <h1 class="h3 pb-0 font-weight-bold text-uppercase mb-4">
-                        <small class="d-block h6 font-weight-light">current air quality &amp; weather in</small>
-                        <span class="site-heading">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr></span>
-                    </h1>
+        <div class="container" id="visuals">
 
-                    <div class="row mb-3">
-                        <div class="col-6 py-2">
-                            <div class="card h-100 aqi"
-                                :class="getAqiScoreClassname((airshit.PM25REALTIME ? airshit.PM25REALTIME['category'] : 'Good'))"
-                            >
-                                <div class="card-body">
-                                    <div class="rotate">
-                                        <i class="fa fa-tachometer-alt fa-5x"></i>
-                                    </div>
-                                    <h3 class="h6 text-uppercase font-weight-bold">PM2.5</h3>
-                                    <p class="small">sources include all combustion including vehicles, some industrial processes, etc.</p>
-                                    <p class="display-4 font-weight-bold mb-0">
-                                        <span class="number--blurred" v-if="! airshit.PM25REALTIME"></span>
-                                        <span v-else>{{ airshit.PM25REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <h4 class="lead mb-0 text-uppercase font-weight-bold">
-                                        <span class="text--blurred" v-if="! airshit.PM25REALTIME"></span>
-                                        <span v-else>{{ airshit.PM25REALTIME['category'] }}</span>
-                                    </h4>
-                                </div>
-                            </div>
+            <header>
+                <h1 class="display-4 pb-0 font-weight-bold text-uppercase mb-4">
+                    <small class="d-block h6 font-weight-light mb-0">current weather, air quality, &amp; industry in</small>
+                    <span class="site-heading mt-n1 d-block">Miller Beach, Gary, Indiana</span>
+                </h1>
+            </header>
+
+            <div class="row">
+                <div class="col-xl-6 mt-2">
+                    <h2 class="h2 text-left">
+                        <span class="text--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                        <div v-else>
+                            <span class="font-weight-bold">{{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }}</span> ago, the <span class="font-weight-bold">weather</span> was reported as
+                            <span class="font-weight-bold">{{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}</span> and around <span class="font-weight-bold">{{ airshit.REPORTED_WEATHER['apparentTemperature'].toFixed(0) }}&deg;F</span>, the overall <span class="font-weight-bold">air quality</span> was reported as <span class="font-weight-bold">{{ overallAirQuality }}</span>, there were <span class="font-weight-bold">{{ congestionMiles }} miles</span> of <span class="font-weight-bold">local traffic</span>, <span class="font-weight-bold">{{ overallFlightTotal }} plane{{ overallFlightTotal === 1 ? '' : 's' }}</span> overhead, <span class="font-weight-bold">{{ overallVesselsTotal }} ships</span> on Lake Michigan, and <span class="font-weight-bold">{{ overallTrainsTotal }} trains</span> in <span class="font-weight-bold">our</span> community.
                         </div>
-                        <div class="col-6 py-2">
-                            <div class="card h-100 aqi"
-                                :class="getAqiScoreClassname((airshit.PM10REALTIME ? airshit.PM10REALTIME['category'] : 'Good'))"
-                            >
-                                <div class="card-body">
-                                    <div class="rotate">
-                                        <i class="fa fa-tachometer-alt fa-5x"></i>
-                                    </div>
-                                    <h3 class="h6 text-uppercase font-weight-bold">PM10</h3>
-                                    <p class="small">sources include dust from construction sites, landfills and agriculture, industrial sources, pollen, bacteria, etc.</p>
-                                    <p class="display-4 font-weight-bold mb-0">
-                                        <span class="number--blurred" v-if="! airshit.PM10REALTIME"></span>
-                                        <span v-else>{{ airshit.PM10REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <h4 class="lead mb-0 text-uppercase font-weight-bold">
-                                        <span class="text--blurred" v-if="! airshit.PM10REALTIME"></span>
-                                        <span v-else>{{ airshit.PM10REALTIME['category'] }}</span>
-                                    </h4>
+                    </h2>
+                </div>
+
+                <div class="col-xl-6 mt-5 mt-xl-2">
+                    <div id="map"></div>
+
+                    <p class="text-center mt-2">
+                        <small class="px-5 w-100 d-block"><a target="_blank" href="/icons/set/train">Train</a>, <a target="_blank" href="/icons/set/fishing-boat">Fishing Boat</a> and other icons by <a target="_blank" href="https://icons8.com">Icons8</a></small>
+                        <small class="px-5 w-100 d-block">Factories listed are <a href="https://www.in.gov/idem/airquality/files/monitoring_criteria_trend_northwest.pdf" target="_blank">Northwest Indiana's Top Ten Emission Sources</a></small>
+                    </p>
+
+                    <div class="mb-0 small text-xl-right text-center mt-5" id="poweredby">
+                        <p class="mb-0" v-if="Object.keys(geography).length > 0">
+                            PM2.5/PM10, AIS, recorded at base station.<br><br>
+                            Base Station: <code>{{ geography.sensor.lat }},{{ geography.sensor.lng }}</code><br>
+                            Lake:<a class="pl-1" target="_blank"
+                                :title="getReversedCoordinates(geography.region.lake)"
+                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.lake))}`"
+                            >coordinates</a><br>
+                            Trains/Flights Region: <a class="pl-1" target="_blank"
+                                :title="getReversedCoordinates(geography.region.land_polygon)"
+                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_polygon))}`"
+                            >coordinates</a><br>
+                            Traffic Region: <a class="pl-1" target="_blank"
+                                :title="getReversedCoordinates(geography.region.land_square)"
+                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_square))}`"
+                            >coordinates</a><br>
+                            <br>
+                            <span class="d-block">
+                                Weather by: <a href="https://darksky.net/poweredby/" target="_blank">darksky.net</a>
+                            </span>
+                            <span class="d-block">
+                                Trains by: <a href="http://southshore.etaspot.net" target="_blank">southshore.etaspot.net</a>
+                            </span>
+                            <span class="d-block">
+                                Traffic by: <a href="http://mapquest.com" target="_blank">mapquest.com</a>
+                            </span>
+                            <span class="d-block">
+                                Flight Tracking by: <a href="https://aviation-edge.com?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">aviation-edge.com</a>
+                            </span>
+                            <span class="d-block">
+                                Vessel Tracking by: <a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon.com</a>
+                            </span>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="container" id="results">
+            <div id="airquality">
+                <h2 class="h5 text-left mb-0 p-2">
+                    <span class="font-weight-bold">Current Air Quality</span>
+                </h2>
+                <div class="row mb-3">
+                    <div class="col-xl-6 py-2">
+                        <div class="card h-100 aqi"
+                            :class="getAqiScoreClassname((airshit.PM25REALTIME ? airshit.PM25REALTIME['category'] : 'Good'))"
+                        >
+                            <div class="card-body">
+                                <div class="rotate">
+                                    <i class="fa fa-tachometer-alt fa-5x"></i>
                                 </div>
+                                <h3 class="h6 text-uppercase font-weight-bold">PM2.5</h3>
+                                <p class="small">sources include all combustion including vehicles, some industrial processes, etc.</p>
+                                <p class="display-4 font-weight-bold mb-0">
+                                    <span class="number--blurred" v-if="! airshit.PM25REALTIME"></span>
+                                    <span v-else>{{ airshit.PM25REALTIME['aqi'] }}</span>
+                                </p>
+                                <h4 class="lead mb-0 text-uppercase font-weight-bold">
+                                    <span class="text--blurred" v-if="! airshit.PM25REALTIME"></span>
+                                    <span v-else>{{ airshit.PM25REALTIME['category'] }}</span>
+                                </h4>
                             </div>
                         </div>
                     </div>
-
-
-                    <div class="highs mb-3">
+                    <div class="col-xl-6 py-2">
+                        <div class="card h-100 aqi"
+                            :class="getAqiScoreClassname((airshit.PM10REALTIME ? airshit.PM10REALTIME['category'] : 'Good'))"
+                        >
+                            <div class="card-body">
+                                <div class="rotate">
+                                    <i class="fa fa-tachometer-alt fa-5x"></i>
+                                </div>
+                                <h3 class="h6 text-uppercase font-weight-bold">PM10</h3>
+                                <p class="small">sources include dust from construction sites, landfills and agriculture, industrial ources, pollen, bacteria, etc.</p>
+                                <p class="display-4 font-weight-bold mb-0">
+                                    <span class="number--blurred" v-if="! airshit.PM10REALTIME"></span>
+                                    <span v-else>{{ airshit.PM10REALTIME['aqi'] }}</span>
+                                </p>
+                                <h4 class="lead mb-0 text-uppercase font-weight-bold">
+                                    <span class="text--blurred" v-if="! airshit.PM10REALTIME"></span>
+                                    <span v-else>{{ airshit.PM10REALTIME['category'] }}</span>
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 mt-3">
                         <h2 class="small text-uppercase mb-2 text-dark">Historical Air Quality Highs <sup><a href="#note-3">[3]</a></sup></h2>
 
                         <div class="row no-gutters mb-2">
@@ -85,6 +146,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-4">
                                 <div class="card br-0">
                                     <div class="card-header">
@@ -112,6 +174,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-4">
                                 <div class="card br-0">
                                     <div class="card-header">
@@ -151,6 +214,7 @@
                                 ></i>
                             </a>
                         </p>
+
                         <div v-if="isAqiMeaningsVisible">
                             <table class="table">
                                 <thead>
@@ -199,148 +263,18 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        <h2 class="small text-uppercase mb-2 text-dark">Historical Industry Highs</h2>
-
-                        <div class="row no-gutters mb-4">
-                            <div class="col-3">
-                                <div class="card br-0">
-                                    <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Ships</h5>
-                                    </div>
-                                    <div class="card-body aqi-stat"
-                                    >
-                                        <div class="rotate">
-                                            <i class="fa fa-ship fa-3x"></i>
-                                        </div>
-                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                            <span class="number--blurred" v-if="! highs.vessels"></span>
-                                            <span v-else>
-                                                {{ highs.vessels.count }}
-                                                <small style="font-size:0.5rem;">total</small>
-                                            </span>
-                                        </p>
-                                        <span class="number--blurred" v-if="! highs.vessels"></span>
-                                        <p v-else class="small mb-0"
-                                            :title="formatDateTimeToLocal(highs.vessels.createdAt, null)"
-                                        >
-                                            {{ formatDateTimeToLocal(highs.vessels.createdAt) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-3">
-                                <div class="card br-0">
-                                    <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Flights</h5>
-                                    </div>
-                                    <div class="card-body aqi-stat"
-                                    >
-                                        <div class="rotate">
-                                            <i class="fa fa-plane fa-3x"></i>
-                                        </div>
-                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                            <span class="number--blurred" v-if="! highs.flights"></span>
-                                            <span v-else>
-                                                {{ highs.flights.count }}
-                                                <small style="font-size:0.5rem;">total</small>
-                                            </span>
-                                        </p>
-                                        <span class="number--blurred" v-if="! highs.flights"></span>
-                                        <p v-else class="small mb-0"
-                                            :title="formatDateTimeToLocal(highs.flights.createdAt, null)"
-                                        >
-                                            {{ formatDateTimeToLocal(highs.flights.createdAt) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-3">
-                                <div class="card br-0">
-                                    <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Trains</h5>
-                                    </div>
-                                    <div class="card-body aqi-stat"
-                                    >
-                                        <div class="rotate">
-                                            <i class="fa fa-train fa-3x"></i>
-                                        </div>
-                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                            <span class="number--blurred" v-if="! highs.trains"></span>
-                                            <span v-else>
-                                                {{ highs.trains.count }}
-                                                <small style="font-size:0.5rem;">total</small>
-                                            </span>
-                                        </p>
-                                        <span class="number--blurred" v-if="! highs.trains"></span>
-                                        <p v-else class="small mb-0"
-                                            :title="formatDateTimeToLocal(highs.trains.createdAt, null)"
-                                        >
-                                            {{ formatDateTimeToLocal(highs.trains.createdAt) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-3">
-                                <div class="card br-0">
-                                    <div class="card-header">
-                                        <h5 class="mb-0 card-title text-uppercase small">Traffic</h5>
-                                    </div>
-                                    <div class="card-body aqi-stat"
-                                    >
-                                        <div class="rotate">
-                                            <i class="fa fa-car fa-3x"></i>
-                                        </div>
-                                        <p class="h4 font-weight-bold mb-0 aqi-stat__stat">
-                                            <span class="number--blurred" v-if="! highs.traffic"></span>
-                                            <span v-else>
-                                                {{ highs.traffic.sum.toFixed(0) }}
-                                                <small style="font-size:0.5rem;">miles</small>
-                                            </span>
-                                        </p>
-                                        <span class="number--blurred" v-if="! highs.traffic"></span>
-                                        <p v-else class="small mb-0"
-                                            :title="formatDateTimeToLocal(highs.traffic.createdAt, null)"
-                                        >
-                                            {{ formatDateTimeToLocal(highs.traffic.createdAt) }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="lead text-right text-uppercase mb-3">
-                        <a href="#" role="button" class="d-inline-block" @click.prevent="showAlert('coming soon!')">see past air quality<i class="fa pl-1 fa-chevron-right" aria-hidden="true"></i></a>
-                    </p>
-
-                    <div id="introduction">
-                        <p class="lead">In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after ArcelorMittal had <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">violated the daily maximum limit for total cyanide and ammonia-nitrogen</a>, releasing a<a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank"> considerable</a> amount of both chemicals into a tributary of Lake Michigan which went <a href="https://chicago.cbslocal.com/2019/08/20/arcelormittal-spill-indiana-state/" target="_blank">unreported</a> for days, <a href="https://www.epa.gov/in/arcelormittal-burns-harbor-llc-portage-indiana" target="_blank">killing</a> 1000s of fish, <a href="https://apnews.com/bd9de73946954208b93cf5c9406c83c7" target="_blank">restricting</a> intake of a water filtration plant, <a href="https://www.washingtonpost.com/climate-environment/2019/08/19/cyanide-steel-plant-trickled-into-lake-michigan-days-before-public-was-notified/" target="_blank">closing</a> local beaches and portions of the <a href="https://www.nps.gov/indu/learn/news/chemical-spill-indu-20190814.htm">Indiana Dunes National Park</a>.
-                        <p class="lead">Suspected the source was likely from one of the many mills/refineries in the region, but with no data to support it, a handful of neighbours donated money and collectively purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood at any time, available for all to see, with the aim of bringing awareness to how the local industry affects the air that both residents and tourists of Miller Beach / Gary breathe.</p>
-
-                        <p class="lead">Tracking the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a> (<a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5, PM10</a>), temperature, humidity, pressure, and reported weather (including wind speeds, direction, cloud coverage, etc.), as to (hopefully) determine who, where, what, and how the weather and local industry affects the local air quality.</p>
-
-                        <p class="lead">Depending on what data is openly available in the future, it may be possible to gather additional data from the many other air quality impacting industries around the region, such as <del>train schedules</del><sup><a href="#note-1">[1]</a></sup>, burn schedules, <del>traffic congestion</del>, construction, <del>ORD/MDY/GYY air traffic</del>, mill non-conformances, <del>cargo/container ships on Lake Michigan</del>, etc.</p>
-
-                        <p class="lead">There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood, we'll track it and add it to our data.</p>
-
-                        <p class="lead">Not limiting our tracking to air, as soon as affordable community water quality testing becomes available for Lake Michigan, we'll track it and add that to our data, too.</p>
                     </div>
                 </div>
-
-                <div class="col-xl-5 offset-xl-1">
+            </div>
+            <div class="row">
+                <div class="col-xl-6" id="weather">
                     <div class="table-responsive">
                         <table class="table text-monospace mb-5">
                             <tbody>
                                 <tr>
-                                    <td colspan="2" style="border-top:0;" class="pt-3 pb-4">
+                                    <td colspan="2" style="border-top:0;" class="pt-0 pb-4">
                                         <h2 class="h5 text-left mb-0 p-2">
-                                            <span class="text--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else><span class="font-weight-bold">{{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }}</span> ago it was <span class="font-weight-bold">{{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}</span> and <span class="font-weight-bold">{{ airshit.TEMP_F }}</span>
-                                            &nbsp;&deg;F</span>
+                                            <span class="font-weight-bold">Current Weather</span>
                                         </h2>
                                     </td>
                                 </tr>
@@ -368,8 +302,8 @@
                                     </td>
                                     <td>
                                         <p class="lead mb-0 font-weight-bold">
-                                            <span class="number--blurred" v-if="! airshit.HUMIDITY_PERCENT"></span>
-                                            <span v-else>{{ airshit.HUMIDITY_PERCENT }}</span>
+                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                                            <span v-else>{{ airshit.REPORTED_WEATHER['humidity'] * 100}}</span>
                                             &nbsp;<sub>%</sub>
                                         </p>
                                     </td>
@@ -382,7 +316,7 @@
                                         <p class="lead mb-0 font-weight-bold">
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                                             <span v-else>{{ airshit.REPORTED_WEATHER['dewPoint'].toFixed(0)}}</span>
-                                            &nbsp;&deg;F
+                                            &nbsp;<sub>&deg;F</sub>
                                         </p>
                                     </td>
                                 </tr>
@@ -416,8 +350,8 @@
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.PRESSURE_BAR"></span>
-                                            <span v-else class="font-weight-bold">{{ (airshit.PRESSURE_BAR * 0.02953).toFixed(2) }}</span>
+                                            <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
+                                            <span v-else class="font-weight-bold">{{ (airshit.REPORTED_WEATHER['pressure'] * 0.02953).toFixed(2) }}</span>
                                             &nbsp;<sub>in Hg</sub>
                                         </p>
                                     </td>
@@ -429,7 +363,7 @@
                                     <td>
                                         <p class="lead mb-0">
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else class="font-weight-bold">{{ airshit.REPORTED_WEATHER['precipIntensity'] }}</span>
+                                            <span v-else class="font-weight-bold">{{ parseFloat(airshit.REPORTED_WEATHER['precipIntensity']).toFixed(2) }}</span>
                                             &nbsp;<sub>in of liquid water</sub>
                                         </p>
                                     </td>
@@ -461,12 +395,17 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <div class="col-xl-6" id="industry">
+                    <div class="table-responsive">
                         <table class="table text-monospace mb-0">
                             <tbody>
                                 <tr>
                                     <td colspan="2" style="border-top:0;" class="pt-0 pb-4">
                                         <h2 class="h5 text-left mb-0 p-2">
-                                            <span class="font-weight-bold">Industry</span>
+                                            <span class="font-weight-bold">Current Industry</span>
                                         </h2>
                                     </td>
                                 </tr>
@@ -556,59 +495,151 @@
                                 <tr>
                                     <th class="pb-0 pt-5 small text-uppercase text-right" colspan="2">
 
-                                        <p class="mb-0" v-if="Object.keys(geography).length > 0">
-                                            Sensor located at: <code>{{ geography.sensor.lat }},{{ geography.sensor.lng }}</code><br>
-                                            Lake:<a class="pl-1" target="_blank"
-                                                :title="getReversedCoordinates(geography.region.lake)"
-                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.lake))}`"
-                                            >coordinates</a><br>
-                                            Trains/Flights Region: <a class="pl-1" target="_blank"
-                                                :title="getReversedCoordinates(geography.region.land_polygon)"
-                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_polygon))}`"
-                                            >coordinates</a><br>
-                                            Traffic Region: <a class="pl-1" target="_blank"
-                                                :title="getReversedCoordinates(geography.region.land_square)"
-                                                :href="`https://www.keene.edu/campus/maps/tool/?coordinates=${encodeURIComponent(getReversedCoordinates(geography.region.land_square))}`"
-                                            >coordinates</a><br><br>
-                                            PM2.5/PM10, AIS, temperature, humidity, <br>pressure recorded at sensor<br><br>
-                                            <br>
-                                            <span class="d-block">
-                                                Weather by: <a href="https://darksky.net/poweredby/" target="_blank">darksky.net</a>
-                                            </span>
-                                            <span class="d-block">
-                                                Trains by: <a href="http://southshore.etaspot.net" target="_blank">southshore.etaspot.net</a>
-                                            </span>
-                                            <span class="d-block">
-                                                Traffic by: <a href="http://mapquest.com" target="_blank">mapquest.com</a>
-                                            </span>
-                                            <span class="d-block">
-                                                Flight Tracking by: <a href="https://aviation-edge.com?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">aviation-edge.com</a>
-                                            </span>
-                                            <span class="d-block">
-                                                Vessel Tracking by: <a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon.com</a>
-                                            </span>
 
-                                            <br><span :title="formatDateTimeToLocal(airshit.createdAt, null)"> Last Updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
-
-                                        </p>
                                     </th>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
-                    <!--=JSON.stringify(airshit)-->
                 </div>
-
             </div>
         </div>
 
-        <div class="map-container py-5">
-            <div id="map"></div>
-            <small class="text-center px-5 w-100 d-block mt-2"><a target="_blank" href="/icons/set/train">Train</a>, <a target="_blank" href="/icons/set/fishing-boat">Fishing Boat</a> and other icons by <a target="_blank" href="https://icons8.com">Icons8</a></small>
-            <small class="text-center px-5 w-100 d-block mt-2">Factories listed are <a href="https://www.in.gov/idem/airquality/files/monitoring_criteria_trend_northwest.pdf" target="_blank">Northwest Indiana's Top Ten Emission Sources</a></small>
+        <div class="container" id="historical-highs">
+            <div class="row">
+
+                <div class="col-xl-12">
+
+                    <h2 class="small text-uppercase mb-2 text-dark">Historical Industry Highs</h2>
+
+                    <div class="row no-gutters mb-4">
+                        <div class="col-xl-3 col-6">
+                            <div class="card br-0">
+                                <div class="card-header">
+                                    <h5 class="mb-0 card-title text-uppercase small">Ships</h5>
+                                </div>
+                                <div class="card-body aqi-stat"
+                                >
+                                    <div class="rotate">
+                                        <i class="fa fa-ship fa-5x"></i>
+                                    </div>
+                                    <p class=" font-weight-bold mb-0 aqi-stat__stat">
+                                        <span class="number--blurred" v-if="! highs.vessels"></span>
+                                        <span v-else>
+                                            {{ highs.vessels.count }}
+                                        </span>
+                                        <small class="h5 font-weight-bold text-uppercase text-muted">total</small>
+                                    </p>
+                                    <span class="number--blurred" v-if="! highs.vessels"></span>
+                                    <p v-else class="small mb-0"
+                                        :title="formatDateTimeToLocal(highs.vessels.createdAt, null)"
+                                    >
+                                        {{ formatDateTimeToLocal(highs.vessels.createdAt) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-6">
+                            <div class="card br-0">
+                                <div class="card-header">
+                                    <h5 class="mb-0 card-title text-uppercase small">Flights</h5>
+                                </div>
+                                <div class="card-body aqi-stat"
+                                >
+                                    <div class="rotate">
+                                        <i class="fa fa-plane fa-5x"></i>
+                                    </div>
+
+                                    <p class="font-weight-bold my-0 aqi-stat__stat">
+                                        <span class="number--blurred" v-if="! highs.flights"></span>
+                                        <span v-else>
+                                            {{ highs.flights.count }}
+                                        </span>
+                                        <small class="h5 font-weight-bold text-uppercase text-muted">total</small>
+                                    </p>
+                                    <span class="number--blurred" v-if="! highs.flights"></span>
+                                    <p v-else class="small mb-0"
+                                        :title="formatDateTimeToLocal(highs.flights.createdAt, null)"
+                                    >
+                                        {{ formatDateTimeToLocal(highs.flights.createdAt) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-6">
+                            <div class="card br-0">
+                                <div class="card-header">
+                                    <h5 class="mb-0 card-title text-uppercase small">Trains</h5>
+                                </div>
+                                <div class="card-body aqi-stat"
+                                >
+                                    <div class="rotate">
+                                        <i class="fa fa-train fa-5x"></i>
+                                    </div>
+                                    <p class="font-weight-bold mb-0 aqi-stat__stat">
+                                        <span class="number--blurred" v-if="! highs.trains"></span>
+                                        <span v-else>
+                                            {{ highs.trains.count }}
+                                        </span>
+                                        <small class="h5 font-weight-bold text-uppercase text-muted">total</small>
+                                    </p>
+                                    <span class="number--blurred" v-if="! highs.trains"></span>
+                                    <p v-else class="small mb-0"
+                                        :title="formatDateTimeToLocal(highs.trains.createdAt, null)"
+                                    >
+                                        {{ formatDateTimeToLocal(highs.trains.createdAt) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-3 col-6">
+                            <div class="card br-0">
+                                <div class="card-header">
+                                    <h5 class="mb-0 card-title text-uppercase small">Traffic</h5>
+                                </div>
+                                <div class="card-body aqi-stat"
+                                >
+                                    <div class="rotate">
+                                        <i class="fa fa-car fa-5x"></i>
+                                    </div>
+
+                                    <p class="font-weight-bold mb-0 aqi-stat__stat">
+                                        <span class="number--blurred" v-if="! highs.traffic"></span>
+                                        <span v-else>
+                                            {{ highs.traffic.sum.toFixed(0) }}
+                                        </span>
+                                        <small class="h5 font-weight-bold text-uppercase text-muted">miles</small>
+                                    </p>
+                                    <span class="number--blurred" v-if="! highs.traffic"></span>
+                                    <p v-else class="small mb-0"
+                                        :title="formatDateTimeToLocal(highs.traffic.createdAt, null)"
+                                    >
+                                        {{ formatDateTimeToLocal(highs.traffic.createdAt) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="container">
+        <div class="container" id="introduction" >
+            <div class="mb-5 inner">
+                <p>In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after a local steel mill had <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">exceeded the daily maximum allowance of cyanide and ammonia-nitrogen</a>, releasing a <a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank">considerable amount</a> of both chemicals into a tributary of Lake Michigan which went <a href="https://chicago.cbslocal.com/2019/08/20/arcelormittal-spill-indiana-state/" target="_blank">unreported for days</a>, <a href="https://www.epa.gov/in/arcelormittal-burns-harbor-llc-portage-indiana" target="_blank">killing 1000s</a> of fish, <a href="https://apnews.com/bd9de73946954208b93cf5c9406c83c7" target="_blank">restricting intake</a> of a water filtration plant, <a href="https://www.washingtonpost.com/climate-environment/2019/08/19/cyanide-steel-plant-trickled-into-lake-michigan-days-before-public-was-notified/" target="_blank">closing local beaches</a>, and portions of the <a href="https://www.nps.gov/indu/learn/news/chemical-spill-indu-20190814.htm">Indiana Dunes National Park</a>.
+
+                <p>Suspected the source was likely from one of the many mills/refineries in the region but with no data to support it, a handful of neighbours purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood in realtime, bringing awareness to how the local industry affects the air that residents and tourists of Miller Beach, Gary, &amp; Northwest Indiana breathe.</p>
+
+                <p>We track the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a>, measuring both <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5 and PM10</a> particles, temperature, humidity, atmospheric pressure, wind speed, wind direction, cloud coverage, UV index, etc. to determine how the weather and local industry affects the local air quality.</p>
+
+                <p>There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood are available, we'll track it and add it to our data.</p>
+            </div>
+        </div>
+
+        <footer class="container">
             <div class="row">
                 <div class="col-md-6">
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left">
@@ -721,7 +752,7 @@
                     </ol>
                 </div>
             </div>
-        </div>
+        </footer>
     </div>
 </template>
 
@@ -799,6 +830,36 @@ export default {
 
             return _.groupBy(vessels, 'type');
         },
+        overallAirQuality() {
+            const pm25 = this.getOverallAqiScore(this.airshit.PM25REALTIME && this.airshit.PM25REALTIME.aqi || 0);
+            const pm10 = this.getOverallAqiScore(this.airshit.PM10REALTIME && this.airshit.PM10REALTIME.aqi || 0);
+
+            const severity = [
+                'good',
+                'moderate',
+                'unhealthy-sensitive',
+                'unhealthy',
+                'unhealthy-very',
+                'death'
+            ];
+
+            return severity[Math.max(severity.indexOf(pm25), severity.indexOf(pm10))];
+        },
+        overallFlightTotal() {
+            if (! this.airshit.FLIGHTS) return 0;
+
+            return [
+                this.airshit.FLIGHTS.GYY.length,
+                this.airshit.FLIGHTS.MDW.length,
+                this.airshit.FLIGHTS.ORD.length
+            ].reduce((a, b) => { return a + b; });
+        },
+        overallVesselsTotal() {
+            return this.airshit.VESSELS.length;
+        },
+        overallTrainsTotal() {
+            return this.airshit.TRAINS.SOUTHSHORE.length;
+        }
     },
 
     data() {
@@ -903,7 +964,7 @@ export default {
             });
 
             L.marker([this.geography.sensor.lat, this.geography.sensor.lng], {icon: sensorIcon}).bindPopup(`
-                PM2.5/PM10 sensor, AIS antenna, and reported weather are recorded from this location.
+                Base Station, PM2.5/PM10 sensor, AIS antenna, and reported weather are recorded from this location.
             `).addTo(map);
 
             for (const airport in this.$store.state.airshit.FLIGHTS) {
@@ -964,20 +1025,24 @@ export default {
             return (angle + 180) % 360;
         },
 
-        getAqiScoreStatClassname(total) {
+        getOverallAqiScore(total) {
             if (_.inRange(total, 0, 50)) {
-                return 'aqi-stat--good';
+                return 'good';
             } else if (_.inRange(total, 51, 100)) {
-                return 'aqi-stat--moderate';
+                return 'moderate';
             } else if (_.inRange(total, 101, 150)) {
-                return 'aqi-stat--unhealthy-sensitive';
+                return 'unhealthy-sensitive';
             } else if (_.inRange(total, 151, 200)) {
-                return 'aqi-stat--unhealthy';
+                return 'unhealthy';
             } else if (_.inRange(total, 201, 300)) {
-                return 'aqi-stat--unhealthy-very';
+                return 'unhealthy-very';
             } else if (total >= 301) {
-                return 'aqi-stat--death';
+                return 'death';
             }
+        },
+
+        getAqiScoreStatClassname(total) {
+            return `aqi-stat--${this.getOverallAqiScore(total)}`;
         },
 
         getAqiScoreClassname(measurement) {
@@ -998,12 +1063,10 @@ export default {
         },
 
         getTotalAirQualityAqiScore(airshit) {
-            if (! airshit || ! airshit.PM25REALTIME || ! airshit.PM10REALTIME) {
-                return 0;
-            }
+            if (! airshit) return 0;
 
-            const pm25 = airshit.PM25REALTIME.aqi || 0;
-            const pm10 = airshit.PM10REALTIME.aqi || 0;
+            const pm25 = airshit.PM25REALTIME && airshit.PM25REALTIME.aqi || 0;
+            const pm10 = airshit.PM10REALTIME && airshit.PM10REALTIME.aqi || 0;
 
             return pm25 + pm10;
         },

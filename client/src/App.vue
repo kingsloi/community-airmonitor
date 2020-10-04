@@ -4,7 +4,7 @@
       <div class="container">
         <a class="navbar-brand text--smushed" href="/">
           <i class="fas fa-air-freshener pr-1"></i>
-          How's <strong class="text-uppercase">our</strong> air quality?
+          millerbeach<strong>.community</strong>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
@@ -15,6 +15,11 @@
             <li class="nav-item">
               <router-link to="/" class="nav-link">Currently</router-link>
             </li>
+<!--
+            <li class="nav-item">
+              <router-link to="/previous" class="nav-link">Previous</router-link>
+            </li>
+-->
             <li class="nav-item">
               <router-link to="/history" class="nav-link">Updates</router-link>
             </li>
