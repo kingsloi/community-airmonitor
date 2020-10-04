@@ -548,9 +548,7 @@ sub {
     }
     .site-heading {
         font-size: 2.5rem;
-        width: 65%;
         @media (min-width: 991px) {
-            width: 100%;
             font-size: 3.5rem;
             letter-spacing: -5px;
             line-height: 0.95;
