@@ -64,8 +64,8 @@
 export default {
   name: 'App',
   metaInfo: {
-    title: 'Miller Beach / Gary / NWI Air Quality',
-    titleTemplate: '%s | Miller Beach / Gary / NWI Air Quality'
+    title: 'Miller Beach Air Quality, Weather, & Industry Dashboard',
+    titleTemplate: '%s | Miller Beach Air Quality, Weather, & Industry Dashboard'
   }
 };
 </script>
