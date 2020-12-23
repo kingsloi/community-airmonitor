@@ -96,7 +96,10 @@
                                 </p>
                                 <h4 class="lead mb-0 text-uppercase font-weight-bold">
                                     <span class="text--blurred" v-if="! airshit.PM25REALTIME"></span>
-                                    <span v-else>{{ airshit.PM25REALTIME['category'] }}</span>
+                                    <template v-else>
+                                        <span>{{ airshit.PM25REALTIME['category'] }}</span>
+                                        <small class="font-size-50 pl-20 mt-1 d-block">raw: <span class="text-lowercase">{{  airshit.PM25REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
+                                    </template>
                                 </h4>
                             </div>
                         </div>
@@ -117,7 +120,10 @@
                                 </p>
                                 <h4 class="lead mb-0 text-uppercase font-weight-bold">
                                     <span class="text--blurred" v-if="! airshit.PM10REALTIME"></span>
-                                    <span v-else>{{ airshit.PM10REALTIME['category'] }}</span>
+                                    <template v-else>
+                                        <span>{{ airshit.PM10REALTIME['category'] }}</span>
+                                        <small class="font-size-50 pl-20 mt-1 d-block">raw: <span class="text-lowercase">{{  airshit.PM10REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
+                                    </template>
                                 </h4>
                             </div>
                         </div>
@@ -310,7 +316,7 @@
                                     <td>
                                         <p class="lead mb-0 font-weight-bold">
                                             <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
-                                            <span v-else>{{ airshit.REPORTED_WEATHER['humidity'] * 100}}</span>
+                                            <span v-else>{{ (airshit.REPORTED_WEATHER['humidity'] * 100).toFixed(0) }}</span>
                                             &nbsp;<sub>%</sub>
                                         </p>
                                     </td>
@@ -983,7 +989,7 @@ export default {
                 flights.forEach((flight) => {
                     L.marker([flight.lat, flight.lng], {icon: aircraftIcon, rotationAngle: flight.bearing}).bindPopup(`
                         Aircraft: ${flight.aircraft}<br>
-                        Flight: ${flight.flight}<br>
+                        Flight: <a href="https://www.planemapper.com/flights/${flight.flight}" target="_blank">${flight.flight}</a> <small>(open in new window)</small><br>
                         Departing: ${flight.departing}, Arriving: ${flight.arriving}<br>
                         Speed: ${flight.speed}<br>
                         Bearing: ${flight.bearing}<br>
@@ -1007,6 +1013,8 @@ export default {
                 const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
                 L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
                     Name: ${vessel.name}<br>
+                    IMO: ${ vessel.imo || '-' }<br>
+                    MMSI: ${vessel.id}<br>
                     Callsign: ${vessel.callsign}<br>
                     Country: ${vessel.country}<br>
                     Type: ${vessel.type}<br>

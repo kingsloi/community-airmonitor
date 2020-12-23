@@ -10,6 +10,14 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 
 @import "themes/default/_default";
 
+$util-font-sizes: 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200;
+
+@each $util-font-size in $util-font-sizes {
+  .font-size-#{$util-font-size} {
+    font-size: $util-font-size * 1% !important;
+  }
+}
+
 // Scaffolding
 // -------------------------
 html {
@@ -271,7 +279,12 @@ sub {
         &__stat {
             span {
                 font-weight: bold;
+
                 @extend .display-4;
+                font-size: 2rem;
+                @media (min-width: 768px) {
+                    font-size: 3.5rem;
+                }
             }
         }
     }
@@ -446,8 +459,10 @@ sub {
 .funded-by-list {
     list-style-type: none;
     text-align: center;
+    padding-left: 0;
 
     @media (min-width: 768px) {
+        padding-left: 3rem;
         text-align: left;
         list-style-type: circle;
     }

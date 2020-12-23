@@ -18,6 +18,7 @@
     "leaflet-rotatedmarker": "^0.2.0",
     "moment": "^2.24.0",
     "popper.js": "^1.16.0",
+    "serve-index": "^1.9.1",
     "timeline-vuejs": "^1.0.11",
     "vue": "^2.6.10",
     "vue-apexcharts": "^1.5.3",

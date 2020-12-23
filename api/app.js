@@ -23,6 +23,7 @@ const cors = require('cors');
 const history = require('connect-history-api-fallback');
 const cache = require('express-redis-cache')();
 
+var serveIndex = require('serve-index');
 const upload = multer({ dest: path.join(__dirname, 'uploads') });
 
 /**
@@ -99,11 +100,6 @@ app.use((req, res, next) => {
 app.disable('x-powered-by');
 
 app.use('/', express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/inputmask/dist'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/chart.js/dist'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/popper.js/dist/umd'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/bootstrap/dist/js'), { maxAge: 31557600000 }));
-app.use('/js/lib', express.static(path.join(__dirname, 'node_modules/jquery/dist'), { maxAge: 31557600000 }));
 app.use('/fonts', express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/webfonts'), { maxAge: 31557600000 }));
 app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts'), { maxAge: 31557600000 }));
 
@@ -111,7 +107,11 @@ app.use('/fonts', express.static(path.join(__dirname, 'public', 'fonts'), { maxA
  * Primary app routes.
  */
 const publicPath = path.resolve(path.join(__dirname, '../', 'client', 'dist'));
-app.use(express.static(publicPath, { maxAge: '1y', etag: false }))
+app.use(express.static(publicPath, { maxAge: '1y', etag: false }));
+app.use('/files', express.static('public/files'), serveIndex('public/files', {
+  'icons': true,
+  'stylesheet': path.join(__dirname, '../', 'client', 'public', 'directory-listing.css'),
+}))
 
 app.get('/currently', cache.route(), airShirtController.index);
 app.get('/sync', airShirtController.sync);

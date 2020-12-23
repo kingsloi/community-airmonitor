@@ -329,6 +329,7 @@ exports.sync = (req, res) => {
 
       const runningShips = _.map(runningVessels, (vessel) => ({
         id: vessel.mmsi_number,
+        imo: vessel.imo_number,
         name: vessel.name,
         callsign: vessel.callsign,
         country: vessel.country,

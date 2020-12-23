@@ -27,6 +27,10 @@
                 messageWhenNoItems: 'There are not items.',
                 timelineItems: [
                     {
+                        from: new Date(2020, 11),
+                        title: 'Shared Proposals/research/files',
+                        description: `Any/all research, files, proposals, etc will be hosted at <a href="/files" target="_blank">millerbeach.community/files</a>.`
+                    }, {
                         from: new Date(2020, 9),
                         title: 'A new URL & fresh coat of paint',
                         description: `Updated dashboard design and rebranded as <a href="https://millerbeach.community" target="_blank">millerbeach.community</a>.`
