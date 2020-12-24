@@ -20,7 +20,7 @@
                     </h2>
                 </div>
 
-                <div class="col-xl-6 mt-5 mt-xl-2">
+                <div class="col-xl-6 mt-5 mt-xl-2 px-xl-3 px-0">
 
 
                     <div class="map-container" @click.prevent="mapMaskActive = false"
@@ -113,7 +113,7 @@
                                     <i class="fa fa-tachometer-alt fa-5x"></i>
                                 </div>
                                 <h3 class="h6 text-uppercase font-weight-bold">PM10</h3>
-                                <p class="small">sources include dust from construction sites, landfills and agriculture, industrial ources, pollen, bacteria, etc.</p>
+                                <p class="small">sources include dust from construction sites, landfills and agriculture, industrial sources, pollen, bacteria, etc.</p>
                                 <p class="display-4 font-weight-bold mb-0">
                                     <span class="number--blurred" v-if="! airshit.PM10REALTIME"></span>
                                     <span v-else>{{ airshit.PM10REALTIME['aqi'] }}</span>
