@@ -1,7 +1,7 @@
 # Community Air Monitor
 > Tracking PM2.5/PM10 via a Purple Air Sensor, weather, traffic congestion, trains schedules, and more, in the [Miller Beach](https://en.wikipedia.org/wiki/Miller_Beach) neighbourhood of [Gary, IN](https://en.wikipedia.org/wiki/Gary,_Indiana).
 
-> — [https://millerbeach-air.com](https://millerbeach-air.com)
+> — [https://millerbeach.community](https://millerbeach.community)
 
 In August 2019, [ArcelorMittal leaked cyanide into the Little Calumet River in Portage, IN](https://www.washingtonpost.com/climate-environment/2019/08/19/cyanide-steel-plant-trickled-into-lake-michigan-days-before-public-was-notified/), killing fish, forcing the closure of the Indiana Dunes National Park, and the many beaches along the Lake Michigan shoreline, affecting the livelihood of the many thousands of people who rely on the Lake/beach daily, but also the many tourists who were visiting the region, during the peak of summer. A few months later in October 2019, neighbours reported a foul odour that was causing eye irritation, headaches, and nausea. Northwest Indiana is described as housing "the largest steelmaking complex in North America" with:
 

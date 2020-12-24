@@ -14,8 +14,8 @@
                     <h2 class="h2 text-left">
                         <span class="text--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                         <div v-else>
-                            <span class="font-weight-bold">{{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }}</span> ago, the <span class="font-weight-bold">weather</span> was reported as
-                            <span class="font-weight-bold">{{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}</span> and around <span class="font-weight-bold">{{ airshit.REPORTED_WEATHER['apparentTemperature'].toFixed(0) }}&deg;F</span>, the overall <span class="font-weight-bold">air quality</span> was reported as <span class="font-weight-bold">{{ overallAirQuality }}</span>, there were <span class="font-weight-bold">{{ congestionMiles }} miles</span> of <span class="font-weight-bold">local traffic</span>, <span class="font-weight-bold">{{ overallFlightTotal }} plane{{ overallFlightTotal === 1 ? '' : 's' }}</span> overhead, <span class="font-weight-bold">{{ overallVesselsTotal }} ships</span> on Lake Michigan, and <span class="font-weight-bold">{{ overallTrainsTotal }} trains</span> in <span class="font-weight-bold">our</span> community.
+                            <span class="highlighted">{{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }}</span> ago, the <span class="highlighted">weather</span> was reported as
+                            <span class="highlighted">{{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}</span> and around <span class="highlighted">{{ airshit.REPORTED_WEATHER['apparentTemperature'].toFixed(0) }}&deg;F</span>, the overall <span class="highlighted">air quality</span> was reported as <span class="highlighted">{{ overallAirQuality }}</span>, there were <span class="highlighted">{{ congestionMiles }} miles</span> of <span class="highlighted">local traffic</span>, <span class="highlighted">{{ overallFlightTotal }} plane{{ overallFlightTotal === 1 ? '' : 's' }}</span> overhead, <span class="highlighted">{{ overallVesselsTotal }} ships</span> on Lake Michigan, and <span class="highlighted">{{ overallTrainsTotal }} trains</span> in <span class="highlighted">our</span> community.
                         </div>
                     </h2>
                 </div>
@@ -778,33 +778,33 @@ import _ from 'lodash';
 
 export default {
     metaInfo: {
-        title: 'Miller Beach / Gary / NWI Air Quality',
+        title: 'Miller Beach Air Quality, Weather, & Industry Dashboard',
         titleTemplate: null,
         meta: [
           { name: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place." },
 
-            {property: 'og:title', content: 'Miller Beach / Gary / NWI Air Quality'},
+            {property: 'og:title', content: 'Miller Beach Air Quality, Weather, & Industry Dashboard'},
             {property: 'og:site_name', content: 'How\'s OUR Air Quality?'},
             // The list of types is available here: http://ogp.me/#types
             {property: 'og:type', content: 'website'},
             // Should the the same as your canonical link, see below.
-            {property: 'og:url', content: 'https://millerbeach-air.com/'},
-            {property: 'og:image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'},
+            {property: 'og:url', content: 'https://millerbeach.community/'},
+            {property: 'og:image', content: 'https://millerbeach.community/images/millerbeach-gary-nwi-air-quality-promo.jpg'},
             // Often the same as your meta description, but not always.
             {property: 'og:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place."},
 
             // Twitter card
             {name: 'twitter:card', content: 'summary'},
-            {name: 'twitter:site', content: 'https://millerbeach-air.com'},
+            {name: 'twitter:site', content: 'https://millerbeach.community'},
             {name: 'twitter:title', content: 'Miller Beach / Gary / NWI Air Quality'},
             {name: 'twitter:description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place."},
             // Your twitter handle, if you have one.
-            {name: 'twitter:image:src', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'},
+            {name: 'twitter:image:src', content: 'https://millerbeach.community/images/millerbeach-gary-nwi-air-quality-promo.jpg'},
 
             // Google / Schema.org markup:
             {itemprop: 'name', content: 'Miller Beach / Gary / NWI Air Quality'},
             {itemprop: 'description', content: "A community-powered air quality/industry tracker for the Miller Beach/Gary/NWI region, tracking the air we breathe, ships on Lake Michigan, GYY/ORD/MDW flights, trains, and traffic congestion, all in one place."},
-            {itemprop: 'image', content: 'https://millerbeach-air.com/images/millerbeach-gary-nwi-air-quality-promo.jpg'}
+            {itemprop: 'image', content: 'https://millerbeach.community/images/millerbeach-gary-nwi-air-quality-promo.jpg'}
         ]
     },
 
