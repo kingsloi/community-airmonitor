@@ -1,4 +1,5 @@
 const Airshit = require('../models/Airshit');
+const Vessel = require('../models/Vessel');
 const moment = require('moment');
 const axios = require('axios');
 const aqibot = require('aqi-bot');
@@ -510,3 +511,50 @@ exports.airshitByDate = (req, res) => {
   const end = moment(`${date} 23:59:59`).format();
   Airshit.find({ createdAt: { $gte: start, $lt: end } }).then((result) => res.json({ airshits: result }));
 };
+
+exports.getVesselPhotos = async (req, res) => {
+  const { vessel } = req.params;
+
+  const shippingApiKey = process.env.FLEETMON_API_KEY;
+
+  const vessels = await Vessel.find();
+  const mapped = _.reduce(vessels, (carry, vessel) => {
+    carry[vessel.imoNumber] = vessel.photo;
+    return carry;
+  }, {});
+
+  return res.json({ photos: mapped });
+}
+
+exports.searchVesselPhoto = async (req, res) => {
+  const { vessel } = req.params;
+  const shippingApiKey = process.env.FLEETMON_API_KEY;
+
+  const found = await Vessel.findOne({ imoNumber: vessel });
+
+  if (found) {
+    return res.json({ success: false, photo: found.photo });
+  }
+
+  const response = await axios.get(`https://apiv2.fleetmon.com/vessel/photo/large?apikey=${shippingApiKey}&imo_number=${vessel}`);
+
+  if (response.data.vessels.length > 0) {
+    const photo = response.data.vessels[0].image_url;
+
+    const vesselstamp = new Vessel({
+      imoNumber: vessel, photo
+    });
+
+    vesselstamp.save((err, save) => {
+      if (err) return console.error(err);
+
+      cache.del('/vessels/photos', (error, deleted) => {
+        if (error) throw error;
+      });
+
+      return res.json({ success: true, photo });
+    });
+  }
+
+  return res.json({ success: false, photo: null });
+}
