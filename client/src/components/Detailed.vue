@@ -658,10 +658,14 @@
           return this.$store.state.geography;
         },
         dateSliderMax() {
-          return ((Object.keys(this.grouped).length - 1 === 0) ? Object.keys(this.grouped).length - 1 : 100);
+          console.log('date', (Object.keys(this.grouped).length);
+          return 100;
+          // return ((Object.keys(this.grouped).length - 1 === 0) ? Object.keys(this.grouped).length - 1 : 100);
         },
         airshitSliderMax() {
-          return ((this.airshits.length - 1 === 0) ? this.airshits.length - 1 : 100);
+          console.log('airshit', this.airshits.length);
+          return 100;
+          // return ((this.airshits.length - 1 === 0) ? this.airshits.length - 1 : 100);
         },
         vesselsByType() {
           const vessels = this.$store.state.airshit.VESSELS;
