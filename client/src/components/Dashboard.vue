@@ -483,9 +483,9 @@
                                     </td>
                                     <td>
                                         <p class="lead mb-0">
-                                            <span class="number--blurred" v-if="! airshit.VESSELS"></span>
-                                            <span v-else class="separator" v-for="(vessels, type) in vesselsByType" v-bind:key="type">
-                                                <span class="font-weight-bold">{{ vessels.length }}</span> <small class="small font-weight-light">{{ type }}(s)</small>
+                                            <span class="number--blurred" v-if="! vessels"></span>
+                                            <span v-else class="separator" v-for="(data, type) in vesselsByType" v-bind:key="type">
+                                                <span class="font-weight-bold">{{ data.length }}</span> <small class="small font-weight-light">{{ type }}(s)</small>
                                             </span>
                                         </p>
                                     </td>
@@ -782,6 +782,7 @@ require('leaflet-rotatedmarker');
 import { API } from '@/api';
 import moment from 'moment';
 import _ from 'lodash';
+const geo = require('geolocation-utils');
 
 export default {
     metaInfo: {
@@ -846,7 +847,7 @@ export default {
             return total.toFixed(0);
         },
         vesselsByType() {
-            const vessels = this.$store.state.airshit.VESSELS;
+            const vessels = this.vessels;
 
             return _.groupBy(vessels, 'type');
         },
@@ -875,10 +876,16 @@ export default {
             ].reduce((a, b) => { return a + b; });
         },
         overallVesselsTotal() {
-            return this.airshit.VESSELS.length;
+            return this.vessels.length;
         },
         overallTrainsTotal() {
             return this.airshit.TRAINS.SOUTHSHORE.length;
+        },
+        vessels() {
+            return this.$store.state.airshit.VESSELS.filter((vessel) => {
+                const { lat, lng } = vessel;
+                return geo.insidePolygon([lat, lng], this.geography.region.lake);
+            });
         }
     },
 
@@ -915,6 +922,7 @@ export default {
         },
 
         initMaps() {
+            const self = this;
             if (! document.getElementById('map')) {
                 return;
             }
@@ -1016,12 +1024,7 @@ export default {
                 });
             }
 
-            // const VessellsTravelingOnThru = this.$store.state.airshit.VESSELS.filter((vessel) => {
-            //     const { lat, lng } = vessel;
-            //     return geo.insidePolygon([lat, lng], this.geography.region.lake);
-            // });
-
-            this.$store.state.airshit.VESSELS.forEach((vessel) => {
+            self.vessels.forEach((vessel) => {
                 const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
                 L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
                     Name: ${vessel.name}<br>
@@ -1125,11 +1128,11 @@ export default {
 
         showAqiMeanings() {
             this.isAqiMeaningsVisible = ! this.isAqiMeaningsVisible;
-        }
+        },
     },
 
     mounted() {
-    }
+    },
 }
 </script>
 

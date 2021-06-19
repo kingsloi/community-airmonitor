@@ -7,7 +7,15 @@ const state = {
     geography: {},
     highs: {},
     grouped: {},
-    airshit: {},
+    airshit: {
+        PM25REALTIME: null,
+        PM10REALTIME: null,
+        REPORTED_WEATHER: null,
+        TRAINS: { SOUTHSHORE: [] },
+        TRAFFIC: { INCIDENTS: [] },
+        FLIGHTS: { ORD: [], MDW: [], GYY: [] },
+        VESSELS: [],
+    },
     airshits: [],
 };
 

@@ -426,7 +426,7 @@
                     </tr>
 
                     <template v-if="overallVesselsTotal > 0">
-                      <tr v-bind:key="`vessels-${index}`" v-for="(vessel, index) in this.$store.state.airshit.VESSELS"  class="small">
+                      <tr v-bind:key="`vessels-${index}`" v-for="(vessel, index) in this.vessels"  class="small">
                         <td>{{ vessel.lat }},{{ vessel.lng }}</td>
                         <td>{{ vessel.id }}</td>
                         <td>{{ vessel.imo }}</td>
@@ -599,7 +599,7 @@
     import moment from 'moment';
     require('leaflet-rotatedmarker');
     import Slider from '@vueform/slider/dist/slider.vue2.js';
-    // const geo = require('geolocation-utils');
+    const geo = require('geolocation-utils');
 
     export default {
       components: {
@@ -670,7 +670,7 @@
           return this.airshits.length;
         },
         vesselsByType() {
-          const vessels = this.$store.state.airshit.VESSELS;
+          const vessels = this.vessels;
 
           return _.groupBy(vessels, 'type');
         },
@@ -706,7 +706,7 @@
         },
 
         overallVesselsTotal() {
-          return (this.airshit.VESSELS ? this.airshit.VESSELS.length : 0);
+          return (this.vessels ? this.vessels.length : 0);
         },
 
         overallTrainsTotal() {
@@ -729,6 +729,12 @@
             return severity[Math.max(severity.indexOf(pm25), severity.indexOf(pm10))];
         },
 
+        vessels() {
+            return this.airshit.VESSELS.filter((vessel) => {
+              const { lat, lng } = vessel;
+              return geo.insidePolygon([lat, lng], this.geography.region.lake);
+            });
+        }
       },
 
       methods: {
@@ -1003,8 +1009,8 @@
           }
 
           if (self.viewing.vessels) {
-            for (const index in Object.keys(this.$store.state.airshit.VESSELS)) {
-              const vessel = this.$store.state.airshit.VESSELS[index];
+            for (const index in Object.keys(this.vessels)) {
+              const vessel = this.vessels[index];
               const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
               const marker = L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
                 Name: ${vessel.name}<br>
@@ -1020,7 +1026,9 @@
                 Draught: ${vessel.draught}<br>
                 Status: ${vessel.status}<br>
                 Bearing: ${vessel.direction}<br>
-                `);
+                lat: ${vessel.lat}<br>
+                lng: ${vessel.lng}<br>
+              `);
 
               self.markers.vessels.push(marker);
               self.map.addLayer(self.markers.vessels[index]);

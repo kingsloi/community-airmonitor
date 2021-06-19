@@ -325,9 +325,10 @@ exports.sync = (req, res) => {
 
       // Shipping / Vessels
       const { vessels } = shipping;
-      const runningVessels = vessels.filter((vessel) => vessel.position.nav_status === 'under way using engine');
 
-      const runningShips = _.map(runningVessels, (vessel) => ({
+      const vesselsTravelingOnThru = vessels.filter((vessel) => geo.insidePolygon([vessel.position.latitude, vessel.position.longitude], lakeAsPolygon) && vessel.position.nav_status === 'under way using engine');
+
+      const runningShips = _.map(vesselsTravelingOnThru, (vessel) => ({
         id: vessel.mmsi_number,
         imo: vessel.imo_number,
         name: vessel.name,
@@ -504,25 +505,8 @@ exports.airshit = (req, res) => {
 
 exports.airshitByDate = (req, res) => {
   const { date: original } = req.params;
-  const date = moment(original).format('YYYY-MM-DD');
+  const date = moment.utc(original).format('YYYY-MM-DD');
   const start = moment(`${date} 00:00:00`).format();
   const end = moment(`${date} 23:59:59`).format();
-  console.log(start, end);
   Airshit.find({ createdAt: { $gte: start, $lt: end } }).then((result) => res.json({ airshits: result }));
 };
-
-
-exports.graphs = (req, res) => res.render('graphs', {
-  slug: 'graphs',
-  title: 'Graphs Miller Beach / NWI Air Quality',
-});
-
-exports.graphs = (req, res) => res.render('graphs', {
-  slug: 'graphs',
-  title: 'Graphs Miller Beach / NWI Air Quality',
-});
-
-exports.history = (req, res) => res.render('history-and-updates', {
-  slug: 'history-and-updates',
-  title: 'History & Updates | Miller Beach / NWI Air Quality',
-});
