@@ -658,14 +658,12 @@
           return this.$store.state.geography;
         },
         dateSliderMax() {
-          console.log('date', (Object.keys(this.grouped).length));// eslint-disable-line no-console
-          return 100;
-          // return ((Object.keys(this.grouped).length - 1 === 0) ? Object.keys(this.grouped).length - 1 : 100);
+          console.log('date', (Object.keys(this.grouped).length)); // eslint-disable-line no-console
+          return Object.keys(this.grouped).length - 1
         },
         airshitSliderMax() {
-          console.log('airshit', this.airshits.length);// eslint-disable-line no-console
-          return 100;
-          // return ((this.airshits.length - 1 === 0) ? this.airshits.length - 1 : 100);
+          console.log('airshit', this.airshits.length); // eslint-disable-line no-console
+          return this.airshits.length - 1;
         },
         vesselsByType() {
           const vessels = this.$store.state.airshit.VESSELS;
