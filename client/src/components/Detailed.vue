@@ -658,12 +658,16 @@
           return this.$store.state.geography;
         },
         dateSliderMax() {
-          console.log('date', (Object.keys(this.grouped).length)); // eslint-disable-line no-console
-          return Object.keys(this.grouped).length - 1
+          if (Object.keys(this.grouped).length > 1) {
+            return Object.keys(this.grouped).length - 1;
+          }
+          return Object.keys(this.grouped).length;
         },
         airshitSliderMax() {
-          console.log('airshit', this.airshits.length); // eslint-disable-line no-console
-          return this.airshits.length - 1;
+          if (this.airshits > 1) {
+            return this.airshits.length - 1;
+          }
+          return this.airshits.length;
         },
         vesselsByType() {
           const vessels = this.$store.state.airshit.VESSELS;
