@@ -79,7 +79,7 @@
     "passport-twitter": "^1.0.4",
     "paypal-rest-sdk": "^1.8.1",
     "popper.js": "^1.15.0",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "request": "^2.88.0",
     "serve-index": "^1.9.1",
     "stripe": "^7.9.1",
