@@ -17,6 +17,9 @@ const state = {
         VESSELS: [],
     },
     airshits: [],
+    photos: {
+        vessels: {}
+    }
 };
 
 const mutations = {
@@ -34,6 +37,10 @@ const mutations = {
     },
     setHistoricalHighs (state, payload) {
         state.highs = payload;
+    },
+    setVesselPhotos (state, payload) {
+        console.log(payload); // eslint-disable-line no-console
+        state.photos.vessels = payload;
     },
 };
 

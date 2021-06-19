@@ -409,6 +409,7 @@
                     </tr>
 
                     <tr>
+                      <td class="font-weight-bold">photo</td>
                       <td class="font-weight-bold">lat/lng</td>
                       <td class="font-weight-bold">id</td>
                       <td class="font-weight-bold">imo</td>
@@ -427,6 +428,16 @@
 
                     <template v-if="overallVesselsTotal > 0">
                       <tr v-bind:key="`vessels-${index}`" v-for="(vessel, index) in this.vessels"  class="small">
+                        <td>
+                          <template v-if="photos.vessels && photos.vessels[vessel.imo]">
+                            <a :href="photos.vessels[vessel.imo]" target="_blank">
+                              <img :src="photos.vessels[vessel.imo]" class="mw-100" />
+                            </a>
+                          </template>
+                          <template v-else>
+                            -
+                          </template>
+                        </td>
                         <td>{{ vessel.lat }},{{ vessel.lng }}</td>
                         <td>{{ vessel.id }}</td>
                         <td>{{ vessel.imo }}</td>
@@ -634,17 +645,22 @@
             vessels: true,
             trains: true,
             traffic: true
-          }
+          },
         }
       },
 
       created() {
         this.getAllGroupedAirShits();
+        this.getVesselPhotos();
       },
 
       mounted() {},
 
       computed: {
+        photos() {
+          return this.$store.state.photos;
+        },
+
         airshit() {
           return this.$store.state.airshit;
         },
@@ -811,6 +827,16 @@
           this.$store.commit('setAirshit', airshit);
           this.clearMarkers();
           this.updateMarkers();
+        },
+
+        getVesselPhotos() {
+          API.get(`/vessels/photos`).then(response => {
+            this.$store.commit('setVesselPhotos', response.data.photos);
+          })
+          .catch(e => {
+            alert('error!');
+            console.log(e); // eslint-disable-line no-console
+          });
         },
 
         viewAirshitByDate(index) {
