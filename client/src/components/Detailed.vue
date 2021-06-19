@@ -658,10 +658,10 @@
           return this.$store.state.geography;
         },
         dateSliderMax() {
-          return Object.keys(this.grouped).length - 1;
+          return ((Object.keys(this.grouped).length - 1 === 0) ? Object.keys(this.grouped).length - 1 : 100);
         },
         airshitSliderMax() {
-          return this.airshits.length - 1;
+          return ((this.airshits.length - 1 === 0) ? this.airshits.length - 1 : 100);
         },
         vesselsByType() {
           const vessels = this.$store.state.airshit.VESSELS;
@@ -826,8 +826,8 @@
           })
           .catch(e => {
             alert('error!');
-                console.log(e); // eslint-disable-line no-console
-              });
+            console.log(e); // eslint-disable-line no-console
+          });
         },
 
         dateSliderLabel(original) {
