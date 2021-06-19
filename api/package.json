@@ -29,7 +29,7 @@
     "body-parser": "^1.19.0",
     "bootstrap": "^4.3.1",
     "chalk": "^2.4.2",
-    "chart.js": "^2.8.0",
+    "chart.js": "^2.9.4",
     "cheerio": "^1.0.0-rc.3",
     "clockwork": "^0.1.4",
     "compression": "^1.7.4",
