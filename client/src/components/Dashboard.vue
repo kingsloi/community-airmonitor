@@ -22,11 +22,61 @@
 
                 <div class="col-xl-6 mt-5 mt-xl-2 px-xl-3 px-0">
 
-
-                    <div class="map-container" @click.prevent="mapMaskActive = false"
-                         v-bind:class="{ 'map-container--has-mask': mapMaskActive }"
+                    <div class="map-container" style="position: relative;" @click.prevent="mapMaskActive = false"
+                        v-bind:class="{ 'map-container--has-mask': mapMaskActive }"
                     >
-                        <div id="map"></div>
+                      <div id="map"></div>
+
+                      <div class="" style="position: absolute; bottom: 15px; left: 15px; z-index: 100000;">
+
+                        <div class="h4" v-if="airshit.REPORTED_WEATHER">
+                          <span class="mr-3">
+                            {{ airshit.REPORTED_WEATHER['windSpeed'].toFixed(0) }}-{{ airshit.REPORTED_WEATHER['windGust'].toFixed(0) }} <sub>mph</sub>
+                          </span>
+                          <span class="d-inline-block mb-0 font-weight-bold h1" :title="`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`" :style="`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`">
+                            ↑
+                          </span><br/>
+                          {{ airshit.REPORTED_WEATHER['apparentTemperature'].toFixed(0) }}&deg;F
+                          {{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}
+                        </div>
+
+                        <div class="card h-100 aqi d-inline-block mr-1" style="min-width:75px;" v-if="airshit.PM25REALTIME"
+                          :class="getAqiScoreClassname((airshit.PM25REALTIME ? airshit.PM25REALTIME['category'] : 'Good'))"
+                        >
+                          <div class="card-body small py-1">
+                            <p class="text-uppercase font-weight-bold mb-0">PM2.5</p>
+                            <p class="font-weight-bold mb-0 lead">
+                              <span class="number--blurred" v-if="! airshit.PM25REALTIME"></span>
+                              <span v-else>{{ airshit.PM25REALTIME['aqi'] }}</span>
+                            </p>
+                            <p class="mb-0 text-uppercase font-weight-bold ">
+                              <span class="text--blurred" v-if="! airshit.PM25REALTIME"></span>
+                              <template v-else>
+                                <small class="font-size-80 pl-20 d-block"><span class="text-lowercase">{{  airshit.PM25REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
+                              </template>
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="card h-100 aqi d-inline-block" style="min-width:75px;" v-if="airshit.PM10REALTIME"
+                          :class="getAqiScoreClassname((airshit.PM10REALTIME ? airshit.PM10REALTIME['category'] : 'Good'))"
+                        >
+                          <div class="card-body small py-1">
+                            <p class="text-uppercase font-weight-bold mb-0">PM10</p>
+                            <p class="font-weight-bold mb-0 lead">
+                              <span class="number--blurred" v-if="! airshit.PM10REALTIME"></span>
+                              <span v-else>{{ airshit.PM10REALTIME['aqi'] }}</span>
+                            </p>
+                            <p class=" mb-0 text-uppercase font-weight-bold">
+                              <span class="text--blurred" v-if="! airshit.PM10REALTIME"></span>
+                              <template v-else>
+                                <small class="font-size-80 pl-20 d-block"><span class="text-lowercase">{{  airshit.PM10REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
+                              </template>
+                            </p>
+                          </div>
+                        </div>
+
+                      </div>
                     </div>
 
 
@@ -77,60 +127,11 @@
         <div class="container" id="results">
             <div id="airquality">
                 <h2 class="h5 text-left mb-0 p-2">
-                    <span class="font-weight-bold">Current Air Quality</span>
+                    <span class="font-weight-bold">Historical Air Quality Highs <sup><a href="#note-3">[3]</a></sup></span>
                 </h2>
                 <div class="row mb-3">
-                    <div class="col-xl-6 py-2">
-                        <div class="card h-100 aqi"
-                            :class="getAqiScoreClassname((airshit.PM25REALTIME ? airshit.PM25REALTIME['category'] : 'Good'))"
-                        >
-                            <div class="card-body">
-                                <div class="rotate">
-                                    <i class="fa fa-tachometer-alt fa-5x"></i>
-                                </div>
-                                <h3 class="h6 text-uppercase font-weight-bold">PM2.5</h3>
-                                <p class="small">sources include all combustion including vehicles, some industrial processes, etc.</p>
-                                <p class="display-4 font-weight-bold mb-0">
-                                    <span class="number--blurred" v-if="! airshit.PM25REALTIME"></span>
-                                    <span v-else>{{ airshit.PM25REALTIME['aqi'] }}</span>
-                                </p>
-                                <h4 class="lead mb-0 text-uppercase font-weight-bold">
-                                    <span class="text--blurred" v-if="! airshit.PM25REALTIME"></span>
-                                    <template v-else>
-                                        <span>{{ airshit.PM25REALTIME['category'] }}</span>
-                                        <small class="font-size-50 pl-20 mt-1 d-block">raw: <span class="text-lowercase">{{  airshit.PM25REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                    </template>
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-6 py-2">
-                        <div class="card h-100 aqi"
-                            :class="getAqiScoreClassname((airshit.PM10REALTIME ? airshit.PM10REALTIME['category'] : 'Good'))"
-                        >
-                            <div class="card-body">
-                                <div class="rotate">
-                                    <i class="fa fa-tachometer-alt fa-5x"></i>
-                                </div>
-                                <h3 class="h6 text-uppercase font-weight-bold">PM10</h3>
-                                <p class="small">sources include dust from construction sites, landfills and agriculture, industrial sources, pollen, bacteria, etc.</p>
-                                <p class="display-4 font-weight-bold mb-0">
-                                    <span class="number--blurred" v-if="! airshit.PM10REALTIME"></span>
-                                    <span v-else>{{ airshit.PM10REALTIME['aqi'] }}</span>
-                                </p>
-                                <h4 class="lead mb-0 text-uppercase font-weight-bold">
-                                    <span class="text--blurred" v-if="! airshit.PM10REALTIME"></span>
-                                    <template v-else>
-                                        <span>{{ airshit.PM10REALTIME['category'] }}</span>
-                                        <small class="font-size-50 pl-20 mt-1 d-block">raw: <span class="text-lowercase">{{  airshit.PM10REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                    </template>
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-12 mt-3">
-                        <h2 class="small text-uppercase mb-2 text-dark">Historical Air Quality Highs <sup><a href="#note-3">[3]</a></sup></h2>
 
+                    <div class="col-xl-12 mt-3">
                         <div class="row no-gutters mb-2">
                             <div class="col-4">
                                 <div class="card br-0">
@@ -646,9 +647,9 @@
 
                 <p>Suspected the source was likely from one of the many mills/refineries in the region but with no data to support it, a handful of neighbours purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood in realtime, bringing awareness to how the local industry affects the air that residents and tourists of Miller Beach, Gary, &amp; Northwest Indiana breathe.</p>
 
-                <p>We track the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a>, measuring both <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5 and PM10</a> particles, temperature, humidity, atmospheric pressure, wind speed, wind direction, cloud coverage, UV index, etc. to determine how the weather and local industry affects the local air quality.</p>
+                <p>By tracking the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a>, measuring both <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5 and PM10</a> particles, temperature, humidity, atmospheric pressure, wind speed, wind direction, cloud coverage, UV index, etc. to determine how the weather and local industry affects the local air quality.</p>
 
-                <p>There are plenty of other pollutants in the air we're not tracking, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood are available, we'll track it and add it to our data.</p>
+                <p>There are plenty of other pollutants in the air not being tracked, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood are available, they'll be tracked add it to our data.</p>
             </div>
         </div>
 
@@ -687,6 +688,12 @@
                 <div class="col-md-6 sources">
                     <h2 class="h4 text-uppercase font-weight-light text-center text-md-left">News / Links / Sources</h2>
                     <ul>
+                        <li class="source">
+                            <span class="source__type">Website:</span>
+                            <a href="https://www.chicagotribune.com/suburbs/post-tribune/ct-ptb-env-indiana-toxic-st-0328-20210326-3x4xhquoqjeglp7lqa7rim5dny-story.html" target="_blank">
+                                Indiana leads US in toxic releases per square mile, EPA report states
+                            </a>
+                        </li>
                         <li class="source">
                             <span class="source__type">Website:</span>
                             <a href="https://waqi.info/" target="_blank">
@@ -1009,6 +1016,11 @@ export default {
                 });
             }
 
+            // const VessellsTravelingOnThru = this.$store.state.airshit.VESSELS.filter((vessel) => {
+            //     const { lat, lng } = vessel;
+            //     return geo.insidePolygon([lat, lng], this.geography.region.lake);
+            // });
+
             this.$store.state.airshit.VESSELS.forEach((vessel) => {
                 const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
                 L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
@@ -1041,7 +1053,8 @@ export default {
         },
 
         degeesToRotation(angle) {
-            return (angle + 180) % 360;
+            return angle;
+            // return (angle + 180) % 360;
         },
 
         getOverallAqiScore(total) {

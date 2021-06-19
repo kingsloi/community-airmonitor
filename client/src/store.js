@@ -6,11 +6,18 @@ Vue.use(Vuex)
 const state = {
     geography: {},
     highs: {},
+    grouped: {},
     airshit: {},
     airshits: [],
 };
 
 const mutations = {
+    setGrouped (state, payload) {
+        state.grouped = payload;
+    },
+    setAirshits (state, payload) {
+        state.airshits = payload;
+    },
     setAirshit (state, payload) {
         state.airshit = payload;
     },

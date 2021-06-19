@@ -27,6 +27,11 @@
                 messageWhenNoItems: 'There are not items.',
                 timelineItems: [
                     {
+                        from: new Date(2020, 12),
+                        title: 'Added a detailed view of all airshits',
+                        description: `available at: <a href="/#/detailed">millerbeach.community/detailed</a>`
+                    },
+                    {
                         from: new Date(2020, 11),
                         title: 'Shared Proposals/research/files',
                         description: `Any/all research, files, proposals, etc will be hosted at <a href="/files" target="_blank">millerbeach.community/files</a>.`

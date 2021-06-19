@@ -1,7 +1,7 @@
 import DashboardView from './components/Dashboard.vue';
 import PageNotFoundView from './components/PageNotFound.vue';
 import HistoryView from './components/History.vue';
-import PreviousView from './components/Previous.vue';
+import DetailedView from './components/Detailed.vue';
 
 const routes = [
     {
@@ -21,8 +21,8 @@ const routes = [
         }]
     },
     {
-        path: '/previous',
-        component: PreviousView,
+        path: '/detailed',
+        component: DetailedView,
     },
     {
         path: '*',

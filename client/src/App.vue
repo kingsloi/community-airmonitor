@@ -15,11 +15,11 @@
             <li class="nav-item">
               <router-link to="/" class="nav-link">Currently</router-link>
             </li>
-<!--
+
             <li class="nav-item">
-              <router-link to="/previous" class="nav-link">Previous</router-link>
+              <router-link to="/detailed" class="nav-link">Detailed</router-link>
             </li>
--->
+
             <li class="nav-item">
               <router-link to="/history" class="nav-link">Updates</router-link>
             </li>
@@ -54,7 +54,7 @@
             </ul>
         </div>
         <div class="container">
-            <p class="made-with-love">made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a> by <a href="mailto:kingsley.raspe@protonmail.ch">kingsley</a></p>
+            <p class="made-with-love">made with<i class="fa fa-heart pulse"></i><a href="https://goo.gl/maps/Enx7PD4yEn6YhoF7A" target="_blank">IN Gary</a> by <a href="https://kingsley.sh">kingsley</a></p>
         </div>
     </footer>
   </div>

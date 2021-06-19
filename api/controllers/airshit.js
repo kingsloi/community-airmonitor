@@ -15,7 +15,7 @@ const cache = require('express-redis-cache')();
  * GET /
  * Home page.
  */
-exports.index = (req, res) => {
+exports.currently = (req, res) => {
   const today = moment();
 
   const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -469,49 +469,53 @@ exports.sync = (req, res) => {
 };
 
 exports.past = (req, res) => {
-  const params = {};
+  Airshit.find({}, { _id: 1, createdAt: 1 }).sort( { _id: -1 } )
+    .then((result) => {
 
-  if (req.query.date_from && req.query.date_to) {
-    let date_from = Date.parse(req.query.date_from);
+      const grouped = _.groupBy(result, (airshit) => {
+        return moment(airshit.createdAt).startOf('day').format();
+      });
 
-    if (isNaN(date_from) == false) {
-      date_from = moment(date_from).format('YYYY-MM-DD HH:mm:ss');
-    }
-
-    let date_to = Date.parse(req.query.date_to);
-
-    if (isNaN(date_to) == false) {
-      date_to = moment(date_to).format('YYYY-MM-DD HH:mm:ss');
-    }
-
-    const from = moment(req.query.date_from).format('YYYY-MM-DD HH:mm:ss');
-    const to = moment(req.query.date_to).format('YYYY-MM-DD HH:mm:ss');
-    params.createdAt = { $gte: from, $lte: to };
-  }
-
-  Airshit.paginate(params, {
-    sort: { _id: -1 },
-    limit: req.query.l ? parseInt(req.query.l) : 48,
-    page: req.query.page ? req.query.page : 1,
-  })
-    .then((result) => res.render('past', {
-      slug: 'past',
-      title: 'Past Miller Beach / NWI Air Quality',
-      airshits: result.docs,
-      total: result.totalPages,
-      currentPage: result.page,
-      limit: result.limit,
-      possiblePages: generatePageRange(result.page, result.totalPages),
-      filters: {
-        date_from: req.query.date_from || '',
-        date_to: req.query.date_to || '',
-      },
-    }))
+      return res.json({
+        airshits: grouped,
+        geography: {
+          sensor: {
+            lat: process.env.LOCATION_LAT,
+            lng: process.env.LOCATION_LON,
+          },
+          region: {
+            land_polygon: regionArea.landPolygon(),
+            land_square: regionArea.landSquare(),
+            lake: regionArea.lakePolygon(),
+          },
+        },
+      })
+    })
     .catch((err) => {
       console.log(err);
       return res.send('Error Contacting the database or Some Trouble happened while exec Pagination Script');
     });
 };
+
+exports.airshit = (req, res) => {
+  const { airshit: id } = req.params;
+  Airshit.findOne({ _id: id }).then((result) => res.json({ airshit: result }));
+};
+
+exports.airshitByDate = (req, res) => {
+  const { date: original } = req.params;
+  const date = moment(original).format('YYYY-MM-DD');
+  const start = moment(`${date} 00:00:00`).format();
+  const end = moment(`${date} 23:59:59`).format();
+  console.log(start, end);
+  Airshit.find({ createdAt: { $gte: start, $lt: end } }).then((result) => res.json({ airshits: result }));
+};
+
+
+exports.graphs = (req, res) => res.render('graphs', {
+  slug: 'graphs',
+  title: 'Graphs Miller Beach / NWI Air Quality',
+});
 
 exports.graphs = (req, res) => res.render('graphs', {
   slug: 'graphs',
