@@ -827,7 +827,7 @@
           API.get(`/previous-by-day`).then(response => {
             this.$store.commit('setGrouped', response.data.airshits);
             this.$store.commit('setGeography', response.data.geography);
-            this.viewAirshitByDate(0);
+            this.viewAirshitByDate(1);
             this.initMaps();
           })
           .catch(e => {
