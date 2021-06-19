@@ -852,7 +852,7 @@
         },
 
         datetime(datetime) {
-          return moment.utc(datetime);
+          return moment.utc(datetime).local();
         },
 
         initMaps() {
