@@ -791,7 +791,6 @@
 
         stopTicker() {
           clearInterval(this.interval);
-          this.dateSlider = 0;
           this.playing = false;
         },
 
