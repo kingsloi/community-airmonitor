@@ -187,6 +187,17 @@ exports.currently = (req, res) => {
 exports.sync = (req, res) => {
   const { hash } = req.query;
 
+  // https://api.weather.gov/alerts/active/area/LM
+  // LMZ742: Northerly Island IL, Calumet Harbor IL
+  // LMZ743: Calumet Harbor, IL to Gary, IN
+  // LMZ744: Gary, IN to Burns Harbor, IN
+  // LMZ745: Burns Harbor, IN to Michigan City, IN
+  // LMZ046: Michigan City, IN to New Buffalo, MI
+
+  // https://api.weather.gov/zones/forecast/LMZ743
+  // https://api.weather.gov/zones/forecast/LMZ744
+  // https://api.weather.gov/zones/forecast/LMZ745
+
   // https://www.keene.edu/campus/maps/tool/
   const regionAsPolygon = regionArea.landPolygon();
   const regionAsSquare = regionArea.landSquare();
