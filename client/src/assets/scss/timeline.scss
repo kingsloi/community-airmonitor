@@ -1,0 +1,74 @@
+// Timeline
+// -------------------------
+.timeline {
+    text-align: left;
+    width: 100%;
+    max-width: 500px;
+
+    .wrapper-timeline {
+        position: relative;
+    }
+
+    .wrapper-item {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        margin-bottom: 20px;
+
+        .section-year {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 18px;
+
+            .year {
+                margin: 0;
+            }
+        }
+
+        &.unique-timeline {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.timeline-item {
+    .item {
+        border-left: 5px solid #ccd5db;
+        padding: 20px 0 20px 15px;
+        position: relative;
+    }
+
+    .month-item {
+        margin: 0;
+        text-transform: uppercase;
+        font-size: 16px;
+        letter-spacing: 2px;
+    }
+
+    .title-item {
+        margin: 0;
+        padding: 5px 0;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    .description-item {
+        font-weight: 300;
+        margin: 0;
+    }
+
+    .dot {
+        display: block;
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+
+        // background: #2da1bf;
+        left: -10px;
+        top: 26px;
+    }
+}

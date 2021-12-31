@@ -6,22 +6,41 @@
           <i class="fas fa-air-freshener pr-1"></i>
           millerbeach<strong>.community</strong>
         </a>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse">
           <span class="sr-only">Toggle navigation</span>
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav ml-auto">
+          <ul class="nav navbar-nav ml-auto" id="site-navigation">
+
             <li class="nav-item">
-              <router-link to="/" class="nav-link">Currently</router-link>
+              <a href="#visuals" onclick="window.location.href='/#visuals'; return false;" class="nav-link">Air Quality</a>
             </li>
 
             <li class="nav-item">
-              <router-link to="/detailed" class="nav-link">Detailed</router-link>
+              <a href="#aqi-table" onclick="window.location.href='/#aqi-table'; return false;" class="nav-link">AQI Table</a>
             </li>
 
             <li class="nav-item">
-              <router-link to="/history" class="nav-link">Updates</router-link>
+              <a href="#industry" onclick="window.location.href='/#industry'; return false;" class="nav-link">Details</a>
+            </li>
+
+            <li class="nav-item">
+              <a href="#historical-highs" onclick="window.location.href='/#historical-highs'; return false;" class="nav-link">Highs</a>
+            </li>
+
+            <li class="nav-item border border-danger">
+              <a href="#report" onclick="window.location.href='/#report'; return false;" class="nav-link text-danger">Report</a>
+            </li>
+
+            <li class="nav-item d-none">
+              <a href="#thanks" onclick="window.location.href='/#thanks'; return false;" class="nav-link">Thanks</a>
+            </li>
+
+            <li class="nav-item border-left ml-3">
+              <router-link to="/about" class="nav-link">About</router-link>
             </li>
           </ul>
         </div>
@@ -66,6 +85,12 @@ export default {
   metaInfo: {
     title: 'Miller Beach Air Quality, Weather, & Industry Dashboard',
     titleTemplate: '%s | Miller Beach Air Quality, Weather, & Industry Dashboard'
+  },
+
+  mounted() {
+  },
+
+  methods: {
   }
 };
 </script>

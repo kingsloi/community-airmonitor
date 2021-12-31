@@ -1,6 +1,6 @@
 import DashboardView from './components/Dashboard.vue';
 import PageNotFoundView from './components/PageNotFound.vue';
-import HistoryView from './components/History.vue';
+import AboutView from './components/About.vue';
 import DetailedView from './components/Detailed.vue';
 
 const routes = [
@@ -9,8 +9,8 @@ const routes = [
         component: DashboardView,
     },
     {
-        path: '/history',
-        component: HistoryView,
+        path: '/about',
+        component: AboutView,
         auth: false,
         metaTags: [{
             name: 'description',

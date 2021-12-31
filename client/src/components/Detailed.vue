@@ -343,6 +343,7 @@
                       <template v-if="airshit.FLIGHTS.MDW && airshit.FLIGHTS.MDW.length > 0">
                         <template v-for="(flight, index) in airshit.FLIGHTS.MDW">
                           <tr v-bind:key="`mdw-${index}`" class="small">
+                            <td>{{ flight.lat }},{{ flight.lng }}</td>
                             <td>{{ flight.flight }}</td>
                             <td>{{ flight.departing }}</td>
                             <td>{{ flight.arriving }}</td>
@@ -350,8 +351,6 @@
                             <td>{{ flight.aircraft }}</td>
                             <td>{{ flight.alt }}</td>
                             <td>{{ flight.bearing }}</td>
-                            <td>{{ flight.lat }}</td>
-                            <td>{{ flight.lng }}</td>
                             <td>{{ flight.speed }}</td>
                           </tr>
                         </template>
@@ -360,6 +359,7 @@
                       <template v-if="airshit.FLIGHTS.GYY && airshit.FLIGHTS.GYY.length > 0">
                         <template v-for="(flight, index) in airshit.FLIGHTS.GYY">
                           <tr v-bind:key="`gyy-${index}`" class="small">
+                            <td>{{ flight.lat }},{{ flight.lng }}</td>
                             <td>{{ flight.flight }}</td>
                             <td>{{ flight.departing }}</td>
                             <td>{{ flight.arriving }}</td>
@@ -367,8 +367,6 @@
                             <td>{{ flight.aircraft }}</td>
                             <td>{{ flight.alt }}</td>
                             <td>{{ flight.bearing }}</td>
-                            <td>{{ flight.lat }}</td>
-                            <td>{{ flight.lng }}</td>
                             <td>{{ flight.speed }}</td>
                           </tr>
                         </template>
@@ -539,7 +537,7 @@
                     {{ airshit.REPORTED_WEATHER['windSpeed'].toFixed(0) }}-{{ airshit.REPORTED_WEATHER['windGust'].toFixed(0) }} <sub>mph</sub>
                   </span>
                   <span class="d-inline-block mb-0 font-weight-bold h1" :title="`wind bearing from ${airshit.REPORTED_WEATHER['windBearing']}\xB0`" :style="`transform: rotate(${degeesToRotation(airshit.REPORTED_WEATHER['windBearing'])}deg)`">
-                    ↑
+                    &darr;
                   </span><br/>
                   {{ airshit.REPORTED_WEATHER['apparentTemperature'].toFixed(0) }}&deg;F
                   {{ airshit.REPORTED_WEATHER['summary'].toLowerCase() }}

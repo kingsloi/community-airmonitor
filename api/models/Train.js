@@ -3,12 +3,12 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-const vesselSchema = new mongoose.Schema({
-  VESSELS: []
+const trainSchema = new mongoose.Schema({
+  SOUTHSHORE: Array,
 }, { timestamps: true });
 
-vesselSchema.plugin(mongoosePaginate);
+trainSchema.plugin(mongoosePaginate);
 
-const Vessel = mongoose.model('Vessel', vesselSchema);
+const Train = mongoose.model('Train', trainSchema);
 
-module.exports = Vessel;
+module.exports = Train;

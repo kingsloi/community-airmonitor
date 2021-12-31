@@ -1,18 +1,48 @@
 <template>
     <div class="container">
-        <div class="col-12">
-            <h1 class="h3 pb-45 font-weight-bold text-uppercase">
-                <small class="d-block h6 font-weight-light">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr> Air Quality Tracker</small>
-                <span class="site-heading">Update History</span>
-            </h1>
+        <div class="row">
+            <div class="col-12">
+                <h1 class="h3 pb-45 font-weight-bold text-uppercase">
+                    <small class="d-block h6 font-weight-light">Miller Beach / Gary / <abbr title="Northwest Indiana">NWI</abbr> Air Quality Tracker</small>
+                    <span class="site-heading">About & Updates</span>
+                </h1>
+            </div>
         </div>
-        <div class="col-lg-6 offset-lg-3">
-            <Timeline
-                :timeline-items="timelineItems"
-                :message-when-no-items="messageWhenNoItems"
-                :unique-year="true"
-            />
+
+        <div class="row">
+            <section class="col-12" id="about">
+                <h2 class="h6 pb-45 font-weight-bold text-uppercase mb-5">
+                    <span class="site-heading text-center d-block">History</span>
+                </h2>
+
+                <div class="mb-10 inner">
+                    <p>In September 2019, a foul odor rolled through the Miller Beach neighbourhood of Gary IN, causing many residents to experience eye irritation, headaches, and nausea. This came a month after a local steel mill had <a href="https://www.in.gov/idem/cleanwater/2576.htm" target="_blank">exceeded the daily maximum allowance of cyanide and ammonia-nitrogen</a>, releasing a <a href="https://echo.epa.gov/detailed-facility-report?fid=110000607558" target="_blank">considerable amount</a> of both chemicals into a tributary of Lake Michigan which went <a href="https://chicago.cbslocal.com/2019/08/20/arcelormittal-spill-indiana-state/" target="_blank">unreported for days</a>, <a href="https://www.epa.gov/in/arcelormittal-burns-harbor-llc-portage-indiana" target="_blank">killing 1000s</a> of fish, <a href="https://apnews.com/bd9de73946954208b93cf5c9406c83c7" target="_blank">restricting intake</a> of a water filtration plant, <a href="https://www.washingtonpost.com/climate-environment/2019/08/19/cyanide-steel-plant-trickled-into-lake-michigan-days-before-public-was-notified/" target="_blank">closing local beaches</a>, and portions of the <a href="https://www.nps.gov/indu/learn/news/chemical-spill-indu-20190814.htm">Indiana Dunes National Park</a>.
+
+                    <p>Suspected the source was likely from one of the many mills/refineries in the region but with no data to support it, a handful of neighbours purchased a <a href="https://www2.purpleair.com/collections/air-quality-sensors/products/purpleair-pa-ii" target="_blank">PurpleAir PA II Air Quality Sensor</a> to check the air quality in their neighbourhood in realtime, bringing awareness to how the local industry affects the air that residents and tourists of Miller Beach, Gary, &amp; Northwest Indiana breathe.</p>
+
+                    <p>By tracking the <a href="https://en.wikipedia.org/wiki/Air_quality_index" role="button" target="_blank">Air Quality Index (AQI)</a>, measuring both <a href="https://www.epa.gov/pm-pollution/particulate-matter-pm-basics#PM" role="button" target="_blank">PM2.5 and PM10</a> particles, temperature, humidity, atmospheric pressure, wind speed, wind direction, cloud coverage, UV index, etc. to determine how the weather and local industry affects the local air quality.</p>
+
+                    <p>There are plenty of other pollutants in the air not being tracked, such as SO₂, NO₂, CO, to name a few. As soon as affordable ways of tracking these pollutants in our neighbourhood are available, they'll be tracked add it to our data.</p>
+                </div>
+            </section>
         </div>
+
+        <div class="row">
+            <div class="col-12">
+                <h2 class="h5 pb-45 font-weight-bold text-uppercase mb-5">
+                    <span class="site-heading text-center d-block">Updates</span>
+                </h2>
+            </div>
+
+            <section class="col-lg-6 offset-lg-3">
+                <Timeline
+                    :timeline-items="timelineItems"
+                    :message-when-no-items="messageWhenNoItems"
+                    :unique-year="true"
+                />
+            </section>
+        </div>
+
     </div>
 </template>
 

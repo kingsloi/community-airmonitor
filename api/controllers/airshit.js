@@ -1,5 +1,12 @@
+const Advisories = require('../models/Advisories');
 const Airshit = require('../models/Airshit');
+const Flight = require('../models/Flight');
+const Traffic = require('../models/Traffic');
+const Train = require('../models/Train');
 const Vessel = require('../models/Vessel');
+const VesselPhoto = require('../models/VesselPhoto');
+const Weather = require('../models/Weather');
+
 const moment = require('moment');
 const axios = require('axios');
 const aqibot = require('aqi-bot');
@@ -16,7 +23,54 @@ const cache = require('express-redis-cache')();
  * GET /
  * Home page.
  */
-exports.currently = (req, res) => {
+exports.currently = async (req, res) => {
+  const today = moment();
+
+  const vesselphotos = await VesselPhoto.find();
+
+  const advisories   = await Advisories.findOne({}, {}, { sort: { _id: -1 } });
+  const airshit      = await Airshit.findOne({}, {}, { sort: { _id: -1 } });
+  const flight       = await Flight.findOne({}, {}, { sort: { _id: -1 } });
+  const traffic      = await Traffic.findOne({}, {}, { sort: { _id: -1 } });
+  const train        = await Train.findOne({}, {}, { sort: { _id: -1 } });
+  const vessel       = await Vessel.findOne({}, {}, { sort: { _id: -1 } });
+
+  const weather      = await Weather.findOne({}, {}, { sort: { _id: -1 } });
+
+  const start = today.format('YYYY-MM-DD HH:mm:ss');
+  const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
+
+  const trend = await Airshit.find({ createdAt: {'$gte': end, '$lte': start } });
+
+  return res.json({
+    trend,
+
+    advisories,
+    airshit,
+    flight,
+    traffic,
+    train,
+    vessel,
+    vesselphotos,
+    weather,
+
+    geography: {
+      sensor: { lat: process.env.LOCATION_LAT, lng: process.env.LOCATION_LON, },
+      region: {
+        lake: regionArea.lakePolygon(),
+        lake_zones: process.env.LAKE_MICHIGAN_ZONES.split(','),
+        land_square: regionArea.landSquare(),
+        land_polygon: regionArea.landPolygon(),
+      },
+    }
+  });
+};
+
+/**
+ * GET /highs
+ * Update the records.
+ */
+exports.highs = (req, res) => {
   const today = moment();
 
   const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
@@ -26,11 +80,8 @@ exports.currently = (req, res) => {
   const endYear = moment(startYear).endOf('year').format('YYYY-MM-DD HH:mm:ss');
 
   async.series([
-    (callback) => { // latest
-      Airshit.findOne({}, {}, { sort: { _id: -1 } }).exec(callback);
-    },
     (callback) => { // month high
-      Airshit.find({createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
+      Airshit.find({ createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
     },
     (callback) => { // year high
       Airshit.find({createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
@@ -45,10 +96,20 @@ exports.currently = (req, res) => {
                   $sum: [
                     { $ifNull: ['$PM25REALTIME.aqi', 0] },
                     { $ifNull: ['$PM10REALTIME.aqi', 0] },
+                    { $ifNull: ['$SO2REALTIME.aqi', 0] },
+                    { $ifNull: ['$NO2REALTIME.aqi', 0] },
+                    { $ifNull: ['$O3REALTIME.aqi', 0] },
+                    { $ifNull: ['$COREALTIME.aqi', 0] },
                   ],
                 },
               }],
             },
+            PM25REALTIME: '$PM25REALTIME',
+            PM10REALTIME: '$PM10REALTIME',
+            SO2REALTIME: '$SO2REALTIME',
+            NO2REALTIME: '$NO2REALTIME',
+            O3REALTIME: '$O3REALTIME',
+            COREALTIME: '$COREALTIME',
             createdAt: '$createdAt',
           },
         },
@@ -57,7 +118,7 @@ exports.currently = (req, res) => {
       ]).exec(callback);
     },
     (callback) => { // vessels high
-      Airshit.aggregate([
+      Vessel.aggregate([
         {
           $project: {
             count: {
@@ -71,14 +132,12 @@ exports.currently = (req, res) => {
       ]).exec(callback);
     },
     (callback) => { // flights high
-      Airshit.aggregate([
+      Flight.aggregate([
         {
           $project: {
             count: {
               $add: [
-                { $max: { $size: { $ifNull: ['$FLIGHTS.GYY', []] } } },
-                { $max: { $size: { $ifNull: ['$FLIGHTS.ORD', []] } } },
-                { $max: { $size: { $ifNull: ['$FLIGHTS.MDW', []] } } },
+                { $max: { $size: { $ifNull: ['$FLIGHTS', []] } } },
               ],
             },
             createdAt: '$createdAt',
@@ -89,12 +148,12 @@ exports.currently = (req, res) => {
       ]).exec(callback);
     },
     (callback) => { // trains high
-      Airshit.aggregate([
+      Train.aggregate([
         {
           $project: {
             count: {
               $add: [
-                { $max: { $size: { $ifNull: ['$TRAINS.SOUTHSHORE', []] } } },
+                { $max: { $size: { $ifNull: ['$SOUTHSHORE', []] } } },
               ],
             },
             createdAt: '$createdAt',
@@ -105,12 +164,12 @@ exports.currently = (req, res) => {
       ]).exec(callback);
     },
     (callback) => { // traffic high
-      Airshit.aggregate([
+      Traffic.aggregate([
         {
           $project: {
             sum: {
               $add: [
-                { $max: { $sum: { $ifNull: ['$TRAFFIC.INCIDENTS.distance', []] } } },
+                { $max: { $sum: { $ifNull: ['$INCIDENTS.distance', []] } } },
               ],
             },
             createdAt: '$createdAt',
@@ -126,359 +185,667 @@ exports.currently = (req, res) => {
       return res.send('Error Contacting the database or Some Trouble happened while exec Pagination Script');
     }
 
-    // Latest
-    const latest = results[0];
-
     // AQI Month
-    const highestInMonth = Math.max(...results[1].map((airshit) => {
+    const highestInMonth = Math.max(...results[0].map((airshit) => {
       return calculations.totalAirQuality(airshit);
     }));
-    const highestMonthDay = results[1].find((airshit) => {
+    const highestMonthDay = results[0].find((airshit) => {
       return calculations.totalAirQuality(airshit) === highestInMonth;
     });
 
     // AQI Year
-    const highestInYear = Math.max(...results[2].map((airshit) => {
+    const highestInYear = Math.max(...results[1].map((airshit) => {
       return calculations.totalAirQuality(airshit);
     }));
-    const highestYearDay = results[2].find((airshit) => {
+    const highestYearDay = results[1].find((airshit) => {
       return calculations.totalAirQuality(airshit) === highestInYear;
     });
 
     // All Time
-    const highestAllTimeDay = results[3][0];
+    const highestAllTimeDay = results[2][0];
 
     // Vessels
-    const highestVessels = results[4][0];
+    const highestVessels = results[3][0];
     // Flights
-    const highestFlights = results[5][0];
+    const highestFlights = results[4][0];
     // Trains
-    const highestTrains = results[6][0];
+    const highestTrains = results[5][0];
     // Traffic
-    const highestTraffic = results[7][0];
+    const highestTraffic = results[6][0];
 
     res.json({
-      airshit: latest,
-      geography: {
-        sensor: {
-          lat: process.env.LOCATION_LAT,
-          lng: process.env.LOCATION_LON,
-        },
-        region: {
-          land_polygon: regionArea.landPolygon(),
-          land_square: regionArea.landSquare(),
-          lake: regionArea.lakePolygon(),
-        },
-      },
-      highs: {
-        month: highestMonthDay,
-        year: highestYearDay,
-        alltime: highestAllTimeDay,
+      month: highestMonthDay,
+      year: highestYearDay,
+      alltime: highestAllTimeDay,
 
-        vessels: highestVessels,
-        flights: highestFlights,
-        trains: highestTrains,
-        traffic: highestTraffic,
-      },
+      vessels: highestVessels,
+      flights: highestFlights,
+      trains: highestTrains,
+      traffic: highestTraffic,
     });
   });
 };
 
-exports.sync = (req, res) => {
-  const { hash } = req.query;
+exports.getFlights = async () => {
+  const endpoints = [];
+  const polygon = regionArea.landPolygon();
 
-  // https://api.weather.gov/alerts/active/area/LM
+  // Get aviation-edge API key & airport IATAS codes
+  const apikey = process.env.AVIATION_EDGE_API_KEY;
+  const iatas  = process.env.NEARBY_AIRPORTS_IATAS.split(',');
+
+  try {
+    // Loop through each IATA, build URL for both arrival and departure calls
+    iatas.forEach((airport) => {
+      ['arr', 'dep'].forEach((direction) => {
+        endpoints.push(axios.get(`https://aviation-edge.com/v2/public/flights?key=${apikey}&${direction}Iata=${airport}`));
+      });
+    });
+
+    // Loop through all endpoints
+    const responses = await axios.all(endpoints);
+
+    // Extract the responses data, combine into 1 array
+    const data = [...responses].map((r) => r.data).filter(e => e.success !== false);
+    const flattened = [].concat(...data);
+
+    const flights = flattened.filter((flight) => {
+      const { geography } = flight;
+      const { latitude, longitude } = geography;
+
+      return geo.insidePolygon([latitude, longitude], polygon);
+    });
+
+    return flights.map((info) => {
+      const { geography, aircraft, speed, departure, arrival, flight } = info;
+      const { latitude, longitude, altitude, direction } = geography;
+
+      return {
+        alt: altitude,
+        bearing: direction,
+        lat: latitude,
+        lng: longitude,
+        speed: speed.horizontal,
+        flight: flight.iataNumber,
+        reg: aircraft.regNumber,
+        aircraft: aircraft.iataCode,
+        departing: departure.iataCode,
+        arriving: arrival.iataCode,
+      };
+    });
+  } catch (e) {
+    console.error(e);
+
+    return [];
+  }
+}
+
+exports.getVessels = async () => {
+  const apikey = process.env.FLEETMON_API_KEY;
+  const lakeAsPolygon = regionArea.lakePolygon();
+
+  try {
+    const { data } = await axios.get(`https://apiv2.fleetmon.com/regional_ais/?apikey=${apikey}`);
+    const { vessels } = data;
+
+    const vesselsTravelingOnThru = vessels.filter((vessel) => {
+      return vessel.position.nav_status === 'under way using engine';
+    }).filter((vessel) => {
+      return geo.insidePolygon([vessel.position.latitude, vessel.position.longitude], lakeAsPolygon);
+    });
+
+    return _.map(vesselsTravelingOnThru, (vessel) => ({
+      id: vessel.mmsi_number,
+      imo: vessel.imo_number,
+      name: vessel.name,
+      callsign: vessel.callsign,
+      country: vessel.country,
+      type: vessel.type,
+      width: vessel.width,
+      length: vessel.length,
+      deadweight: vessel.dwt,
+      destination: vessel.voyage.destination,
+      draught: vessel.voyage.draught,
+      lat: vessel.position.latitude,
+      lng: vessel.position.longitude,
+      status: vessel.position.nav_status,
+      direction: vessel.position.true_heading,
+    }));
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+exports.getWeather = async () => {
+  const location = `${process.env.LOCATION_LAT},${process.env.LOCATION_LON}`;
+  const weatherApiKey = process.env.FORCASTIO_API_KEY;
+  const exclude = 'minutely,hourly,daily,alerts,flags';
+
+  try {
+    const { data: { currently } } = await axios.get(`https://api.forecast.io/forecast/${weatherApiKey}/${location}?units=us&exclude=${exclude}`);
+    return currently;
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+}
+
+exports.getTraffic = async () => {
+  const trafficApiKey = process.env.MAPQUEST_API_KEY;
+  const regionAsSquare = regionArea.landSquare();
+  const trafficBounds = regionAsSquare.join(',');
+
+  try {
+    const { data, data: { incidents} } = await axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=incidents,congestion`);
+
+    return incidents.map((incident) => ({
+      lat: incident.lat,
+      lng: incident.lng,
+      distance: incident.distance,
+      freeFlowMinDelay: incident.delayFromFreeFlow,
+      shortDesc: incident.shortDesc,
+      startTime: incident.startTime,
+      endTime: incident.endTime,
+    }));
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+exports.getTrains = async () => {
+  const regionAsPolygon = regionArea.landPolygon();
+
+  try {
+    const { data: { get_vehicles: trains } } = await axios.get('http://southshore.etaspot.net/service.php?service=get_vehicles&includeETAData=1&orderedETAArray=1&token=TESTING');
+
+    const southshoreTravelingOnThru = trains.filter((train) => geo.insidePolygon([train.lat, train.lng], regionAsPolygon) && train.inService);
+
+    return southshoreTravelingOnThru.map((train) => ({
+      id: train.trainID,
+      lat: train.lat,
+      lng: train.lng,
+      direction: train.direction,
+    }));
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+exports.getAdvisories = async () => {
+  const regionAsPolygon = regionArea.landPolygon();
+
   // LMZ742: Northerly Island IL, Calumet Harbor IL
   // LMZ743: Calumet Harbor, IL to Gary, IN
   // LMZ744: Gary, IN to Burns Harbor, IN
   // LMZ745: Burns Harbor, IN to Michigan City, IN
   // LMZ046: Michigan City, IN to New Buffalo, MI
+  // https://api.weather.gov/zones/forecast/zone>
+  const lakeshore = process.env.LAKE_MICHIGAN_ZONES.split(',');
 
-  // https://api.weather.gov/zones/forecast/LMZ743
-  // https://api.weather.gov/zones/forecast/LMZ744
-  // https://api.weather.gov/zones/forecast/LMZ745
+  try {
+    const { data: { features } } = await axios.get(`https://api.weather.gov/alerts/active/area/LM`);
 
-  // https://www.keene.edu/campus/maps/tool/
-  const regionAsPolygon = regionArea.landPolygon();
-  const regionAsSquare = regionArea.landSquare();
-  const lakeAsPolygon = regionArea.lakePolygon();
+    const advisories = features.filter((f) => f.properties.geocode.UGC.filter(element => lakeshore.includes(element)).length !== 0);
+
+    const mapped = advisories.map((a) => {
+      const {
+        properties: {
+          id,
+          areaDesc, geocode,
+          effective, ends,
+          severity, certainty, urgency, event, response,
+          headline, description, instruction,
+          senderName
+        }
+      } = a;
+
+      return {
+        id,
+        areaDesc, geocode: geocode.UGC,
+        effective, ends,
+        severity, certainty, urgency, event, response,
+        headline, description, instruction,
+        senderName
+      }
+    });
+
+    return mapped;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+exports.getPurpleAirAirQuality = async () => {
+  const purpleId = process.env.PURPLE_AIR_ID;
+
+  const avg = (arr) => arr.reduce((a, b) => a + parseFloat(b), 0).toFixed(5) / arr.length;
+
+  try {
+    const { data: { results } } = await axios.get(`https://www.purpleair.com/json?show=${purpleId}`);
+
+    // PurpleAir/Air Quality
+    // Purple returns 2 results from the two sensors on each device
+    // we read both, and just average them. We do this for PM2.5/10
+    const [ one, two ] = results;
+
+    const { pm2_5_atm: pm2_5a, pm10_0_atm: pm10a, LastSeen: PM_LAST_READ_AT } = one;
+    const { pm2_5_atm: pm2_5b, pm10_0_atm: pm10b } = two;
+
+    const aqi25 = await aqibot.AQICalculator.getAQIResult('PM2.5', avg([pm2_5a, pm2_5b]));
+    const aqi10 = await aqibot.AQICalculator.getAQIResult('PM10', avg([pm10a, pm10b]));
+
+    return { PM25REALTIME: aqi25, PM10REALTIME: aqi10, PM_LAST_READ_AT };
+  } catch (e) {
+    console.error(e);
+    return { PM25REALTIME: {}, PM10REALTIME: {}, PM_LAST_READ_AT: null };
+  }
+}
+
+exports.getAdvancedAirQuality = async () => {
+  try {
+    // const { data: { token } } = await axios.post(`https://apitest.aqmeshdata.net/api/Authenticate`, {
+    //   username: process.env.AQMESH_USERNAME,
+    //   password: process.env.AQMESH_PASSWORD
+    // });
+    const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJPQVFNLUFQSSIsImp0aSI6ImEzNGYyNGVjLTlmNjctNDQ2MS1hOTk4LTQ3MDhiMGM2ZjhhOCIsIk1lbWJlcnNoaXBJZCI6IjExOTkiLCJTZXNzaW9uSWQiOiI2ZGI3MDJlMC1lZTQ0LTQ1NjItOTBkYS0yOWQwMTY5NjA2MTMiLCJJUF9BZGRyZXNzIjoiNDUuMjIuMzcuMTMxIiwiZXhwIjoxNjQwODIyMTAyLCJpc3MiOiJBUU1lc2guU2VjdXJpdHkuQmVhcmVyIiwiYXVkIjoiQVFNZXNoLlNlY3VyaXR5LkJlYXJlciJ9.wZHL2FA-EljODjoPeYmAxYgYC5_hg49J0elBTw4lJy4`;
+    // console.log(token);
+
+    // const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/Pods/Assets`, {
+    //   headers: {
+    //     'authorization': `Bearer ${token}`
+    //   }
+    // });
+
+  // const locations = [
+  //   {
+  //     location_number: 915,
+  //     location_name: 'Location 2410103',
+  //     location_notes: null,
+  //     location_owner_number: 21,
+  //     location_latitude: 52.201599,
+  //     location_longitude: -1.726683,
+  //     location_altitude: null,
+  //     pod_number: 1204
+  //   }, { location_number: 911,
+  //     location_name: 'Location 2410103',
+  //     location_notes: null,
+  //     location_owner_number: 21,
+  //     location_latitude: 52.201599,
+  //     location_longitude: -1.726683,
+  //     location_altitude: null,
+  //     pod_number: 1204,
+  //   }
+  // ].map(p => p.location_number);
+
+  // const promises = []
+
+  // for (const i in locations) {
+  //   const location = locations[i];
+  //   const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/11`, {
+  //     headers: {
+  //       'authorization': `Bearer ${token}`
+  //     }
+  //   });
+  //   promises.push(data);
+  // }
+    const gases = [
+      {
+        "gas_reading_number": 3256954,
+        "location_number": 510,
+        "pod_serial_number": 2410149,
+        "owner_number": 8,
+        "reading_datestamp": "2019-04-19T09:15:00",
+        "gas_p1": 10,
+        "gas_p2": 900,
+        "gas_p3": 3600,
+        "gasprotocol_version": "v4.2.3",
+        "battery_voltage": 3.3,
+        "temperature_f": 54.7,
+        "pressure": 1024.5,
+        "humidity": 69.5,
+        "noise_level":-1000.0,
+        "peak_noise":-1000.0,
+        "co_sensor_serial_number": "162640361",
+        "co_state": "Reading",
+        "co_prescaled": 444.39,
+        "co_slope": 1.0574,
+        "co_offset":-76.2663,
+        "co_units": "μg/m³",
+        "no_sensor_serial_number": "160360435",
+        "no_state": "Reading",
+        "no_prescaled": 5.83,
+        "no_slope": 1.0000,
+        "no_offset": 0.0000,
+        "no_units": "μg/m³",
+        "so2_sensor_serial_number": "164642759",
+        "so2_state": "Reading",
+        "so2_prescaled":-1.09,
+        "so2_slope": 1.0000,
+        "so2_offset": 0.0000,
+        "so2_units": "μg/m³",
+        "no2_sensor_serial_number": "202363414",
+        "no2_state": "Reading",
+        "no2_prescaled": 3.59,
+        "no2_slope": 1.0000,
+        "no2_offset": 0.0000,
+        "no2_units": "μg/m³",
+        "o3_sensor_serial_number": "245500944",
+        "o3_state": "Reading",
+        "o3_prescaled": 57.06,
+        "o3_slope": 1.0000,
+        "o3_offset": 0.0000,
+        "o3_units": "μg/m³",
+        "h2s_sensor_serial_number": null,
+        "h2s_state": "Not Fitted",
+        "h2s_prescaled":-1000.00,
+        "h2s_slope": null,
+        "h2s_offset": null,
+        "h2s_units": "μg/m³","eo_sensor_serial_number": null,
+        "eo_state": "Not Fitted",
+        "eo_prescaled": -1000.00,
+        "eo_slope": null,
+        "eo_offset": null,
+        "eo_units": "μg/m³",
+        "uart_type": "CO2","uart_sensor_serial_number": null,
+        "uart_state": "Not Fitted",
+        "uart_prescaled": -1000.00,
+        "uart_slope": null,
+        "uart_offset": null,
+        "uart_units": "mg/m³",
+        "aux1_sensor_serial_number": null,
+        "aux1_type": "Not Fitted",
+        "aux1_state": "Not Fitted",
+        "aux1_prescaled": -1000.00,
+        "aux1_slope": 1.0000,
+        "aux1_offset": 0.0000,
+        "aux1_units": null,
+        "aux2_sensor_serial_number": null,
+        "aux2_type": "Not Fitted",
+        "aux2_state": "Not Fitted",
+        "aux2_prescaled": -1000.00,
+        "aux2_slope": 1.0000,
+        "aux2_offset": 0.0000,
+        "aux2_units": null,
+        "aux3": 1494.00,
+        "aux4": 0.00
+      }
+    ];
+
+    const pm = [
+      {
+        "particle_reading_number": 15613118,
+        "location_number": 510,
+        "pod_serial_number": 2410149,
+        "owner_number": 8,
+        "reading_datestamp": "2019-03-08T15:11:00",
+        "particle_p1": 30,
+        "particle_p2": 60,
+        "particle_p3": 3600,
+        "particleprotocol_version": "v3.0",
+        "reading_status": "Other Fault Zero",
+        "battery_voltage": 3.0,
+        "battery_low": false,
+        "super_cap_voltage": 4.0,
+        "temperature_f": 48.920000,
+        "humidity": 66.2,
+        "pressure": 1003.1,
+        "particle_modem_overlap": false,
+        "pm10_prescale": -893.00,
+        "pm10_slope": 1.0000,
+        "pm10_offset": 0.0000,
+        "pm_course_prescale": -1000.0,
+        "pm_course_slope": 1.0,
+        "pm_course_offset": 0.0,
+        "pm4_prescale": -893.00,
+        "pm4_slope": 1.0000,
+        "pm4_offset": 0.0000,
+        "pm2_5_prescale": -893.00,
+        "pm2_5_slope": 1.0000,
+        "pm2_5_offset": 0.0000,
+        "pm1_prescale": -893.00,
+        "pm1_slope": 1.0000,
+        "pm1_offset": 0.0000,
+        "pm_total_prescale": -893.00,
+        "pm_total_slope": 1.0000,
+        "pm_total_offset": 0.0000
+      }
+    ]
+/*
+    console.log(
+      pm.map((e) => ({
+        pm1_prescale: e.pm1_prescale,
+        pm2_5_prescale: e.pm2_5_prescale,
+        pm10_prescale: e.pm10_prescale,
+      }))
+    );
+
+    console.log(
+      gases.map((e) => ({
+        co_prescaled: e.co_prescaled,
+        no_prescaled: e.no_prescaled,
+        so2_prescaled: e.so2_prescaled,
+        no2_prescaled: e.no2_prescaled,
+        o3_prescaled: e.o3_prescaled,
+        h2s_prescaled: e.h2s_prescaled,
+        eo_prescaled: e.eo_prescaled,
+        uart_prescaled: e.uart_prescaled
+      }))
+    );
+*/
+
+    const aqiso2 = await aqibot.AQICalculator.getAQIResult('SO2', 13.370);
+    const aqino2 = await aqibot.AQICalculator.getAQIResult('NO2', 13.370);
+    const aqio3 = await aqibot.AQICalculator.getAQIResult('O3', 13.370);
+    const aqico = await aqibot.AQICalculator.getAQIResult('CO', 13.370);
+
+    const aqi25 = await aqibot.AQICalculator.getAQIResult('PM2.5', 50.54);
+    const aqi10 = await aqibot.AQICalculator.getAQIResult('PM10', 39.145);
+
+    return {
+      PM25REALTIME: aqi25,
+      PM10REALTIME: aqi10,
+
+      SO2REALTIME: aqiso2,
+      NO2REALTIME: aqino2,
+      O3REALTIME: aqio3,
+      COREALTIME: aqico,
+
+      GASES_LAST_READ_AT: gases[0].reading_datestamp,
+      PM_LAST_READ_AT: pm[0].reading_datestamp,
+    };
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+}
+
+exports.sync = async (req, res) => {
+  const { hash, metrics: m } = req.query;
 
   if (hash !== process.env.SYNC_SECRET_HASH) {
     res.status(400).end();
   }
 
-  const avg = (arr) => arr.reduce((a, b) => a + parseInt(b, 10), 0) / arr.length;
+  let metrics = {
+    trains: [],
+    flights: [],
+    vessels: [],
+    traffic: [],
+    advisories: [],
 
-  const purpleId = process.env.PURPLE_AIR_ID;
+    weather: {},
+    airquality: { purpleair: {}, advanced: {} }
+  };
 
-  const airportEndpoints = [];
-  const flightsApiKey = process.env.AVIATION_EDGE_API_KEY;
-  const airports = process.env.NEARBY_AIRPORTS_IATAS.split(',');
+  await Promise.all(m.split(',').map(async (measurement) => {
+    let model;
 
-  const location = `${process.env.LOCATION_LAT},${process.env.LOCATION_LON}`;
-  const weatherApiKey = process.env.FORCASTIO_API_KEY;
-  const exclude = 'minutely,hourly,daily,alerts,flags';
-  const trafficApiKey = process.env.MAPQUEST_API_KEY;
-  const trafficBounds = regionAsSquare.join(',');
-  const shippingApiKey = process.env.FLEETMON_API_KEY;
+    switch(measurement) {
+      case 'flights':
+        const flights = await module.exports.getFlights();
 
-  // Each nearby airport
-  // get the arr-iving and dep-arting flights at the airport
-  airports.forEach((airport) => {
-    ['arr', 'dep'].forEach((direction) => {
-      airportEndpoints.push(axios.get(`https://aviation-edge.com/v2/public/flights?key=${flightsApiKey}&${direction}Iata=${airport}`));
-    });
+        model = new Flight({ FLIGHTS: flights });
+        await model.save();
+
+        metrics.flights = flights;
+      break;
+      case 'vessels':
+        const vessels = await module.exports.getVessels();
+
+        model = new Vessel({ VESSELS: vessels });
+        await model.save();
+
+        metrics.vessels = vessels;
+      break;
+      case 'weather':
+        const weather = await module.exports.getWeather();
+
+        model = new Weather({ REPORTED_WEATHER: weather });
+        await model.save();
+
+        metrics.weather = weather;
+      break;
+      case 'traffic':
+        const traffic = await module.exports.getTraffic();
+
+        model = new Traffic({ INCIDENTS: traffic });
+        await model.save();
+
+        metrics.traffic = traffic;
+      break;
+      case 'trains':
+        const trains = await module.exports.getTrains();
+
+        model = new Train({ SOUTHSHORE: trains });
+        await model.save();
+
+        metrics.trains = trains;
+      break;
+      case 'advisories':
+        const advisories = await module.exports.getAdvisories();
+
+        model = new Advisories({ ADVISORIES: advisories });
+        await model.save();
+
+        metrics.advisories = advisories;
+      break;
+      case 'airquality-purpleair':
+        const purpleair = await module.exports.getPurpleAirAirQuality();
+
+        model = new Airshit(purpleair);
+        await model.save();
+
+        metrics.airquality.purpleair = purpleair;
+      break;
+      case 'airquality-advanced':
+        const advanced = await module.exports.getAdvancedAirQuality();
+
+        model = new Airshit(advanced);
+        await model.save();
+
+        metrics.airquality.advanced = advanced;
+      break;
+      default:
+    }
+  }))
+  .then(() => {
+    return res.json({ success: true, metrics });
+  })
+  .catch((e) => {
+    console.error(e);
+    return res.json({ success: false, metrics });
   });
+};
 
-  axios.all([
-    axios.get(`https://www.purpleair.com/json?show=${purpleId}`),
-    axios.get(`https://api.forecast.io/forecast/${weatherApiKey}/${location}?units=us&exclude=${exclude}`),
-    axios.get('http://southshore.etaspot.net/service.php?service=get_vehicles&includeETAData=1&orderedETAArray=1&token=TESTING'),
-    axios.get(`https://www.mapquestapi.com/traffic/v2/incidents?&outFormat=json&boundingBox=${encodeURIComponent(trafficBounds)}&key=${trafficApiKey}&filters=incidents,congestion`),
-    axios.get(`https://apiv2.fleetmon.com/regional_ais/?apikey=${shippingApiKey}`),
-    ...airportEndpoints,
-  ])
-    .then(axios.spread((purpleData, weatherData, trainData, trafficData, shippingData, ...airportsData) => {
-      const purple = purpleData.data;
-      const weather = weatherData.data;
-      const southshore = trainData.data;
-      const traffic = trafficData.data;
-      const shipping = shippingData.data;
-      const airportData = [...airportsData].map((r) => r.data);
+exports.migrate = async (req, res) => {
+  const { hash } = req.query;
 
-      // PurpleAir/Air Quality
-      // Purple returns 2 results from the two sensors on each device
-      // we read both, and just average them. We do this for PM2.5/10
-      const one = purple.results[0];
-      const two = purple.results[1];
+  if (hash !== process.env.SYNC_SECRET_HASH) {
+    res.status(400).end();
+  }
 
-      const PM25Means = [];
-      const PM25Cumulative = [];
-      const PM10Means = [];
-      const PM10Cumulative = [];
+  for await (const airshit of Airshit.find()) {
+    let airshitobj = airshit.toObject();
 
-      const results = [];
-      const sensors = [one, two];
+    const {
+      VESSELS,
+      REPORTED_WEATHER,
+      FLIGHTS,
+      TRAINS,
+      TRAFFIC,
+      createdAt, updatedAt,
+      TEMP_F,
+      HUMIDITY_PERCENT,
+      PRESSURE_BAR,
+      LAST_READ_AT
+    } = airshitobj;
 
-      sensors.forEach((sensor) => {
-        const stats = JSON.parse(sensor.Stats);
+    if (TEMP_F) {
+      await Airshit.updateOne({ _id: airshit.id }, { $unset: {"TEMP_F": 1} });
+    }
 
-        // PM 2.5
-        const PM25Measurements = ['v', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6'];
-        PM25Measurements.forEach((measurement) => {
-          if (typeof PM25Cumulative[measurement] === 'undefined') {
-            PM25Cumulative[measurement] = [];
-          }
-          PM25Cumulative[measurement].push(stats[measurement]);
-        });
+    if (HUMIDITY_PERCENT) {
+      await Airshit.updateOne({ _id: airshit.id }, { $unset: {"HUMIDITY_PERCENT": 1} });
+    }
 
-        // PM 10
-        const PM10Measurements = ['pm10_0_atm'];
-        PM10Measurements.forEach((measurement) => {
-          if (typeof PM10Cumulative[measurement] === 'undefined') {
-            PM10Cumulative[measurement] = [];
-          }
+    if (PRESSURE_BAR) {
+      await Airshit.updateOne({ _id: airshit.id }, { $unset: {"PRESSURE_BAR": 1} });
+    }
 
-          PM10Cumulative[measurement].push(sensor[measurement]);
-        });
-      });
+    if (LAST_READ_AT) {
+      await Airshit.updateOne({ _id: airshit.id }, { $rename: { "LAST_READ_AT": "PM_LAST_READ_AT" } });
+    }
 
-      // average both PM2.5 and PM10 from sensor A & B.
-      Object.keys(PM25Cumulative).forEach((measurement) => {
-        PM25Means[measurement] = avg(PM25Cumulative[measurement]);
-      });
-      Object.keys(PM10Cumulative).forEach((measurement) => {
-        PM10Means[measurement] = avg(PM10Cumulative[measurement]);
-      });
+    if (VESSELS.length >= 0) {
+      await new Vessel({ VESSELS, createdAt, updatedAt }).save();
+    }
 
-      // AQI promises
-      const promises = [];
+    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"VESSELS": 1} });
 
-      // We only care about mapping real time. We could
-      // potentially store the others, but it seems
-      // redundant to store them when we could
-      // generate them ourselves if we ever
-      // needed to later, saving DB bloat.
-      const PM25Mapping = {
-        PM25REALTIME: 'v',
-      // '10MINUTES': 'v1',
-      // '30MINUTES': 'v2',
-      // '1HOUR': 'v3',
-      // '6HOUR': 'v4',
-      // '1DAY': 'v5',
-      // '1WEEK': 'v6',
-      };
+    if (REPORTED_WEATHER) {
+      await new Weather({ REPORTED_WEATHER, createdAt, updatedAt }).save();
+    }
 
-      const PM10Mapping = {
-        PM10REALTIME: 'pm10_0_atm',
-      };
+    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"REPORTED_WEATHER": 1} });
 
-      // PM2.5 AQI
-      Object.keys(PM25Mapping).forEach((variable) => {
-        const aqi = aqibot.AQICalculator.getAQIResult('PM2.5', PM25Means[PM25Mapping[variable]]).then((result) => {
-          results[variable] = result;
-        }).catch((err) => {
-          console.log(err);
-        });
+    let ALL_FLIGHTS = [];
 
-        promises.push(aqi);
-      });
+    if (FLIGHTS) {
+      if (FLIGHTS.GYY) {
+        ALL_FLIGHTS = [ ...ALL_FLIGHTS, ...FLIGHTS.GYY ]
+      }
 
-      // PM10 AQI
-      Object.keys(PM10Mapping).forEach((variable) => {
-        const aqi = aqibot.AQICalculator.getAQIResult('PM10', PM10Means[PM10Mapping[variable]]).then((result) => {
-          results[variable] = result;
-        }).catch((err) => {
-          console.log(err);
-        });
+      if (FLIGHTS.MDW) {
+        ALL_FLIGHTS = [ ...ALL_FLIGHTS, ...FLIGHTS.MDW ]
+      }
 
-        promises.push(aqi);
-      });
+      if (FLIGHTS.ORD) {
+        ALL_FLIGHTS = [ ...ALL_FLIGHTS, ...FLIGHTS.ORD ]
+      }
 
-      // Shipping / Vessels
-      const { vessels } = shipping;
+      await new Flight({ FLIGHTS: ALL_FLIGHTS, createdAt, updatedAt }).save();
+    }
 
-      const vesselsTravelingOnThru = vessels.filter((vessel) => geo.insidePolygon([vessel.position.latitude, vessel.position.longitude], lakeAsPolygon) && vessel.position.nav_status === 'under way using engine');
+    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"FLIGHTS": 1} });
 
-      const runningShips = _.map(vesselsTravelingOnThru, (vessel) => ({
-        id: vessel.mmsi_number,
-        imo: vessel.imo_number,
-        name: vessel.name,
-        callsign: vessel.callsign,
-        country: vessel.country,
-        type: vessel.type,
-        width: vessel.width,
-        length: vessel.length,
-        deadweight: vessel.dwt,
-        destination: vessel.voyage.destination,
-        draught: vessel.voyage.draught,
-        lat: vessel.position.latitude,
-        lng: vessel.position.longitude,
-        status: vessel.position.nav_status,
-        direction: vessel.position.true_heading,
-      }));
+    if (TRAINS && TRAINS.SOUTHSHORE.length > 0) {
+      await new Train({ SOUTHSHORE: TRAINS.SOUTHSHORE, createdAt, updatedAt }).save();
+    }
 
-      // Trains
-      const trains = southshore.get_vehicles;
+    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"TRAINS": 1} });
 
-      const southshoreTravelingOnThru = trains.filter((train) => geo.insidePolygon([train.lat, train.lng], regionAsPolygon) && train.inService);
+    if (TRAFFIC && TRAFFIC.INCIDENTS.length > 0) {
+      await new Traffic({ INCIDENTS: TRAFFIC.INCIDENTS, createdAt, updatedAt }).save();
+    }
 
-      const southshoreTrains = southshoreTravelingOnThru.map((train) => ({
-        id: train.trainID,
-        lat: train.lat,
-        lng: train.lng,
-        direction: train.direction,
-      }));
+    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"TRAFFIC": 1} });
 
-      // Traffic / Incidents
-      const incidents = traffic.incidents.map((incident) => ({
-        lat: incident.lat,
-        lng: incident.lng,
-        distance: incident.distance,
-        freeFlowMinDelay: incident.delayFromFreeFlow,
-        shortDesc: incident.shortDesc,
-        startTime: incident.startTime,
-        endTime: incident.endTime,
-      }));
-
-      // Flights
-      let flights = airportData.map((airport) => {
-      // If airport doesn't have departing/arriving flights
-        if (airport.error) {
-          return [];
-        }
-
-        // Are planes over the region?
-        const flightsTravelingOnThru = airport.filter((flight) => {
-          const { geography } = flight;
-          const { latitude, longitude } = geography;
-
-          return geo.insidePolygon([latitude, longitude], regionAsPolygon);
-        });
-
-        // For each flight in region, map them into a format
-        // we can work with, removing all unnecessary data
-        return flightsTravelingOnThru.map((info) => {
-          const {
-            geography, aircraft, speed, departure, arrival, flight,
-          } = info;
-          const {
-            latitude, longitude, altitude, direction,
-          } = geography;
-
-          return {
-            alt: altitude,
-            bearing: direction,
-            lat: latitude,
-            lng: longitude,
-            speed: speed.horizontal,
-            flight: flight.iataNumber,
-            reg: aircraft.regNumber,
-            aircraft: aircraft.iataCode,
-            departing: departure.iataCode,
-            arriving: arrival.iataCode,
-          };
-        });
-      });
-
-      // concatenate multiple flight arrays into a single array
-      flights = flights.reduce((a, e) => a.concat(e), []);
-
-      // Group both departing and arriving flights by airport
-      const departingFlights = _.groupBy(flights, (f) => f.departing);
-      const arrivingFlights = _.groupBy(flights, (f) => f.arriving);
-
-      // merge all flights by airport
-      flights = { ...departingFlights, ...arrivingFlights };
-
-      // from all flights by airport, only get the ones
-      // we have defined as nearby
-      const flightsOverRegion = {};
-      airports.forEach((airport) => {
-        flightsOverRegion[airport] = [];
-        if (typeof flights[airport] !== 'undefined') {
-          flightsOverRegion[airport] = flights[airport];
-        }
-      });
-
-      Promise.all(promises)
-        .then((result) => {
-          const shitstamp = new Airshit({
-            PM25REALTIME: results.PM25REALTIME,
-            PM10REALTIME: results.PM10REALTIME,
-            LAST_READ_AT: one.LastSeen,
-            TEMP_F: one.temp_f,
-            HUMIDITY_PERCENT: one.humidity,
-            PRESSURE_BAR: one.pressure,
-            REPORTED_WEATHER: weather.currently,
-            TRAINS: {
-              SOUTHSHORE: southshoreTrains,
-            },
-            TRAFFIC: {
-              INCIDENTS: incidents,
-            },
-            FLIGHTS: flightsOverRegion,
-            VESSELS: runningShips,
-          });
-
-          shitstamp.save((err, response) => {
-            if (err) return console.error(err);
-            cache.del('/currently', (error, deleted) => {
-              if (error) throw error;
-            });
-
-            res.send({ success: true });
-          });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.send({ success: false });
-        });
-    }))
-    .catch((error) => {
-      console.log(error);
-      res.send({ success: false });
-    });
+    console.log(`${airshit.id} migrated`);
+  }
 };
 
 exports.past = (req, res) => {

@@ -8,6 +8,7 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "../node_modules/@fortawesome/fontawesome-free/scss/regular";
 @import "../node_modules/@fortawesome/fontawesome-free/scss/solid";
 
+@import "timeline";
 @import "themes/default/_default";
 
 $util-font-sizes: 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200;
@@ -41,6 +42,7 @@ body {
     font-size: 14px;
 }
 
+
 footer {
     p, ul {
         margin-bottom: 0;
@@ -73,6 +75,7 @@ textarea {
 .navbar-brand {
     font-size: 18px;
     float: left;
+    letter-spacing: -0.5px;
 }
 
 .navbar-toggler {
@@ -91,13 +94,21 @@ textarea {
     right: 0;
 }
 
-/*
-* Solves Bootstrap 4 issue
-* https://github.com/twbs/bootstrap/issues/25654
-*/
-/* Styles in sm disposition and up */
+.nav-item.border-danger .active,
+.nav-item.border-danger a:hover {
+    background-color: $brand-danger;
+    color: #fff !important;
+}
+
+// Vue Router
+// -------------------------
+
+.router-link-exact-active {
+    @extend .active;
+}
+
+// https://github.com/twbs/bootstrap/issues/25654
 @media (min-width: 576px) and (max-width: 767px) {
-    /* Solves bs4 bug */
     .navbar-expand-md > .container,
     .navbar-expand-lg > .container,
     .navbar-expand-xl > .container {
@@ -105,20 +116,14 @@ textarea {
         padding-right: 15px !important;
     }
 }
-
-/* Styles in md disposition and up */
 @media (min-width: 768px) and (max-width: 991px) {
-    /* Solves bs4 bug */
     .navbar-expand-lg > .container,
     .navbar-expand-xl > .container {
         padding-left: 15px !important;
         padding-right: 15px !important;
     }
 }
-
-/* Styles in lg disposition and up */
 @media (min-width: 992px) and (max-width: 1199px) {
-    /* Solves bs4 bug */
     .navbar-expand-xl > .container {
         padding-left: 15px !important;
         padding-right: 15px !important;
@@ -171,8 +176,182 @@ textarea {
     margin-right: 6px;
 }
 
+
+// Misc
+// -------------------------
+//
 .form-control::placeholder {
     @extend .text-dark;
+}
+
+.number--blurred {
+    filter: blur(5px);
+
+    &:after {
+        content: "0";
+    }
+}
+
+.text--blurred {
+    filter: blur(5px);
+
+    &:after {
+        content: "LOADING";
+    }
+}
+
+.highlighted {
+    font-weight: bold;
+    background-image: linear-gradient(
+        transparent 0%,
+        transparent calc(50% - 9px),
+        rgba(77, 165, 244, 0.35) calc(50% - 9px),
+        rgba(77, 165, 244, 0.35) 100%
+    );
+    background-size: 100% 190%;
+    word-break: break-word;
+    padding: 2px 0px 1px;
+    transition: all 120ms ease-in-out 0s;
+    background-position: 0px 0px;
+}
+
+.separator {
+    display: block;
+}
+
+.site-heading {
+    letter-spacing: -1px;
+    @media (min-width: 991px) {
+        letter-spacing: -3px;
+    }
+
+    h1 & {
+        font-size: 2.5rem;
+        line-height: 0.85;
+        @media (min-width: 991px) {
+            font-size: 3.5rem;
+
+            line-height: 0.95;
+        }
+    }
+    h2 & {
+        font-size: 2.0rem;
+        @media (min-width: 991px) {
+            font-size: 3.0rem;
+
+            line-height: 0.95;
+        }
+    }
+}
+
+.lead {
+    .separator {
+        padding: 0.25rem;
+        display: block;
+    }
+}
+
+.w-lg-50 {
+    @include media-breakpoint-up(lg) {
+        width: 50%;
+    }
+ }
+
+.w-lg-75 {
+    @include media-breakpoint-up(lg) {
+        width: 75%;
+    }
+ }
+
+ .metrics{
+    .add {
+        position: relative;
+        padding-right: 15px;
+        &:after{
+            content: "+";
+            position: absolute;
+            right: 5px;
+        }
+
+        &:last-child {
+            &:after{
+                content: "";
+                display: none;
+            }
+        }
+    }
+ }
+
+// Map
+// -------------------------
+
+.map-container {
+    &.map-container--has-mask {
+        cursor: pointer;
+        &:after{
+            top: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            content: ""
+        }
+    }
+    #map {
+        width: 100%;
+        height: 600px;
+    }
+}
+
+
+// AQI
+// -------------------------
+.aqi-card {
+    @extend .card;
+
+    img {
+        width: 30px;
+    }
+}
+
+.aqi {
+    @extend .card;
+
+    &--good {
+        @extend .bg-success;
+
+        @extend .text-white;
+    }
+
+    &--moderate {
+        background-color: #FFDC00;
+
+        @extend .text-dark;
+    }
+
+    &--unhealthy-sensitive {
+        background-color: #FF851B;
+
+        @extend .text-dark;
+    }
+
+    &--unhealthy {
+        background-color: #FF4136;
+
+        @extend .text-dark;
+    }
+
+    &--unhealthy-very {
+        background-color: #85144b;
+
+        @extend .text-white;
+    }
+
+    &--death {
+        background-color: #111111;
+
+        @extend .text-white;
+    }
 }
 
 .aqi-stat {
@@ -209,76 +388,269 @@ textarea {
     &--death {
         .aqi-stat__stat {
             color: #111111;
+            text-shadow: 0px -2px 4px #fff,
+                         0px -2px 5px #FF3,
+                         0px -10px 10px #F90,
+                        0px -20px 40px #C33;
+        }
+    }
+
+    .icon {
+        z-index: 8;
+        float: right;
+        height: 100%;
+
+        i {
+            color: rgba(20, 20, 20, 0.15);
+            position: absolute;
+            left: 0;
+            left: auto;
+            right: -10px;
+            bottom: -10px;
+            display: block;
         }
     }
 }
 
-.card {
-    &.aqi {
-        &--good {
-            @extend .bg-success;
+.stat {
+    > .row {
+        .col {
+            margin-right: -$spacer;
 
-            @extend .text-white;
+            &:last-child {
+                margin-right: 0;
+            }
         }
+    }
 
-        &--moderate {
-            background-color: #FFDC00;
-
-            @extend .text-dark;
+    &--weather {
+        .summary {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0;
         }
+    }
 
-        &--unhealthy-sensitive {
-            background-color: #FF851B;
-
-            @extend .text-dark;
-        }
-
-        &--unhealthy {
-            background-color: #FF4136;
-
-            @extend .text-dark;
-        }
-
-        &--unhealthy-very {
-            background-color: #85144b;
-
-            @extend .text-white;
-        }
-
-        &--death {
-            background-color: #111111;
-
-            @extend .text-white;
+    &--advisories {
+        li {
+            &:last-child {
+                .divider {
+                    display: none !important;
+                }
+            }
         }
     }
 }
 
-.lead {
-    .separator {
-        padding: 0.25rem;
-        display: block;
+
+// Dashboard item
+// -------------------------
+.card-item {
+    tr {
+        td {
+            vertical-align: middle;
+
+            &:first-child {
+                p {
+                    font-size: 0.9rem;
+                    text-align: right;
+                }
+            }
+        }
     }
-    sub {
-        font-size: 55%;
+
+    &--weather {
+        tr {
+            td {
+                small {
+                    font-size: 60% !important;
+                    margin-left: 5px;
+                    letter-spacing: -0.75px;
+                }
+            }
+        }
+    }
+
+    &--industry {
+        tr {
+            td {
+                small {
+                    font-size: 80% !important;
+                    margin-left: 5px;
+                }
+            }
+        }
     }
 }
 
-sub {
-    &.d-block {
-        padding-bottom: 0.25rem;
-        line-height: inherit;
+// AQI
+// -------------------------
+#aqi-table {
+     @include media-breakpoint-up(md) {
+        width: 75%;
+        margin: 0 auto;
+    }
+
+    @include media-breakpoint-up(lg) {
+        width: 60%;
+        margin: 0 auto;
+    }
+
+    table {
+        tr {
+            td {
+                &:first-child {
+                    // text-align: right;
+                }
+            }
+        }
     }
 }
 
-.pb-45 {
-    padding-bottom: 1.75rem;
+// Highs
+// -------------------------
+#historical-highs {
+
+    @include media-breakpoint-up(md) {
+        width: 75%;
+        margin: 0 auto;
+    }
+
+    @include media-breakpoint-up(lg) {
+        width: 60%;
+        margin: 0 auto;
+    }
+
+    .aqi-stat {
+        &__stat {
+            span {
+                font-weight: bold;
+
+                @extend .display-4;
+                font-size: 2rem;
+                @media (min-width: 768px) {
+                    font-size: 3.5rem;
+                }
+            }
+        }
+    }
 }
 
-.br-0 {
-    border-radius: 0px;
+#report {
+    blockquote {
+        p {
+            font-size: 1.33rem;
+        }
+
+        .blockquote-footer {
+        &:before {
+                content: '';
+            }
+        }
+    }
 }
 
-#introduction {
+// Vue Trend Chart
+// -------------------------
+.vtc {
+    height: 250px;
+    font-size: 12px;
+    overflow: visible;
+
+    @include media-breakpoint-up(sm) {
+        height: 320px;
+    }
+
+    .labels {
+        stroke: rgba(0, 0, 0, 0.05);
+        .x-labels {
+            .label {
+                padding-top: 10px;
+                display: none;
+                &:first-child {
+                    display: block;
+                }
+                &:last-child {
+                    display: block;
+                }
+            }
+        }
+    }
+    .active-line {
+        stroke: rgba(0, 0, 0, 0.2);
+    }
+    .point {
+        stroke-width: 2;
+        transition: stroke-width 0.2s;
+    }
+    .point.is-active {
+        stroke-width: 5;
+    }
+}
+
+.tooltip {
+    opacity: 1;
+    position: absolute;
+    z-index: 10000000;
+    padding: 10px;
+    background: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+
+    &:not(.is-active) {
+        display: none;
+    }
+
+    &-data {
+        display: flex;
+        &-item {
+            display: flex;
+            align-items: center;
+
+            &:before {
+                content: "";
+                display: block;
+                width: 15px;
+                height: 15px;
+                margin-right: 5px;
+            }
+        }
+    }
+}
+
+// Build measurement-* classes for airquality chart
+// -------------------------
+@each $name, $value in $measurements {
+    .#{$name} {
+        .airquality-trend & {
+            .stroke {
+              stroke: $value;
+              stroke-width: 2;
+            }
+            .fill {
+              fill: $value;
+              opacity: 0.05;
+            }
+            .point {
+              fill: $value;
+              stroke: $value;
+            }
+        }
+
+        .tooltip & {
+            &:before {
+                background: $value;
+            }
+        }
+    }
+}
+
+
+// About
+// -------------------------
+#about {
     margin: 7rem auto;
     .inner {
         @media (min-width: 992px) {
@@ -295,122 +667,90 @@ sub {
     }
 }
 
-#historical-highs {
-    .aqi-stat {
-        &__stat {
-            span {
-                font-weight: bold;
+.support-us {
+    ul {
+        padding-left: 1.5rem;
+    }
+    li {
+        margin-bottom: 0.5rem;
+        line-height: 1.33;
+    }
+}
 
-                @extend .display-4;
-                font-size: 2rem;
-                @media (min-width: 768px) {
-                    font-size: 3.5rem;
-                }
-            }
+.sources {
+    .source {
+        &+&{
+            margin-bottom: 1rem;
+        }
+        &__type {
+            padding-right: 4px;
+            text-transform: uppercase;
+
+            @extend .small;
+
+            @extend .d-block;
+
+            @extend .d-md-inline;
         }
     }
 }
 
-#results {
-    margin: 4rem auto 0rem;
-    #airquality {
-        margin-bottom: 5rem !important;
-        @media (min-width: 992px) {
-            width: 60%;
-            margin: 0 auto;
-        }
+.funded-by-list {
+    list-style-type: none;
+    text-align: center;
+    padding-left: 0;
+
+    @media (min-width: 768px) {
+        padding-left: 3rem;
+        text-align: left;
+        list-style-type: circle;
     }
 }
 
-.table {
-    .aqi {
-        .score {
-            text-align: center;
+.partner-logo {
+    &:hover {
+        img {
+            filter: grayscale(0%);
+        }
+    }
+
+    img {
+        filter: grayscale(100%);
+        max-width: 150px;
+    }
+}
+
+.footnotes {
+    li {
+        counter-increment: section;
+        display: table-row;
+
+        &::before {
+            @extend .btn-link;
+
+            content: "[" counter(section) "]";
+            padding-right: 7.5px;
+        }
+
+        &::after {
+            content: "";
             display: block;
-            padding: 0.25rem;
-
-            .number {
-                display: block;
-                font-size: 1.5rem;
-            }
-
-            .category {
-                display: block;
-                margin-top: -6px;
-                text-transform: uppercase;
-                letter-spacing: -0.5px;
-            }
-        }
-
-        &--good {
-            span {
-                @extend .bg-success;
-
-                @extend .text-white;
-            }
-        }
-
-        &--moderate {
-            span {
-                background-color: #FFDC00;
-
-                @extend .text-dark;
-            }
-        }
-
-        &--unhealthy-sensitive {
-            span {
-                background-color: #FF851B;
-
-                @extend .text-dark;
-            }
-        }
-
-        &--unhealthy {
-            span {
-                background-color: #FF4136;
-
-                @extend .text-dark;
-            }
-        }
-
-        &--unhealthy-very {
-            span {
-                background-color: #85144b;
-
-                @extend .text-white;
-            }
-        }
-
-        &--death {
-            span {
-                background-color: #111111;
-
-                @extend .text-white;
-            }
+            margin-top: 0.25rem;
         }
     }
 }
 
-.card {
-    overflow: hidden;
 
-    .card-body {
-        .rotate {
-            z-index: 8;
-            float: right;
-            height: 100%;
-
-            i {
-                color: rgba(20, 20, 20, 0.15);
-                position: absolute;
-                left: 0;
-                left: auto;
-                right: -10px;
-                bottom: -10px;
-                display: block;
-            }
-        }
+// Footer
+// -------------------------
+#poweredby {
+    @media (min-width: 1199px) {
+        position: absolute;
+        top: 335px;
+        left: -250px;
+        z-index: 1000;
+        background: #fff;
+        padding:0.5rem;
     }
 }
 
@@ -459,235 +799,5 @@ sub {
 @keyframes pound {
     to {
         transform: scale(1.5);
-    }
-}
-
-.sources {
-    .source {
-        &__type {
-            padding-right: 4px;
-            text-transform: uppercase;
-
-            @extend .small;
-
-            @extend .d-block;
-
-            @extend .d-md-inline;
-        }
-    }
-}
-
-.funded-by-list {
-    list-style-type: none;
-    text-align: center;
-    padding-left: 0;
-
-    @media (min-width: 768px) {
-        padding-left: 3rem;
-        text-align: left;
-        list-style-type: circle;
-    }
-}
-
-.partner-logo {
-    &:hover {
-        img {
-            filter: grayscale(0%);
-        }
-    }
-
-    img {
-        filter: grayscale(100%);
-        max-width: 150px;
-    }
-}
-
-.notes-list {
-    li {
-        counter-increment: section;
-        display: table-row;
-
-        &::before {
-            @extend .btn-link;
-
-            content: "[" counter(section) "]";
-            padding-right: 7.5px;
-        }
-
-        &::after {
-            content: "";
-            display: block;
-            margin-top: 0.5rem;
-        }
-
-        + li {
-            &::after {
-                display: none;
-            }
-        }
-    }
-}
-
-.number--blurred {
-    filter: blur(5px);
-
-    &:after {
-        content: "0";
-    }
-}
-
-.text--blurred {
-    filter: blur(5px);
-
-    &:after {
-        content: "LOADING";
-    }
-}
-
-.text--smushed {
-    letter-spacing: -1px;
-}
-
-.map-container {
-    &.map-container--has-mask {
-        cursor: pointer;
-        &:after{
-            top: 0;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: transparent;
-            content: ""
-        }
-    }
-    #map {
-        width: 100%;
-        height: 600px;
-    }
-}
-
-
-.site-heading {
-    letter-spacing: -1px;
-}
-
-#visuals {
-    .site-sub-heading{
-        width: 85%;
-        @media (min-width: 991px) {
-            width: 100%;
-        }
-    }
-    .site-heading {
-        font-size: 2.5rem;
-        @media (min-width: 991px) {
-            font-size: 3.5rem;
-            letter-spacing: -5px;
-            line-height: 0.95;
-        }
-    }
-}
-
-.highlighted {
-    font-weight: bold;
-    background-image: linear-gradient(
-        transparent 0%,
-        transparent calc(50% - 9px),
-        rgba(77, 165, 244, 0.35) calc(50% - 9px),
-        rgba(77, 165, 244, 0.35) 100%
-    );
-    background-size: 100% 190%;
-    word-break: break-word;
-    padding: 2px 0px 1px;
-    transition: all 120ms ease-in-out 0s;
-    background-position: 0px 0px;
-}
-
-.timeline {
-    text-align: left;
-    width: 100%;
-    max-width: 500px;
-
-    .wrapper-timeline {
-        position: relative;
-    }
-
-    .wrapper-item {
-        display: grid;
-        grid-template-columns: 100px 1fr;
-        margin-bottom: 20px;
-
-        .section-year {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 18px;
-
-            .year {
-                margin: 0;
-            }
-        }
-
-        &.unique-timeline {
-            margin-bottom: 0;
-        }
-    }
-}
-
-.timeline-item {
-    .item {
-        border-left: 5px solid #ccd5db;
-        padding: 20px 0 20px 15px;
-        position: relative;
-    }
-
-    .month-item {
-        margin: 0;
-        text-transform: uppercase;
-        font-size: 16px;
-        letter-spacing: 2px;
-    }
-
-    .title-item {
-        margin: 0;
-        padding: 5px 0;
-        font-size: 15px;
-        font-weight: 500;
-    }
-
-    .description-item {
-        font-weight: 300;
-        margin: 0;
-    }
-
-    .dot {
-        display: block;
-        position: absolute;
-        width: 15px;
-        height: 15px;
-        border-radius: 50%;
-
-        // background: #2da1bf;
-        left: -10px;
-        top: 26px;
-    }
-}
-
-// vue-router
-.router-link-exact-active {
-    @extend .active;
-}
-
-#poweredby {
-    @media (min-width: 1199px) {
-        position: absolute;
-        top: 335px;
-        left: -250px;
-        z-index: 1000;
-        background: #fff;
-        padding:0.5rem;
     }
 }

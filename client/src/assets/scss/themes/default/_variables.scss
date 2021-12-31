@@ -1,11 +1,35 @@
+// Spacers
+// -------------------------
+$spacers: (
+    6: (1rem * 4.5),
+    7: (1rem * 6),
+    8: (1rem * 9),
+    9: (1rem * 10),
+    10: (1rem * 11),
+    15: (1rem * 16),
+    20: (1rem * 21)
+);
+
 // Brand Colors
 // -------------------------
-
 $brand-primary: #4d90fc;
 $brand-success: #60bf60;
 $brand-warning: #ff9800;
 $brand-danger: #de4b33;
 $brand-info: #5bc0dd;
+
+// Measurements
+// -------------------------
+$measurements: (
+    measurement-1: #F6C85F,
+    measurement-2: #CA472F,
+    measurement-3: #FFA056,
+    measurement-4: #0B84A5,
+    measurement-5: #6F4E7C,
+    measurement-6: #9DD866,
+    measurement-7: #8DDDD0,
+);
+
 
 // Typography
 // -------------------------
@@ -53,4 +77,6 @@ $navbar-light-color: #252525;
 $navbar-light-hover-color: #4da5f4;
 $navbar-light-active-color: #4da5f4;
 
+// Cards
+// -------------------------
 $card-spacer-x: 0.75rem;

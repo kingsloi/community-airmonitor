@@ -9,8 +9,11 @@ import VueMeta from 'vue-meta'
 
 import VueCompositionAPI from '@vue/composition-api'
 
+import TrendChart from 'vue-trend-chart';
+
 import 'bootstrap';
 
+Vue.use(TrendChart);
 Vue.use(VueRouter);
 Vue.use(VueMeta, {
   refreshOnceOnNavigation: true
@@ -19,7 +22,14 @@ Vue.use(VueCompositionAPI);
 
 const router = new VueRouter({
   routes: routes,
-  mode: 'hash'
+  mode: 'history',
+  scrollBehavior: (to) => {
+    if (to.hash) {
+      return { selector: to.hash }
+    } else {
+      return { x: 0, y: 0 }
+    }
+  },
 });
 
 Vue.config.productionTip = false

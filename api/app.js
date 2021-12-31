@@ -114,10 +114,12 @@ app.use('/files', express.static('public/files'), serveIndex('public/files', {
 }))
 
 app.get('/currently', cache.route({ expire: 450  }), airShirtController.currently);
+app.get('/highs', cache.route({ expire: 86400  }), airShirtController.highs);
 app.get('/sync', airShirtController.sync);
-app.get('/previous-by-day', cache.route({ expire: 86400  }), airShirtController.past);
-app.get('/airshits/date/:date', cache.route({ expire: 31540000  }), airShirtController.airshitByDate);
-app.get('/airshits/:airshit', cache.route({ expire: 31540000  }), airShirtController.airshit);
+app.get('/migrate', airShirtController.migrate);
+//app.get('/previous-by-day', cache.route({ expire: 86400  }), airShirtController.past);
+//app.get('/airshits/date/:date', cache.route({ expire: 31540000  }), airShirtController.airshitByDate);
+//app.get('/airshits/:airshit', cache.route({ expire: 31540000  }), airShirtController.airshit);
 app.get('/vessels/photos', cache.route({ expire: 86400  }), airShirtController.getVesselPhotos);
 app.get('/vessels/:vessel/photos', cache.route({ expire: 86400  }), airShirtController.searchVesselPhoto);
 
