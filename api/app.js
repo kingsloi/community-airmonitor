@@ -113,7 +113,7 @@ app.use('/files', express.static('public/files'), serveIndex('public/files', {
   'stylesheet': path.join(__dirname, '../', 'client', 'public', 'directory-listing.css'),
 }))
 
-app.get('/currently', cache.route({ expire: 450  }), airShirtController.currently);
+app.get('/currently', cache.route({ expire: 30  }), airShirtController.currently);
 app.get('/highs', cache.route({ expire: 86400  }), airShirtController.highs);
 app.get('/sync', airShirtController.sync);
 app.get('/migrate', airShirtController.migrate);

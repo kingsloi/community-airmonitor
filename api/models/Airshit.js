@@ -4,7 +4,8 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const airshitSchema = new mongoose.Schema({
   LAST_READ_AT: String,
 
-  // GASES_LAST_READ_AT: String,
+  PM_LAST_READ_AT: String,
+  GASES_LAST_READ_AT: String,
 
   PM25REALTIME: {
     concentration: Number,

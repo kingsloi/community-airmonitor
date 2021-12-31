@@ -797,7 +797,7 @@ exports.migrate = async (req, res) => {
     }
 
     if (LAST_READ_AT) {
-      await Airshit.updateOne({ _id: airshit.id }, { $rename: { "LAST_READ_AT": "PM_LAST_READ_AT" } });
+      // await Airshit.updateOne({ _id: airshit.id }, { $rename: { "LAST_READ_AT": "PM_LAST_READ_AT" } });
     }
 
     if (VESSELS.length >= 0) {
