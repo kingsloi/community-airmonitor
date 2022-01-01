@@ -436,7 +436,7 @@
                 </span>
             </header>
             <div class="row">
-                <div class="col-xl-12 card-item card-item--airquality" id="airquality" v-if="datasets.length > 0">
+                <div class="col-xl-12 card-item card-item--airquality" id="airquality">
                     <div class="card border-left-0 border-right-0 border-bottom-0 border-top-0">
                         <div class="card-body px-0 pb-3">
                             <h2 class="h5 text-left mb-3 border-top border-bottom pt-2">
