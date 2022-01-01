@@ -19,10 +19,7 @@ const _ = require('lodash');
 const fs = require('fs');
 const cache = require('express-redis-cache')();
 
-/**
- * GET /
- * Home page.
- */
+
 exports.currently = async (req, res) => {
   const today = moment();
 
@@ -37,14 +34,7 @@ exports.currently = async (req, res) => {
 
   const weather      = await Weather.findOne({}, {}, { sort: { _id: -1 } });
 
-  const start = today.format('YYYY-MM-DD HH:mm:ss');
-  const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
-
-  const trend = await Airshit.find({ createdAt: {'$gte': end, '$lte': start } });
-
   return res.json({
-    trend,
-
     advisories,
     airshit,
     flight,
@@ -66,10 +56,15 @@ exports.currently = async (req, res) => {
   });
 };
 
-/**
- * GET /highs
- * Update the records.
- */
+exports.trend = async (req, res) => {
+  const start = today.format('YYYY-MM-DD HH:mm:ss');
+  const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
+
+  const trend = await Airshit.find({ createdAt: {'$gte': end, '$lte': start } });
+
+  return res.json({ trend });
+};
+
 exports.highs = (req, res) => {
   const today = moment();
 

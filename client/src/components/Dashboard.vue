@@ -436,11 +436,11 @@
                 </span>
             </header>
             <div class="row">
-                <div class="col-xl-12 card-item card-item--airquality" id="airquality">
+                <div class="col-xl-12 card-item card-item--airquality" id="airquality" v-if="datasets.length > 0">
                     <div class="card border-left-0 border-right-0 border-bottom-0 border-top-0">
                         <div class="card-body px-0 pb-3">
                             <h2 class="h5 text-left mb-3 border-top border-bottom pt-2">
-                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Air Quality Index Trend (last 14 days)</span>
+                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Air Quality Index Trend (last 7 days)</span>
                             </h2>
 
                             <div class="mx-n3">
@@ -852,59 +852,63 @@
                                 <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Southernmost Lake Michigan Advisories</span>
                             </h2>
 
-                            <div class="card-deck px-3">
-                                <div class="card col-md-6 col-lg-4" v-for="advisory in advisories.data" v-bind:key="advisory.id">
-                                    <div class="card-body py-4">
-                                        <h5 class="card-title mb-2"><a href="">{{ advisory.event }}</a></h5>
-                                        <div class="card-text">
-                                            <div class="clearfix mb-3">
-                                                <span class="badge badge-secondary ml-0">{{ advisory.severity }}</span>
-                                                <span class="badge badge-secondary ml-1">{{ advisory.certainty }}</span>
-                                                <span class="badge badge-secondary ml-1">{{ advisory.urgency }}</span>
-                                                <span class="badge badge-secondary ml-1">{{ advisory.response }}</span>
-                                            </div>
+                            <div class="row px-3">
+                                <div class=" col-sm-12 col-xl-4 mb-4 " v-for="advisory in advisories.data" v-bind:key="advisory.id">
+                                    <Div class="card">
+                                        <div class="card-body py-4">
+                                            <h5 class="card-title mb-2"><a href="">{{ advisory.event }}</a></h5>
+                                            <div class="card-text">
+                                                <div class="clearfix mb-3">
+                                                    <span class="badge badge-secondary ml-0">{{ advisory.severity }}</span>
+                                                    <span class="badge badge-secondary ml-1">{{ advisory.certainty }}</span>
+                                                    <span class="badge badge-secondary ml-1">{{ advisory.urgency }}</span>
+                                                    <span class="badge badge-secondary ml-1">{{ advisory.response }}</span>
+                                                </div>
 
-                                            <span class="d-block small text-right font-weight-bold">
-                                                effective:
-                                                <time datetime="2021-12-20 09:57" class="font-weight-light">{{ advisory.effective }}</time>
-                                            </span>
-                                            <span class="d-block small text-right font-weight-bold mb-3">
-                                                expires:
-                                                <time datetime="2021-12-20 09:57" class="font-weight-light d-blosck">{{ advisory.ends }}</time>
-                                                <span class="font-weight-light d-block">(in 3 hours)</span>
-                                            </span>
+                                                <span class="d-block small text-right font-weight-bold">
+                                                    effective:
+                                                    <time :datetime="advisory.effective" class="font-weight-light">{{ formatDateTime(advisory.effective) }}</time>
+                                                </span>
+                                                <span class="d-block small text-right font-weight-bold mb-3">
+                                                    expires:
+                                                    <time :datetime="advisory.ends" class="font-weight-light d-blosck">{{ formatDateTime(advisory.ends) }}</time>
+                                                    <span class="font-weight-light d-block ad-none">
+                                                        (in {{  formatDateTimeDiffToHuman(advisory.ends) }})
+                                                    </span>
+                                                </span>
 
-                                            <h4 class="small text-uppercase font-weight-bold mt-3 mb-0">affected areas</h4>
-                                            <small class="d-block">
-                                                <template v-for="zone in advisory.geocode">
-                                                    <a href="#" v-bind:key="zone" v-if="geography.region.lake_zones.includes(zone)" class="d-block">
-                                                        {{ zone }} - {{ lakeZones[zone] }}
-                                                    </a>
-                                                </template>
-                                            </small>
+                                                <h4 class="small text-uppercase font-weight-bold mt-3 mb-0">affected areas</h4>
+                                                <small class="d-block">
+                                                    <template v-for="zone in advisory.geocode">
+                                                        <a href="#" v-bind:key="zone" v-if="geography.region.lake_zones.includes(zone)" class="d-block">
+                                                            {{ zone }} - {{ lakeZones[zone] }}
+                                                        </a>
+                                                    </template>
+                                                </small>
 
-                                            <h4 class="small text-uppercase font-weight-bold mt-3 mb-0" v-if="advisory.instruction">instructions</h4>
-                                            <p class="" v-if="advisory.instruction">{{ convertToLineBreaks(advisory.instruction) }}</p>
+                                                <h4 class="small text-uppercase font-weight-bold mt-3 mb-0" v-if="advisory.instruction">instructions</h4>
+                                                <p class="" v-if="advisory.instruction">{{ convertToLineBreaks(advisory.instruction) }}</p>
 
-                                            <details class="mt-3">
-                                                <summary class="pb-1">
-                                                    <h4 class="small text-uppercase mb-0 font-weight-bold  d-inline-block">summary</h4>
-                                                </summary>
-                                                <p class="font-weight-light mb-0 pt-1 pl-3 ml-3" style="border-left: 5px solid #ccc; white-space: pre-line;"
-                                                    v-if="advisory.description"
-                                                >
-                                                    {{ convertToLineBreaks(advisory.description) }}
-                                                </p>
-                                            </details>
-                                        </div>
-                                    </div>
-                                    <div class="card-footer mx-n3">
-                                        <div class="text-muted d-block clearfix small">
-                                            <div class="">
-                                                <span>{{ advisory.senderName }}</span>
+                                                <details class="mt-3">
+                                                    <summary class="pb-1">
+                                                        <h4 class="small text-uppercase mb-0 font-weight-bold  d-inline-block">summary</h4>
+                                                    </summary>
+                                                    <p class="font-weight-light mb-0 pt-1 pl-3 ml-3" style="border-left: 5px solid #ccc; white-space: pre-line;"
+                                                        v-if="advisory.description"
+                                                    >
+                                                        {{ convertToLineBreaks(advisory.description) }}
+                                                    </p>
+                                                </details>
                                             </div>
                                         </div>
-                                    </div>
+                                        <div class="card-footer">
+                                            <div class="text-muted d-block clearfix small">
+                                                <div class="">
+                                                    <span>{{ advisory.senderName }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Div>
                                 </div>
                                 <div card col-md-6 col-lg-4 v-if="advisories.data.length === 0">
                                     <div class="card-body">&mdash;</div>
@@ -928,7 +932,7 @@
 
                     <section class="mb-5">
                         <div class="row row-xl-gutterless mb-2">
-                            <div class="col-4 ">
+                            <div class="col-6 col-lg-4 ">
                                 <div class="card br-0 overflow-hidden">
                                     <div class="card-header">
                                         <h5 class="mb-0 card-title text-uppercase small">Month</h5>
@@ -963,7 +967,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-4 pl-0 pl-xl-3">
+                            <div class="col-6 pl-0 pl-0 pl-xl-3 col-lg-4">
                                 <div class="card br-0 overflow-hidden">
                                     <div class="card-header">
                                         <h5 class="mb-0 card-title text-uppercase small">Year</h5>
@@ -998,7 +1002,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-4 pl-0 pl-xl-3">
+                            <div class="col-12 mt-3 mt-lg-0 pl-xl-3 col-lg-4">
                                 <div class="card br-0 overflow-hidden">
                                     <div class="card-header">
                                         <h5 class="mb-0 card-title text-uppercase small">All Time</h5>
@@ -1499,6 +1503,7 @@ export default {
     created () {
         this.getLatestValues();
         this.getHighestValues();
+        this.getTrendValues();
     },
 
     watch: {
@@ -1541,6 +1546,19 @@ export default {
             this.mapMaskActive = false;
         },
 
+        getTrendValues() {
+            API.get(`/trend`).then(response => {
+                this.$store.commit('setAirshits', response.data.trend);
+
+                this.initChart();
+                this.initPopper();
+            })
+            .catch(e => {
+                alert('error!');
+                console.log(e); // eslint-disable-line no-console
+            });
+        },
+
         getHighestValues() {
             API.get(`/highs`).then(response => {
                 this.$store.commit('setHistoricalHighs', response.data);
@@ -1553,7 +1571,6 @@ export default {
 
         getLatestValues() {
             API.get(`/currently`).then(response => {
-                this.$store.commit('setAirshits', response.data.trend);
                 this.$store.commit('setGeography', response.data.geography);
 
                 this.$store.commit('setAirshit', response.data.airshit);
@@ -1567,7 +1584,6 @@ export default {
                 if (response.data.weather) this.$store.commit('setWeather', response.data.weather);
 
                 this.initMap();
-                this.initChart();
             })
             .catch(e => {
                 alert('error!');
@@ -1777,6 +1793,16 @@ export default {
             return pm25 + pm10 + so2 + no2 + o3 + co;
         },
 
+        formatDateTime(datetime, format = 'Do MMM YYYY HH:mm') {
+            return moment(datetime).format(format);
+        },
+
+        formatDateTimeDiffToHuman(end) {
+            const moment1 = moment();
+            const moment2 = moment(end)
+            return moment.duration(moment1.diff(moment2)).humanize();
+        },
+
         formatDateTimeToLocal(datetime, format = 'Do MMM YY HH:mm') {
             return moment.utc(datetime).local().format(format);
         },
@@ -1800,7 +1826,6 @@ export default {
     },
 
     mounted() {
-        this.initPopper();
         $('body').scrollspy({ target: '#site-navigation', offset: 50 });
     },
 }
