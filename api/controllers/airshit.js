@@ -57,6 +57,7 @@ exports.currently = async (req, res) => {
 };
 
 exports.trend = async (req, res) => {
+  const today = moment();
   const start = today.format('YYYY-MM-DD HH:mm:ss');
   const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
 
