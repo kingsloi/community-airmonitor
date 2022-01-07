@@ -552,73 +552,7 @@ textarea {
     }
 }
 
-// Vue Trend Chart
-// -------------------------
-.vtc {
-    height: 250px;
-    font-size: 12px;
-    overflow: visible;
 
-    @include media-breakpoint-up(sm) {
-        height: 320px;
-    }
-
-    .labels {
-        stroke: rgba(0, 0, 0, 0.05);
-        .x-labels {
-            .label {
-                padding-top: 10px;
-                display: none;
-                &:first-child {
-                    display: block;
-                }
-                &:last-child {
-                    display: block;
-                }
-            }
-        }
-    }
-    .active-line {
-        stroke: rgba(0, 0, 0, 0.2);
-    }
-    .point {
-        stroke-width: 2;
-        transition: stroke-width 0.2s;
-    }
-    .point.is-active {
-        stroke-width: 5;
-    }
-}
-
-.tooltip {
-    opacity: 1;
-    position: absolute;
-    z-index: 10000000;
-    padding: 10px;
-    background: #fff;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-
-    &:not(.is-active) {
-        display: none;
-    }
-
-    &-data {
-        display: flex;
-        &-item {
-            display: flex;
-            align-items: center;
-
-            &:before {
-                content: "";
-                display: block;
-                width: 15px;
-                height: 15px;
-                margin-right: 5px;
-            }
-        }
-    }
-}
 
 // Build measurement-* classes for airquality chart
 // -------------------------

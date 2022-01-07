@@ -61,9 +61,15 @@ exports.trend = async (req, res) => {
   const start = today.format('YYYY-MM-DD HH:mm:ss');
   const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
 
-  const trend = await Airshit.find({ createdAt: {'$gte': end, '$lte': start } });
+  const weathers      = await Weather.find({ createdAt: {'$gte': end, '$lte': start } });
+  const advisories    = await Advisories.find({ createdAt: {'$gte': end, '$lte': start } });
+  const airshits      = await Airshit.find({ createdAt: {'$gte': end, '$lte': start } });
+  const flights       = await Flight.find({ createdAt: {'$gte': end, '$lte': start } });
+  const traffics      = await Traffic.find({ createdAt: {'$gte': end, '$lte': start } });
+  const trains        = await Train.find({ createdAt: {'$gte': end, '$lte': start } });
+  const vessels       = await Vessel.find({ createdAt: {'$gte': end, '$lte': start } });
 
-  return res.json({ trend });
+  return res.json({ weathers, advisories, airshits, flights, traffics, trains, vessels });
 };
 
 exports.highs = (req, res) => {

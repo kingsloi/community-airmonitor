@@ -440,38 +440,15 @@
                     <div class="card border-left-0 border-right-0 border-bottom-0 border-top-0">
                         <div class="card-body px-0 pb-3">
                             <h2 class="h5 text-left mb-3 border-top border-bottom pt-2">
-                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Air Quality Index Trend (last 7 days)</span>
+                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Trends (last 7 days)</span>
                             </h2>
 
-                            <div class="mx-n3">
-                                <trend-chart
-                                    :datasets="datasets"
-                                    :grid="trendgrid"
-                                    :labels="trendlabels"
-                                    :min="-1"
-                                    :interactive="true"
-                                    @mouse-move="onMouseMove"
-                                    class="airquality-trend"
-                                />
+                            <div class="mx-lg-auto w-lg-75" id="chart"></div>
 
-                                <div id="pop" role="tooltip" ref="tooltip" class="tooltip" :class="{ 'is-active': tooltipData }">
-                                    <div class="tooltip-container" v-if="tooltipData">
-                                        <strong class="d-block mb-2 border-bottom">{{ trendlabels.xLabels[tooltipData.index] }}</strong>
-                                        <div class="tooltip-data">
-                                            <template v-for="(m, mt, i) in measurementTypes">
-                                                <div class="d-block" v-bind:key="mt" :class="{'ml-4': i > 0}">
-                                                    <template v-for="(unit, className, ii) in measurements">
-                                                        <div class="tooltip-data-item" :class="className" v-bind:key="className" v-if="m.indexOf(unit) > -1">
-                                                            {{ unit.replace('REALTIME', '') }}: {{ tooltipData.data[ii] }}
-                                                        </div>
-                                                    </template>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
+                            <span v-if="Object.values(trend).flat().length === 0">
+                                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                                <span class="sr-only">Loading...</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -496,6 +473,16 @@
                                             <td>
                                                 <p class="lead mb-0 text-uppercase font-weight-bold" v-if="weather.data">
                                                     {{ weather.data.summary }}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <p class="lead mb-0 text-lowercase">Temperature</p>
+                                            </td>
+                                            <td>
+                                                <p class="lead mb-0 text-uppercase font-weight-bold" v-if="weather.data">
+                                                    {{ weather.data.apparentTemperature.toFixed(0) }}&deg;F
                                                 </p>
                                             </td>
                                         </tr>
@@ -677,7 +664,11 @@
                                                             <td>{{ incident.distance.toFixed(0) }} miles</td>
                                                             <td>{{ incident.freeFlowMinDelay.toFixed(0) }} mins</td>
                                                         </tr>
-
+                                                        <tr v-if="traffic.data.length === 0">
+                                                            <td colspan="3">
+                                                                no traffic
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </td>
@@ -738,6 +729,11 @@
                                                                 <small class="d-block pl-0 ml-0">{{ flight.speed.toFixed(0) }}mph</small>
                                                             </td>
                                                         </tr>
+                                                        <tr v-if="flights.data.length === 0">
+                                                            <td colspan="5">
+                                                                no flights
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </td>
@@ -756,7 +752,7 @@
                                             </td>
                                             <td>
                                                 <p class="lead mb-0">
-                                                    <span class="number--blurred" v-if="! vessels.data"></span>
+                                                    <span v-if="Object.keys(vesselsByType).length === 0">0 vessels</span>
                                                     <span v-else class="separator" v-for="(data, type) in vesselsByType" v-bind:key="type">
                                                         <span class="font-weight-bold">{{ data.length }}</span><small class="small font-weight-light">{{ type }}(s)</small>
                                                     </span>
@@ -792,6 +788,12 @@
                                                                     {{ vessel.width }}<span class="px-0 mx-0">x</span>{{ vessel.length }} (WxL)
                                                                 </span>
                                                                 <span class="d-block pl-0 ml-0" v-if="vessel.deadweight">{{ vessel.deadweight }} DWT</span>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr v-if="vessels.data.length === 0">
+                                                            <td colspan="5">
+                                                                no vessels
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -833,6 +835,11 @@
                                                             <td>{{ train.lat }}, {{ train.lng }}</td>
                                                             <td>{{ train.id }}</td>
                                                             <td>{{ train.direction }}</td>
+                                                        </tr>
+                                                        <tr v-if="trains.data.length === 0">
+                                                            <td colspan="3">
+                                                                no trains
+                                                            </td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -1307,8 +1314,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import L from 'leaflet';
 import moment from 'moment';
-import Popper from 'popper.js/dist/umd/popper.js';
-
+import ApexCharts from 'apexcharts/dist/apexcharts.esm.js';
 import { API } from '@/api';
 import megaemitters from '../config/megaemitters.js';
 import lmz742 from '../config/742-LMZ.js';
@@ -1354,10 +1360,12 @@ export default {
         airshitContainsGases() {
             return Object.keys(this.airshit.data).some(metric => this.measurementTypes.gases.indexOf(metric) > -1);
         },
+        trend() {
+            return this.$store.state.trend;
+        },
         airshits() {
             return this.$store.state.airshits;
         },
-
         airshit() {
             return this.$store.state.airshit;
         },
@@ -1481,22 +1489,6 @@ export default {
                 'measurement-5': 'O3REALTIME',
                 'measurement-6': 'COREALTIME'
             },
-
-            trendgrid: {
-                verticalLines: true,
-                horizontalLines: true
-            },
-
-            trendlabels: {
-                xLabels: [],
-
-                yLabels: 10,
-                yLabelsTextFormatter: val => val ? (Math.round(val * 100) / 100).toFixed(0) : 0
-            },
-
-            popper: null,
-            popperIsActive: false,
-            tooltipData: null,
         }
     },
 
@@ -1527,31 +1519,19 @@ export default {
             this.tooltipData = params || null;
         },
 
-        initPopper() {
-            const chart = document.querySelector(".airquality-trend");
-            const ref = chart.querySelector(".active-line");
-            const tooltip = this.$refs.tooltip;
-            this.popper = new Popper(ref, tooltip, {
-                placement: "right",
-                modifiers: {
-                    offset: { offset: '0,10' },
-                    preventOverflow: {
-                        boundariesElement: chart
-                    }
-                }
-            });
-        },
-
         removeMapMask() {
             this.mapMaskActive = false;
         },
 
         getTrendValues() {
             API.get(`/trend`).then(response => {
-                this.$store.commit('setAirshits', response.data.trend);
+                const { data: { weathers, airshits, flights, traffics, trains, vessels } } = response;
+
+                this.$store.commit('setTrend', {
+                    weathers, airshits, flights, traffics, trains, vessels
+                });
 
                 this.initChart();
-                this.initPopper();
             })
             .catch(e => {
                 alert('error!');
@@ -1590,27 +1570,200 @@ export default {
                 console.log(e); // eslint-disable-line no-console
             });
         },
-
         initChart() {
-            this.trendlabels.xLabels = (this.airshits || []).map(a => moment(a.createdAt).format('LLL').toString());
+            let datasets = [
+                { name: 'Traffic (max)', data: [] },
+                { name: 'Flights (max)', data: [] },
+                { name: 'Vessels (max)', data: [] },
+                { name: 'Trains (max)', data: [] },
+                { name: 'Wind Speed (avg)', data: [] },
+                { name: 'Temperature (avg)', data: [] },
+                { name: 'AQI (total)', data: [] },
+            ];
 
-            const datasets = [];
+            const { airshits, weathers, flights, vessels, trains, traffics } = this.trend;
 
-            for (const measurement in this.measurements) {
-                datasets.push({
-                    // default
-                    fill: false,
-                    smooth: true,
-                    showPoints: false,
+            let idx;
+            let filtered;
 
-                    // name and data
-                    className: measurement,
-                    data: (this.airshits || []).map(a => a[this.measurements[measurement]] || {}).map(a => a.aqi >= 0 ? a.aqi : -1),
-                });
+            const dates = [];
+            const start = moment().subtract(7, 'd');
+            const end   = moment().subtract(6, 'h');
+
+            while (start.isSameOrBefore(end)) {
+                dates.push(start.format('YYYY-MM-DD HH:mm:ss'));
+                start.add(6, 'hour');
             }
 
-            // remove all datapoints that are -1 (unset)
-            this.datasets = datasets.filter(d => [...new Set(d.data)].sort().toString() !== [-1].sort().toString());
+            for (const date of dates) {
+                let sum = [];
+
+                // 5:59:59 hours
+                const seriesend = moment(date).add(21599, 'second').format('YYYY-MM-DD HH:mm:ss');
+
+                filtered = airshits.filter((a) =>
+                    moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend)
+                );
+
+               for (const measurement in this.measurements) {
+                    const value = this.measurements[measurement];
+                    const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : -1);
+                    sum.push(...aqis.filter(e => e >= 0));
+                }
+
+                idx = datasets.findIndex(d => d.name === 'AQI (total)');
+                datasets[idx].data.push(this.max(sum));
+
+                // Weather
+                filtered = weathers.filter((a) =>moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
+
+                // Wind
+                idx = datasets.findIndex(d => d.name === 'Wind Speed (avg)');
+                datasets[idx]['data'].push(
+                    this.avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.windSpeed || 0))
+                );
+
+                // Temp
+                idx = datasets.findIndex(d => d.name === 'Temperature (avg)');
+                datasets[idx]['data'].push(
+                    this.avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.apparentTemperature || 0))
+                );
+
+                // FLights
+                filtered = flights.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
+                idx = datasets.findIndex(d => d.name === 'Flights (max)');
+                datasets[idx]['data'].push(
+                    this.max(filtered.map(a => a['FLIGHTS'] || {}).map(a => a.length || 0))
+                );
+
+                // vessels
+                filtered = vessels.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
+                idx = datasets.findIndex(d => d.name === 'Vessels (max)');
+                datasets[idx]['data'].push(
+                    this.max(filtered.map(a => a['VESSELS'] || {}).map(a => a.length) || 0)
+                );
+
+                // Trains
+                filtered = trains.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
+                idx = datasets.findIndex(d => d.name === 'Trains (max)');
+                datasets[idx]['data'].push(
+                    this.max(filtered.map(a => a['SOUTHSHORE'] || {}).map(a => a.length) || 0)
+                );
+
+                // traffic
+                filtered = traffics.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
+                idx = datasets.findIndex(d => d.name === 'Traffic (max)');
+                datasets[idx]['data'].push(
+                    this.max(filtered.map(a => a['INCIDENTS'] || []).map(a => a.reduce((sum, x) => sum + x.distance, 0) || 0) || [])
+                );
+            }
+
+            const colors = [
+                '#FF9800',
+                '#9DD866',
+                '#0B84A5',
+                '#F6C85F',
+                '#CA472F',
+                '#5bc0dd',
+                '#FFA056',
+                '#8DDDD0',
+                '#6F4E7C',
+                '#60bf60',
+            ];
+
+            const options = {
+                series: datasets,
+                chart: {
+                    height: 300,
+                    type: 'heatmap',
+                    toolbar: {
+                        show: false,
+                    }
+                },
+                plotOptions: {
+                    heatmap: {
+                        reverseNegativeShade: false,
+                        distributed: true,
+                        useFillColorAsStroke: false,
+                        colorScale: {
+                            inverse: false,
+                        },
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                colors: colors,
+                xaxis: {
+                    type: 'datetime',
+                    categories: dates
+                },
+                title: {},
+                grid: {},
+                tooltip: {
+                    x: {
+                        format: 'dd MMM yyyy HH:mm',
+                    },
+                    y: {
+                        formatter: (value, a) => {
+                            const { seriesIndex } = a;
+                            const { name } = datasets[seriesIndex];
+                            let format = '';
+                            switch (name) {
+                                case 'Traffic (max)':
+                                format = `${value} miles`
+                                break;
+                                case 'Wind Speed (avg)':
+                                format = `${value} mph`
+                                break;
+                                case 'Temperature (avg)':
+                                format = `${value}\xB0F`
+                                break;
+                                default:
+                                format = value;
+                            }
+
+                            return format;
+                        },
+                        title: {
+                            formatter: (seriesName) => {
+                                let format;
+                                switch (seriesName) {
+                                    case 'Traffic (max)':
+                                    format = ``
+                                    break;
+                                    case 'Wind Speed (avg)':
+                                    format = ``
+                                    break;
+                                    case 'Temperature (avg)':
+                                    format = ``
+                                    break;
+                                    case 'AQI (total)':
+                                    format = ``
+                                    break;
+                                    case 'Trains (max)':
+                                    format = ``
+                                    break;
+                                    case 'Vessels (max)':
+                                    format = ``
+                                    break;
+                                    case 'Flights (max)':
+                                    format = ``
+                                    break;
+                                    default:
+                                    format = seriesName;
+                                }
+
+                                return format;
+                            },
+                        },
+                    }
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+            chart.render();
         },
 
         initMap() {
@@ -1823,6 +1976,18 @@ export default {
             const regex = /\\n|\\r\\n|\\n\\r|\\r/g;
             return string.replace(regex, '<br>');
         },
+
+        sum(arr) {
+          return (arr.reduce((a, b) => a + b, 0)).toFixed(0);
+        },
+
+        avg(arr) {
+          return (this.sum(arr) / arr.length || 0).toFixed(0);
+        },
+
+        max(arr) {
+            return (Math.abs(Math.max(...arr)) !== Infinity ? Math.max(...arr) : 0).toFixed(0);
+        }
     },
 
     mounted() {

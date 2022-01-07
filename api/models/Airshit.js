@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
 const airshitSchema = new mongoose.Schema({
-  LAST_READ_AT: String,
-
   PM_LAST_READ_AT: String,
   GASES_LAST_READ_AT: String,
 
@@ -42,15 +40,6 @@ const airshitSchema = new mongoose.Schema({
     aqi: Number,
     category: String,
   },
-
-  REPORTED_WEATHER: {},
-  TRAINS: {},
-  TRAFFIC: {},
-  FLIGHTS: {},
-  VESSELS: [],
-  TEMP_F: String,
-  HUMIDITY_PERCENT: String,
-  PRESSURE_BAR: String,
 }, { timestamps: true });
 
 airshitSchema.plugin(mongoosePaginate);
