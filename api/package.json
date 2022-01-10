@@ -21,7 +21,7 @@
     "aqi-bot": "^1.1.4",
     "async": "^3.1.0",
     "axios": "^0.19.0",
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "chalk": "^2.4.2",
     "connect-history-api-fallback": "^1.6.0",
