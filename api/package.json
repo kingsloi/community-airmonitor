@@ -20,7 +20,7 @@
   "dependencies": {
     "aqi-bot": "^1.1.4",
     "async": "^3.1.0",
-    "axios": "^0.19.0",
+    "axios": "^0.21.2",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "chalk": "^2.4.2",
