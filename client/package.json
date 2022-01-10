@@ -18,6 +18,7 @@
     "jquery": "^3.4.1",
     "leaflet": "^1.6.0",
     "leaflet-rotatedmarker": "^0.2.0",
+    "lodash": "^4.17.21",
     "moment": "^2.24.0",
     "popper.js": "^1.16.0",
     "serve-index": "^1.9.1",
@@ -43,7 +44,8 @@
     "node-sass": "^4.13.0",
     "sass": "^1.23.7",
     "sass-loader": "^8.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "worker-plugin": "^5.0.1"
   },
   "eslintConfig": {
     "root": true,
