@@ -58,26 +58,11 @@ const state = {
     photos: {
         vessels: {}
     },
-
-    trend: {
-        weathers: [],
-        advisories: [],
-        airshits: [],
-        flights: [],
-        traffics: [],
-        trains: [],
-        vessels: [],
-    },
 };
 
 const mutations = {
     setGrouped (state, payload) {
         state.grouped = payload;
-    },
-    setTrend (state, payload) {
-        const { weathers, airshits, flights, traffics, trains, vessels } = payload;
-
-        state.trend = Object.freeze({ weathers, airshits, flights, traffics, trains, vessels });
     },
     setAirshits (state, payload) {
         state.airshits = payload;

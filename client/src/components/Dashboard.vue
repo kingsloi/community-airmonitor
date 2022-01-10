@@ -12,8 +12,6 @@
             <div class="row flex-xl-row-reverse">
 
                 <div class="col-xl-8 ">
-                    <a href="#" @click.prevent="startWorker">hello</a>
-                    {{ workerMessage }}
                     <div class="map-container" style="position: relative;" @click.prevent="mapMaskActive = false"
                         v-bind:class="{ 'map-container--has-mask': mapMaskActive }"
                     >
@@ -447,7 +445,7 @@
 
                             <div class="mx-lg-auto w-lg-75" id="chart"></div>
 
-                            <span v-if="Object.values(trend).flat().length === 0">
+                            <span v-if="loaded.trends === false">
                                 <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
                                 <span class="sr-only">Loading...</span>
                             </span>
@@ -1309,6 +1307,7 @@
 </template>
 
 <script>
+/* eslint-disable no-console */
 require('leaflet-rotatedmarker');
 // const geo = require('geolocation-utils');
 // import Worker from "../trend.worker.js";
@@ -1466,7 +1465,9 @@ export default {
 
     data() {
         return {
-            workerMessage: "No message yet",
+            loaded: {
+                trends: false,
+            },
 
             activeIndustries: [],
 
@@ -1509,9 +1510,10 @@ export default {
     },
 
     methods: {
-        startWorker(trends) {
-          trendWorker.send({ trends })
+        buildChart(trends) {
+          trendWorker.send({ trends, measurements: this.measurements })
         },
+
         getAirportFlights(airport) {
             return this.flights.data.filter((flight) => {
                 return flight.departing === airport || flight.arriving === airport;
@@ -1536,13 +1538,7 @@ export default {
             API.get(`/trend`).then(response => {
                 const { data: { weathers, airshits, flights, traffics, trains, vessels } } = response;
 
-                // this.$store.commit('setTrend', {
-                //     weathers, airshits, flights, traffics, trains, vessels
-                // });
-
-                const opts = this.startWorker({ weathers, airshits, flights, traffics, trains, vessels })
-
-                this.initChart(opts);
+                this.buildChart({ weathers, airshits, flights, traffics, trains, vessels })
             })
             .catch(e => {
                 alert('error!');
@@ -1812,10 +1808,12 @@ export default {
     },
 
     mounted() {
+        const self = this;
         $('body').scrollspy({ target: '#site-navigation', offset: 50 });
 
         trendWorker.worker.onmessage = event => {
-          console.log(event.data); // eslint-disable-line no-console
+            self.initChart(event.data);
+            self.loaded.trends = true;
         }
     },
 }

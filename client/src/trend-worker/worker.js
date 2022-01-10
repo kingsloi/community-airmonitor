@@ -1,7 +1,25 @@
+/* eslint-disable no-fallthrough */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-constant-condition */
+
 import moment from 'moment';
 
-addEventListener("message", async event => {
-  let trends = event.data.message.trends
+
+const sum = (arr) => {
+  return (arr.reduce((a, b) => a + b, 0)).toFixed(0);
+};
+
+const avg = (arr)  =>{
+  return (sum(arr) / arr.length || 0).toFixed(0);
+};
+
+const max = (arr) =>{
+    return (Math.abs(Math.max(...arr)) !== Infinity ? Math.max(...arr) : 0).toFixed(0);
+};
+
+addEventListener("message", event => {
+  let trends = event.data.message.trends;
+  let measurements = event.data.message.measurements;
 
   let datasets = [
     { name: 'Traffic (max)', data: [] },
@@ -37,14 +55,14 @@ addEventListener("message", async event => {
       moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend)
       );
 
-    for (const measurement in this.measurements) {
-      const value = this.measurements[measurement];
+    for (const measurement in measurements) {
+      const value = measurements[measurement];
       const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : -1);
       sum.push(...aqis.filter(e => e >= 0));
     }
 
     idx = datasets.findIndex(d => d.name === 'AQI (total)');
-    datasets[idx].data.push(this.max(sum));
+    datasets[idx].data.push(max(sum));
 
     // Weather
     filtered = weathers.filter((a) =>moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
@@ -52,41 +70,41 @@ addEventListener("message", async event => {
     // Wind
     idx = datasets.findIndex(d => d.name === 'Wind Speed (avg)');
     datasets[idx]['data'].push(
-      this.avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.windSpeed || 0))
+      avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.windSpeed || 0))
       );
 
     // Temp
     idx = datasets.findIndex(d => d.name === 'Temperature (avg)');
     datasets[idx]['data'].push(
-      this.avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.apparentTemperature || 0))
+      avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.apparentTemperature || 0))
       );
 
     // FLights
     filtered = flights.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Flights (max)');
     datasets[idx]['data'].push(
-      this.max(filtered.map(a => a['FLIGHTS'] || {}).map(a => a.length || 0))
+      max(filtered.map(a => a['FLIGHTS'] || {}).map(a => a.length || 0))
       );
 
     // vessels
     filtered = vessels.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Vessels (max)');
     datasets[idx]['data'].push(
-      this.max(filtered.map(a => a['VESSELS'] || {}).map(a => a.length) || 0)
+      max(filtered.map(a => a['VESSELS'] || {}).map(a => a.length) || 0)
       );
 
     // Trains
     filtered = trains.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Trains (max)');
     datasets[idx]['data'].push(
-      this.max(filtered.map(a => a['SOUTHSHORE'] || {}).map(a => a.length) || 0)
+      max(filtered.map(a => a['SOUTHSHORE'] || {}).map(a => a.length) || 0)
       );
 
     // traffic
     filtered = traffics.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Traffic (max)');
     datasets[idx]['data'].push(
-      this.max(filtered.map(a => a['INCIDENTS'] || []).map(a => a.reduce((sum, x) => sum + x.distance, 0) || 0) || [])
+      max(filtered.map(a => a['INCIDENTS'] || []).map(a => a.reduce((sum, x) => sum + x.distance, 0) || 0) || [])
       );
   }
 
@@ -193,5 +211,5 @@ addEventListener("message", async event => {
     }
   };
 
-  postMessage(options)
+  postMessage(JSON.parse(JSON.stringify(options)));
 });
