@@ -65,7 +65,7 @@ addEventListener("message", event => {
 
     for (const measurement in measurements) {
       const value = measurements[measurement];
-      const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : a.concentration);
+      const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : -1);
       sum.push(...aqis.filter(e => e >= 0));
 
       idx = datasets.findIndex(d => d.name === value.replace('REALTIME', ''));
