@@ -7,6 +7,9 @@ const Vessel = require('../models/Vessel');
 const VesselPhoto = require('../models/VesselPhoto');
 const Weather = require('../models/Weather');
 
+// const { gases } = require('../seeds/gases.js');
+// const { pms } = require('../seeds/pms.js');
+
 const moment = require('moment');
 const axios = require('axios');
 const aqibot = require('aqi-bot');
@@ -75,18 +78,18 @@ exports.trend = async (req, res) => {
 exports.highs = (req, res) => {
   const today = moment();
 
-  const startMonth = today.startOf('month').format('YYYY-MM-DD HH:mm:ss');
-  const endMonth = moment(startMonth).endOf('month').format('YYYY-MM-DD HH:mm:ss');
+  const startMonth = today.startOf('month').toDate();
+  const endMonth = moment(startMonth).endOf('month').toDate();
 
-  const startYear = today.startOf('year').format('YYYY-MM-DD HH:mm:ss');
-  const endYear = moment(startYear).endOf('year').format('YYYY-MM-DD HH:mm:ss');
+  const startYear = today.startOf('year').toDate();
+  const endYear = moment(startYear).endOf('year').toDate();
 
   async.series([
     (callback) => { // month high
       Airshit.find({ createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
     },
     (callback) => { // year high
-      Airshit.find({createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
+      Airshit.find({ createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
     },
     (callback) => { // all time high
       Airshit.aggregate([
@@ -449,216 +452,94 @@ exports.getPurpleAirAirQuality = async () => {
 
 exports.getAdvancedAirQuality = async () => {
   try {
-    // const { data: { token } } = await axios.post(`https://apitest.aqmeshdata.net/api/Authenticate`, {
-    //   username: process.env.AQMESH_USERNAME,
-    //   password: process.env.AQMESH_PASSWORD
-    // });
-    const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJPQVFNLUFQSSIsImp0aSI6ImEzNGYyNGVjLTlmNjctNDQ2MS1hOTk4LTQ3MDhiMGM2ZjhhOCIsIk1lbWJlcnNoaXBJZCI6IjExOTkiLCJTZXNzaW9uSWQiOiI2ZGI3MDJlMC1lZTQ0LTQ1NjItOTBkYS0yOWQwMTY5NjA2MTMiLCJJUF9BZGRyZXNzIjoiNDUuMjIuMzcuMTMxIiwiZXhwIjoxNjQwODIyMTAyLCJpc3MiOiJBUU1lc2guU2VjdXJpdHkuQmVhcmVyIiwiYXVkIjoiQVFNZXNoLlNlY3VyaXR5LkJlYXJlciJ9.wZHL2FA-EljODjoPeYmAxYgYC5_hg49J0elBTw4lJy4`;
-    // console.log(token);
+    const { data: { token } } = await axios.post(`https://apitest.aqmeshdata.net/api/Authenticate`, {
+      username: process.env.AQMESH_USERNAME,
+      password: process.env.AQMESH_PASSWORD
+    });
 
-    // const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/Pods/Assets`, {
-    //   headers: {
-    //     'authorization': `Bearer ${token}`
-    //   }
-    // });
-
-  // const locations = [
-  //   {
-  //     location_number: 915,
-  //     location_name: 'Location 2410103',
-  //     location_notes: null,
-  //     location_owner_number: 21,
-  //     location_latitude: 52.201599,
-  //     location_longitude: -1.726683,
-  //     location_altitude: null,
-  //     pod_number: 1204
-  //   }, { location_number: 911,
-  //     location_name: 'Location 2410103',
-  //     location_notes: null,
-  //     location_owner_number: 21,
-  //     location_latitude: 52.201599,
-  //     location_longitude: -1.726683,
-  //     location_altitude: null,
-  //     pod_number: 1204,
-  //   }
-  // ].map(p => p.location_number);
-
-  // const promises = []
-
-  // for (const i in locations) {
-  //   const location = locations[i];
-  //   const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/11`, {
-  //     headers: {
-  //       'authorization': `Bearer ${token}`
-  //     }
-  //   });
-  //   promises.push(data);
-  // }
-    const gases = [
-      {
-        "gas_reading_number": 3256954,
-        "location_number": 510,
-        "pod_serial_number": 2410149,
-        "owner_number": 8,
-        "reading_datestamp": "2019-04-19T09:15:00",
-        "gas_p1": 10,
-        "gas_p2": 900,
-        "gas_p3": 3600,
-        "gasprotocol_version": "v4.2.3",
-        "battery_voltage": 3.3,
-        "temperature_f": 54.7,
-        "pressure": 1024.5,
-        "humidity": 69.5,
-        "noise_level":-1000.0,
-        "peak_noise":-1000.0,
-        "co_sensor_serial_number": "162640361",
-        "co_state": "Reading",
-        "co_prescaled": 444.39,
-        "co_slope": 1.0574,
-        "co_offset":-76.2663,
-        "co_units": "μg/m³",
-        "no_sensor_serial_number": "160360435",
-        "no_state": "Reading",
-        "no_prescaled": 5.83,
-        "no_slope": 1.0000,
-        "no_offset": 0.0000,
-        "no_units": "μg/m³",
-        "so2_sensor_serial_number": "164642759",
-        "so2_state": "Reading",
-        "so2_prescaled":-1.09,
-        "so2_slope": 1.0000,
-        "so2_offset": 0.0000,
-        "so2_units": "μg/m³",
-        "no2_sensor_serial_number": "202363414",
-        "no2_state": "Reading",
-        "no2_prescaled": 3.59,
-        "no2_slope": 1.0000,
-        "no2_offset": 0.0000,
-        "no2_units": "μg/m³",
-        "o3_sensor_serial_number": "245500944",
-        "o3_state": "Reading",
-        "o3_prescaled": 57.06,
-        "o3_slope": 1.0000,
-        "o3_offset": 0.0000,
-        "o3_units": "μg/m³",
-        "h2s_sensor_serial_number": null,
-        "h2s_state": "Not Fitted",
-        "h2s_prescaled":-1000.00,
-        "h2s_slope": null,
-        "h2s_offset": null,
-        "h2s_units": "μg/m³","eo_sensor_serial_number": null,
-        "eo_state": "Not Fitted",
-        "eo_prescaled": -1000.00,
-        "eo_slope": null,
-        "eo_offset": null,
-        "eo_units": "μg/m³",
-        "uart_type": "CO2","uart_sensor_serial_number": null,
-        "uart_state": "Not Fitted",
-        "uart_prescaled": -1000.00,
-        "uart_slope": null,
-        "uart_offset": null,
-        "uart_units": "mg/m³",
-        "aux1_sensor_serial_number": null,
-        "aux1_type": "Not Fitted",
-        "aux1_state": "Not Fitted",
-        "aux1_prescaled": -1000.00,
-        "aux1_slope": 1.0000,
-        "aux1_offset": 0.0000,
-        "aux1_units": null,
-        "aux2_sensor_serial_number": null,
-        "aux2_type": "Not Fitted",
-        "aux2_state": "Not Fitted",
-        "aux2_prescaled": -1000.00,
-        "aux2_slope": 1.0000,
-        "aux2_offset": 0.0000,
-        "aux2_units": null,
-        "aux3": 1494.00,
-        "aux4": 0.00
+    const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/Pods/Assets_V1`, {
+      headers: {
+        'authorization': `Bearer ${token}`
       }
-    ];
+    });
 
-    const pm = [
-      {
-        "particle_reading_number": 15613118,
-        "location_number": 510,
-        "pod_serial_number": 2410149,
-        "owner_number": 8,
-        "reading_datestamp": "2019-03-08T15:11:00",
-        "particle_p1": 30,
-        "particle_p2": 60,
-        "particle_p3": 3600,
-        "particleprotocol_version": "v3.0",
-        "reading_status": "Other Fault Zero",
-        "battery_voltage": 3.0,
-        "battery_low": false,
-        "super_cap_voltage": 4.0,
-        "temperature_f": 48.920000,
-        "humidity": 66.2,
-        "pressure": 1003.1,
-        "particle_modem_overlap": false,
-        "pm10_prescale": -893.00,
-        "pm10_slope": 1.0000,
-        "pm10_offset": 0.0000,
-        "pm_course_prescale": -1000.0,
-        "pm_course_slope": 1.0,
-        "pm_course_offset": 0.0,
-        "pm4_prescale": -893.00,
-        "pm4_slope": 1.0000,
-        "pm4_offset": 0.0000,
-        "pm2_5_prescale": -893.00,
-        "pm2_5_slope": 1.0000,
-        "pm2_5_offset": 0.0000,
-        "pm1_prescale": -893.00,
-        "pm1_slope": 1.0000,
-        "pm1_offset": 0.0000,
-        "pm_total_prescale": -893.00,
-        "pm_total_slope": 1.0000,
-        "pm_total_offset": 0.0000
+    const locations = data.map(p => p.location_number);
+
+    const promises = [];
+
+    for (const i in locations) {
+      const location = locations[i];
+
+      // GAS, F, µg/m3: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/11
+      // PM, F, PPB   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/10
+      const sensors = ['1/11', '2/10'];
+
+      for (const x in sensors) {
+        const params = sensors[x];
+
+        const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
+          headers: {
+            'authorization': `Bearer ${token}`
+          }
+        });
+        promises.push(data);
       }
-    ]
-/*
-    console.log(
-      pm.map((e) => ({
-        pm1_prescale: e.pm1_prescale,
-        pm2_5_prescale: e.pm2_5_prescale,
-        pm10_prescale: e.pm10_prescale,
-      }))
-    );
+    }
 
-    console.log(
-      gases.map((e) => ({
-        co_prescaled: e.co_prescaled,
-        no_prescaled: e.no_prescaled,
-        so2_prescaled: e.so2_prescaled,
-        no2_prescaled: e.no2_prescaled,
-        o3_prescaled: e.o3_prescaled,
-        h2s_prescaled: e.h2s_prescaled,
-        eo_prescaled: e.eo_prescaled,
-        uart_prescaled: e.uart_prescaled
-      }))
-    );
-*/
+    const [ gases, pms ] = await Promise.all(promises);
 
-    const aqiso2 = await aqibot.AQICalculator.getAQIResult('SO2', 13.370);
-    const aqino2 = await aqibot.AQICalculator.getAQIResult('NO2', 13.370);
-    const aqio3 = await aqibot.AQICalculator.getAQIResult('O3', 13.370);
-    const aqico = await aqibot.AQICalculator.getAQIResult('CO', 13.370);
+    const measurements = [];
 
-    const aqi25 = await aqibot.AQICalculator.getAQIResult('PM2.5', 50.54);
-    const aqi10 = await aqibot.AQICalculator.getAQIResult('PM10', 39.145);
+    let combined = [...pms, ...gases].filter(e => moment(e.reading_datestamp).isBetween(moment().subtract(100, 'd'), moment()));
 
-    return {
-      PM25REALTIME: aqi25,
-      PM10REALTIME: aqi10,
+    // as gases and PM are from two different endpoints, combine 'em by date
+    const grouped = _.groupBy(combined, (p) => moment(p.reading_datestamp).format('YYYY-MM-DD HH:mm:ss'));
 
-      SO2REALTIME: aqiso2,
-      NO2REALTIME: aqino2,
-      O3REALTIME: aqio3,
-      COREALTIME: aqico,
+    // loop through all combined pollutants
+    for await (const timestamp of Object.keys(grouped)) {
 
-      GASES_LAST_READ_AT: gases[0].reading_datestamp,
-      PM_LAST_READ_AT: pm[0].reading_datestamp,
-    };
+      const pollutants = grouped[timestamp];
+
+      // loop through all pollutants, grab their measurement, and get the AQI for it
+      for (const idx in pollutants) {
+        const measurement = pollutants[idx];
+
+        // Only get the data we're interested in
+        await ['pm1', 'pm2_5', 'pm4', 'pm10', 'co', 'no', 'no2', 'so2', 'o3', 'h2s', 'eo', 'aux1', 'aux2'].forEach(async (pollutant) => {
+
+          // Normalise pollutant name
+          const key = `${pollutant.replace('_','').toUpperCase()}REALTIME`;
+
+          // grab the pollutant values
+          // PM = reading_status === 'OK'
+          // Gas = <gas>_state === 'Reading'
+          let value, units;
+          if (pollutant.startsWith('pm') && measurement['reading_status'] === 'OK') {
+            value = measurement[`${pollutant}_prescale`];
+          } else if (measurement[`${pollutant}_state`] === 'Reading') {
+            value = measurement[`${pollutant}_prescaled`];
+            units = measurement[`${pollutant}_units`];
+          }
+
+          // filter 'em
+          if (value === null || value === undefined || value === '' || value === false) return;
+
+          if (! measurements[timestamp]) {
+            measurements[timestamp] = {};
+          }
+
+          // try get the AQI result
+          try {
+            const { concentration, aqi, category } = await aqibot.AQICalculator.getAQIResult(pollutant.toUpperCase().replace('_','.'), value);
+            measurements[timestamp][key] = { concentration, aqi, category, units };
+          } catch (e) {
+            measurements[timestamp][key] = { concentration: value, aqi: null, category: null, units };
+          }
+        });
+      }
+    }
+
+    return await measurements;
   } catch (e) {
     console.error(e);
     return {};
@@ -746,8 +627,11 @@ exports.sync = async (req, res) => {
       case 'airquality-advanced':
         const advanced = await module.exports.getAdvancedAirQuality();
 
-        model = new Airshit(advanced);
-        await model.save();
+        for (const datetime in advanced) {
+          const record = advanced[datetime];
+          model = new Airshit({...record, createdAt: datetime});
+          await model.save();
+        }
 
         metrics.airquality.advanced = advanced;
       break;
@@ -897,7 +781,7 @@ exports.getVesselPhotos = async (req, res) => {
 
   const shippingApiKey = process.env.FLEETMON_API_KEY;
 
-  const vessels = await Vessel.find();
+  const vessels = await VesselPhoto.find();
   const mapped = _.reduce(vessels, (carry, vessel) => {
     carry[vessel.imoNumber] = vessel.photo;
     return carry;
@@ -908,9 +792,15 @@ exports.getVesselPhotos = async (req, res) => {
 
 exports.searchVesselPhoto = async (req, res) => {
   const { vessel } = req.params;
+  const { hash } = req.query;
+
+  if (hash !== process.env.SYNC_SECRET_HASH) {
+    res.status(400).end();
+  }
+
   const shippingApiKey = process.env.FLEETMON_API_KEY;
 
-  const found = await Vessel.findOne({ imoNumber: vessel });
+  const found = await VesselPhoto.findOne({ imoNumber: vessel });
 
   if (found) {
     return res.json({ success: false, photo: found.photo });
@@ -921,7 +811,7 @@ exports.searchVesselPhoto = async (req, res) => {
   if (response.data.vessels.length > 0) {
     const photo = response.data.vessels[0].image_url;
 
-    const vesselstamp = new Vessel({
+    const vesselstamp = new VesselPhoto({
       imoNumber: vessel, photo
     });
 

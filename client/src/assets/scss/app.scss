@@ -352,6 +352,10 @@ textarea {
 
         @extend .text-white;
     }
+
+    &--unsure {
+        background: rgba(#6F4E7C, 0.25);
+    }
 }
 
 .aqi-stat {

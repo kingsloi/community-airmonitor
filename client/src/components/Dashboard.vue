@@ -5,7 +5,7 @@
                 <small class="site-sub-heading d-block h6 font-weight-light mb-2 mb-md-1">the weather, air quality, lake advisories, &amp; industry in/around</small>
                 <span class="site-heading mt-n1 d-block">Miller Beach, Gary, Indiana</span>
             </h1>
-            <span class="d-inline-block mb-0 h6 mt-0">lasted updated <span class="highlighted">{{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }}</span> ago</span>
+            <span class="d-inline-block mb-0 h6 mt-0">lasted updated <span class="highlighted">{{ getLatestUpdated() }}</span> ago</span>
         </header>
 
         <section class="container pb-10" id="visuals">
@@ -85,49 +85,41 @@
                     <div class="stat stat--pm mt-4">
                         <h2 class="small text-uppercase clearfix">Particulate Matter</h2>
                         <!-- <small class="float-right text-muted text-right">updated: {{ airshit.createdAt }}</small> -->
-                        <div class="row row-cols-3">
+                        <div class="row row-cols-4">
 
-                            <!-- PM2.5 -->
-                            <div class="col">
-                                <div class="aqi-card h-100 aqi" v-if="airshit.data.PM25REALTIME"
-                                  :class="getAqiScoreClassname((airshit.data.PM25REALTIME ? airshit.data.PM25REALTIME['category'] : 'Good'))"
-                                >
-                                  <div class="card-body small py-1">
-                                    <p class="text-uppercase font-weight-bold mb-0">PM2.5</p>
-                                    <p class="font-weight-bold mb-0 lead">
-                                      <span class="number--blurred" v-if="! airshit.data.PM25REALTIME"></span>
-                                      <span v-else>{{ airshit.data.PM25REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <p class="mb-0 text-uppercase font-weight-bold ">
-                                      <span class="text--blurred" v-if="! airshit.data.PM25REALTIME"></span>
-                                      <template v-else>
-                                        <small class="font-size-80 d-block mx-n1"><span class="text-lowercase">{{  airshit.data.PM25REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                      </template>
-                                    </p>
-                                  </div>
-                                </div>
-                            </div>
+                            <template v-for="pm in measurementTypes.pm">
+                                <div class="col" v-if="airshit.data[pm]" v-bind:key="pm">
+                                    <div class="aqi-card h-100 "
+                                      :class="getAqiScoreClassname((airshit.data[pm] ? airshit.data[pm]['category'] : 'unsure'))"
+                                    >
+                                        <div class="card-body small py-1">
+                                            <p class="text-uppercase font-weight-bold mb-0">{{ getRealPollutantName(pm) }}</p>
 
-                            <!-- PM10 -->
-                            <div class="col">
-                                <div class="aqi-card h-100 " v-if="airshit.data.PM10REALTIME"
-                                  :class="getAqiScoreClassname((airshit.data.PM10REALTIME ? airshit.data.PM10REALTIME['category'] : 'Good'))"
-                                >
-                                  <div class="card-body small py-1">
-                                    <p class="text-uppercase font-weight-bold mb-0">PM10</p>
-                                    <p class="font-weight-bold mb-0 lead">
-                                      <span class="number--blurred" v-if="! airshit.data.PM10REALTIME"></span>
-                                      <span v-else>{{ airshit.data.PM10REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <p class=" mb-0 text-uppercase font-weight-bold">
-                                      <span class="text--blurred" v-if="! airshit.data.PM10REALTIME"></span>
-                                      <template v-else>
-                                        <small class="font-size-80 d-block mx-n1"><span class="text-lowercase">{{  airshit.data.PM10REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                      </template>
-                                    </p>
-                                  </div>
+                                            <!-- aqi -->
+                                            <p class="font-weight-bold mb-0 lead">
+                                              <span class="number--blurred" v-if="! airshit.data[pm]"></span>
+                                              <span v-else>{{ airshit.data[pm]['aqi'] }}</span>
+                                            </p>
+
+                                            <!-- concentration -->
+                                            <p class="mb-0 font-weight-bold">
+                                                <span class="text--blurred" v-if="! airshit.data[pm]"></span>
+
+                                                <template v-else-if="! airshit.data[pm]['aqi']">
+                                                    <span class="lead font-weight-bold text-lowercase d-block">
+                                                        {{ airshit.data[pm]['concentration'].toFixed(0) }} </span> ppb
+                                                </template>
+
+                                                <template v-else>
+                                                    <small class="font-size-80 d-block mx-n1">
+                                                        <span class="text-lowercase">{{ airshit.data[pm]['concentration'] }} &#181;</span>g/m<sup>3</sup>
+                                                    </small>
+                                                </template>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </template>
                         </div>
                     </div>
 
@@ -136,90 +128,41 @@
                     >
 
                         <h2 class="small text-uppercase">Gases</h2>
+
                         <div class="row">
-                            <!-- SO2 -->
-                            <div class="col">
-                                <div class="aqi-card h-100 " v-if="airshit.data.SO2REALTIME"
-                                  :class="getAqiScoreClassname((airshit.data.SO2REALTIME ? airshit.data.SO2REALTIME['category'] : 'Good'))"
-                                >
-                                  <div class="card-body small py-1">
-                                    <p class="text-uppercase font-weight-bold mb-0">SO2</p>
-                                    <p class="font-weight-bold mb-0 lead">
-                                      <span class="number--blurred" v-if="! airshit.data.SO2REALTIME"></span>
-                                      <span v-else>{{ airshit.data.SO2REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <p class=" mb-0 text-uppercase font-weight-bold">
-                                      <span class="text--blurred" v-if="! airshit.data.SO2REALTIME"></span>
-                                      <template v-else>
-                                        <small class="font-size-80 d-block mx-n1"><span class="text-lowercase">{{  airshit.data.SO2REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                      </template>
-                                    </p>
-                                  </div>
-                                </div>
-                            </div>
+                            <template v-for="gas in measurementTypes.gases">
+                                <div class="col" v-if="airshit.data[gas]" v-bind:key="gas">
+                                    <div class="aqi-card h-100 "
+                                      :class="getAqiScoreClassname((airshit.data[gas] ? airshit.data[gas]['category'] : 'unsure'))"
+                                    >
+                                        <div class="card-body small py-1">
+                                            <p class="text-uppercase font-weight-bold mb-0">{{ getRealPollutantName(gas) }}</p>
 
-                            <!-- CO -->
-                            <div class="col">
-                                <div class="aqi-card h-100 " v-if="airshit.data.COREALTIME"
-                                  :class="getAqiScoreClassname((airshit.data.COREALTIME ? airshit.data.COREALTIME['category'] : 'Good'))"
-                                >
-                                  <div class="card-body small py-1">
-                                    <p class="text-uppercase font-weight-bold mb-0">CO</p>
-                                    <p class="font-weight-bold mb-0 lead">
-                                      <span class="number--blurred" v-if="! airshit.data.COREALTIME"></span>
-                                      <span v-else>{{ airshit.data.COREALTIME['aqi'] }}</span>
-                                    </p>
-                                    <p class=" mb-0 text-uppercase font-weight-bold">
-                                      <span class="text--blurred" v-if="! airshit.data.COREALTIME"></span>
-                                      <template v-else>
-                                        <small class="font-size-80 d-block mx-n1"><span class="text-lowercase">{{  airshit.data.COREALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                      </template>
-                                    </p>
-                                  </div>
-                                </div>
-                            </div>
+                                            <!-- aqi -->
+                                            <p class="font-weight-bold mb-0 lead">
+                                              <span class="number--blurred" v-if="! airshit.data[gas]"></span>
+                                              <span v-else>{{ airshit.data[gas]['aqi'] }}</span>
+                                            </p>
 
-                            <!-- NO2 -->
-                            <div class="col">
-                                <div class="aqi-card h-100 " v-if="airshit.data.NO2REALTIME"
-                                  :class="getAqiScoreClassname((airshit.data.NO2REALTIME ? airshit.data.NO2REALTIME['category'] : 'Good'))"
-                                >
-                                  <div class="card-body small py-1">
-                                    <p class="text-uppercase font-weight-bold mb-0">NO2</p>
-                                    <p class="font-weight-bold mb-0 lead">
-                                      <span class="number--blurred" v-if="! airshit.data.NO2REALTIME"></span>
-                                      <span v-else>{{ airshit.data.NO2REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <p class=" mb-0 text-uppercase font-weight-bold">
-                                      <span class="text--blurred" v-if="! airshit.data.NO2REALTIME"></span>
-                                      <template v-else>
-                                        <small class="font-size-80 d-block mx-n1"><span class="text-lowercase">{{  airshit.data.NO2REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                      </template>
-                                    </p>
-                                  </div>
-                                </div>
-                            </div>
+                                            <!-- concentration -->
+                                            <p class="mb-0 font-weight-bold">
+                                                <span class="text--blurred" v-if="! airshit.data[gas]"></span>
 
-                            <!-- O3 -->
-                            <div class="col">
-                                <div class="aqi-card h-100 " v-if="airshit.data.O3REALTIME"
-                                  :class="getAqiScoreClassname((airshit.data.O3REALTIME ? airshit.data.O3REALTIME['category'] : 'Good'))"
-                                >
-                                  <div class="card-body small py-1">
-                                    <p class="text-uppercase font-weight-bold mb-0">O3</p>
-                                    <p class="font-weight-bold mb-0 lead">
-                                      <span class="number--blurred" v-if="! airshit.data.O3REALTIME"></span>
-                                      <span v-else>{{ airshit.data.O3REALTIME['aqi'] }}</span>
-                                    </p>
-                                    <p class=" mb-0 text-uppercase font-weight-bold">
-                                      <span class="text--blurred" v-if="! airshit.data.O3REALTIME"></span>
-                                      <template v-else>
-                                        <small class="font-size-80 d-block mx-n1"><span class="text-lowercase">{{  airshit.data.O3REALTIME['concentration'] }} &#181;</span>g/m<sup>3</sup></small>
-                                      </template>
-                                    </p>
-                                  </div>
+                                                <template v-else-if="airshit.data[gas]['aqi'] === null">
+                                                    <span class="lead font-weight-bold text-lowercase d-block">
+                                                    {{ airshit.data[gas]['concentration'].toFixed(0) }} </span> {{ airshit.data[gas]['units'] }}
+                                                </template>
+
+                                                <template v-else>
+                                                    <small class="font-size-80 d-block mx-n1">
+                                                        <span class="text-lowercase">{{ airshit.data[gas]['concentration'] }} &#181;</span>g/m<sup>3</sup>
+                                                    </small>
+                                                </template>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </template>
                         </div>
                     </div>
 
@@ -299,7 +242,7 @@
                     <div class="stat stat--advisories mt-4">
                         <h2 class="small text-uppercase">Southernmost Lake Michigan Advisories</h2>
                         <div class="row">
-                            <!-- dvisories -->
+                            <!-- advisories -->
                             <div class="col" >
                                 <div class="aqi-card h-100 aqi">
                                   <div class="card-body small py-1">
@@ -307,19 +250,12 @@
                                       <span>{{ advisories.data.length }}</span>
                                     </p>
                                     <ul class="list-unstyled pl-0 mb-0">
-                                        <template v-for="advisory in advisories.data">
-                                           <li class="text-uppercase font-weight-bold" v-bind:key="advisory.id">
+                                        <template v-for="(zoneAdvisories, zone) in advisoriesByZone()">
+                                            <li class="text-uppercase font-weight-bold" v-bind:key="zone">{{ lakeZones[zone] }}</li>
+                                            <li v-for="advisory in zoneAdvisories" class="text-uppercase font-weight-bold" v-bind:key="`id:${zone}-${advisory.id}`">
                                                 <small class="font-size-80 d-block">
                                                     {{ advisory.event }}
                                                 </small>
-                                                <template  v-if="advisory.geocode.filter(f => geography.region.lake_zones.includes(f)).length > 0">
-                                                    <small class="d-block pl-1"
-                                                        v-for="zone in advisory.geocode.filter(f => geography.region.lake_zones.includes(f)).map(c => lakeZones[c])"
-                                                        v-bind:key="zone"
-                                                    >
-                                                        - {{ zone }}
-                                                    </small>
-                                                </template>
                                                 <span class="small d-block divider">&mdash;</span>
                                             </li>
                                         </template>
@@ -333,7 +269,7 @@
                     <div class="mb-0 small text-xl-right text-center mt-3" id="poweredbys">
                         <p class="mb-0" v-if="Object.keys(geography).length > 0">
                             <span class="d-block mb-2">
-                                AIS, {{ Object.keys(airshit.data).map(e => e.replace('REALTIME','')).join(', ') }} recorded at base station.
+                                AIS, {{ Object.keys(airshit.data).map(e => getRealPollutantName(e)).join(', ') }} recorded at base station.
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago)</span>
                             </span>
                             <span class="d-block">
@@ -355,6 +291,10 @@
                             <span class="d-block">
                                 Vessel Tracking: <a href="https://www.fleetmon.com/my/ais-stations?utm_source=gary-indiana-opensource-air-monitor-footer" target="_blank">FleetMon.com</a>
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-01">(updated {{ formatDateTimeDiffToLocalHuman(vessels.createdAt) }} ago)</span>
+                            </span>
+                            <span class="d-block">
+                                Lake Advisories: <a href="https://forecast.weather.gov/product.php?site=lot&product=nsh&issuedby=lot" target="_blank">weather.gov</a>
+                                <span class="text-right mt-0 ml-1 d-inline-block small mb-01">(updated {{ formatDateTimeDiffToLocalHuman(advisories.createdAt) }} ago)</span>
                             </span>
                         </p>
                     </div>
@@ -774,7 +714,9 @@
                                                     <tbody>
                                                         <tr class="small text-uppercase" v-for="vessel in vessels.data" v-bind:key="vessel.id">
                                                             <td class="p-0">
-                                                                <!-- <img width="75px;" src="https://photos.fleetmon.com/vessels/harbor-king_1703936_1301775_Large.jpg" /> -->
+                                                                <a :href="getVesselPhoto(vessel.imo)" v-if="getVesselPhoto(vessel.imo)" target="_blank">
+                                                                    <img width="75px;" :src="getVesselPhoto(vessel.imo)" />
+                                                                </a>
                                                             </td>
                                                             <td>
                                                                 {{ vessel.name }}
@@ -1361,7 +1303,7 @@ export default {
             return process.env.VUE_APP_API_URL;
         },
         airshitContainsGases() {
-            return Object.keys(this.airshit.data).some(metric => this.measurementTypes.gases.indexOf(metric) > -1);
+            return Object.keys(this.airshit.data).filter(e => this.airshit.data[e]).some(metric => this.measurementTypes.gases.indexOf(metric) > -1);
         },
         trend() {
             return this.$store.state.trend;
@@ -1484,17 +1426,21 @@ export default {
             },
 
             measurementTypes: {
-                pm:     ['PM25REALTIME', 'PM10REALTIME'],
-                gases:  ['SO2REALTIME', 'NO2REALTIME', 'O3REALTIME', 'COREALTIME'],
+                pm:     ['PM1REALTIME','PM25REALTIME', 'PM4REALTIME', 'PM10REALTIME'],
+                gases:  ['SO2REALTIME', 'NOREALTIME', 'NO2REALTIME', 'O3REALTIME', 'COREALTIME'],
             },
 
             measurements: {
-                'measurement-1': 'PM25REALTIME',
-                'measurement-2': 'PM10REALTIME',
-                'measurement-3': 'SO2REALTIME',
-                'measurement-4': 'NO2REALTIME',
-                'measurement-5': 'O3REALTIME',
-                'measurement-6': 'COREALTIME'
+                'measurement-1': 'PM1REALTIME',
+                'measurement-2': 'PM25REALTIME',
+                'measurement-3': 'PM4REALTIME',
+                'measurement-4': 'PM10REALTIME',
+
+                'measurement-5': 'SO2REALTIME',
+                'measurement-6': 'NOREALTIME',
+                'measurement-7': 'NO2REALTIME',
+                'measurement-8': 'O3REALTIME',
+                'measurement-9': 'COREALTIME'
             },
         }
     },
@@ -1522,12 +1468,6 @@ export default {
 
         toggle(variable, value) {
             this[variable] = this[variable].includes(value) ? this[variable].filter(i => i !== value) : [ ...this[variable], value ];
-        },
-
-        onMouseMove(params) {
-            this.popperIsActive = !!params;
-            this.popper.scheduleUpdate();
-            this.tooltipData = params || null;
         },
 
         removeMapMask() {
@@ -1577,6 +1517,7 @@ export default {
                 console.log(e); // eslint-disable-line no-console
             });
         },
+
         initChart(options) {
             const chart = new ApexCharts(document.querySelector("#chart"), options);
 
@@ -1624,35 +1565,34 @@ export default {
                 L.marker([ shit.lat, shit.lng ], { icon: shitIcon }).bindPopup(`${shit.name}`).addTo(map);
             });
 
-            // console.log();// eslint-disable-line no-console
             const advisory = (zone) => this.advisories.data.map(a => a.geocode).filter(a => a.indexOf(zone.toUpperCase()) !== -1 ).length > 0 ? '#ff4433' : '#3388ff';
 
             L.polygon(
                 lmz742.map(ll => ll.reverse()), { color: advisory('lmz742'), fillColor: advisory('lmz742'), fillOpacity: 0.15, opacity: 0.15 }
             )
             .addTo(map)
-            .bindPopup("LMZ742: Northerly Island IL, Calumet Harbor IL");
+            .bindPopup(this.generateAdvisoryPopup('lmz742'));
 
             L.polygon(
                 lmz743.map(ll => ll.reverse()), { color: advisory('lmz743'), fillColor: advisory('lmz743'), fillOpacity: 0.15, opacity: 0.15 }
             )
             .addTo(map)
-            .bindPopup("LMZ743: Calumet Harbor, IL to Gary, IN");
+            .bindPopup(this.generateAdvisoryPopup('lmz743'));
 
             L.polygon(
                 lmz744.map(ll => ll.reverse()), { color: advisory('lmz744'), fillColor: advisory('lmz744'), fillOpacity: 0.15, opacity: 0.15 }
             ).addTo(map)
-            .bindPopup("LMZ744: Gary, IN to Burns Harbor, IN");
+            .bindPopup(this.generateAdvisoryPopup('lmz744'));
 
             L.polygon(
                 lmz745.map(ll => ll.reverse()), { color: advisory('lmz745'), fillColor: advisory('lmz745'), fillOpacity: 0.15, opacity: 0.15 }
             ).addTo(map)
-            .bindPopup("LMZ745: Burns Harbor, IN to Michigan City, IN");
+            .bindPopup(this.generateAdvisoryPopup('lmz745'));
 
             L.polygon(
                 lmz046.map(ll => ll.reverse()), { color: advisory('lmz046'), fillColor: advisory('lmz046'), fillOpacity: 0.15, opacity: 0.15 }
             ).addTo(map)
-            .bindPopup("LMZ046: Michigan City, IN to New Buffalo, MI");
+            .bindPopup(this.generateAdvisoryPopup('lmz046'));
 
             L.marker([this.geography.sensor.lat, this.geography.sensor.lng], { icon: sensorIcon }).bindPopup(`
                 Base Station, PM2.5/PM10 sensor, AIS antenna, and reported weather are recorded from this location.
@@ -1680,6 +1620,7 @@ export default {
             self.vessels.data.forEach((vessel) => {
                 const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
                 L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
+                    ${(this.getVesselPhoto(vessel.imo) ? `<img class="mw-100 mb-2" src="${ this.getVesselPhoto(vessel.imo) }" />` : ' ')}
                     Name: ${vessel.name}<br>
                     IMO: ${ vessel.imo || '-' }<br>
                     MMSI: ${vessel.id}<br>
@@ -1746,6 +1687,9 @@ export default {
                     return 'aqi--unhealthy-very';
                 case 'Hazardous':
                     return 'aqi--death';
+                case 'unsure':
+                default:
+                    return 'aqi--unsure';
             }
         },
 
@@ -1804,7 +1748,83 @@ export default {
 
         max(arr) {
             return (Math.abs(Math.max(...arr)) !== Infinity ? Math.max(...arr) : 0).toFixed(0);
-        }
+        },
+
+        getLatestUpdated() {
+            const dates = [
+                new Date(this.flights.createdAt),
+                new Date(this.vessels.createdAt),
+                new Date(this.trains.createdAt),
+                new Date(this.traffic.createdAt),
+                new Date(this.airshit.createdAt)
+            ];
+
+            return this.formatDateTimeDiffToLocalHuman(new Date(Math.max(...dates)));
+        },
+
+        advisoriesByZone(filter) {
+            const { data: advisories } = this.advisories;
+
+            const locations = {};
+
+            let zones = advisories.map(f => f.geocode).flat();
+
+            if (filter) {
+                zones = zones.filter(z => z === filter);
+            }
+
+            for (const zone of zones) {
+                locations[zone] = advisories.filter(a => a.geocode.indexOf(zone) > -1 && this.lakeZones[zone]);
+            }
+
+            return locations;
+        },
+
+        generateAdvisoryPopup(e) {
+            let list = ``;
+
+            const events = this.advisoriesByZone(e.toUpperCase())[e.toUpperCase()] || [].map(a => a.event)
+
+            for (const idx of events) {
+                list += `<li>${idx.event}</li>`;
+            }
+
+            if (events.length === 0) {
+                list = `<li>no reported advisories</li>`;
+            }
+
+            return `
+                <div>
+                    <strong>${this.lakeZones[e.toUpperCase()]}</strong>
+                    <ul class="pl-4">
+                        ${list}
+                    </ul>
+                </div>
+            `;
+        },
+
+        getVesselPhoto(imoNumber) {
+            const { photo } = this.$store.state.photos.vessels.find(p => p.imoNumber == imoNumber) || { photo: null };
+
+            if (photo) {
+                return photo;
+            }
+
+            return null;
+        },
+
+        getRealPollutantName(pollutant) {
+            let real;
+            switch (pollutant) {
+                case 'PM25REALTIME':
+                    real = 'PM2.5'
+                break;
+                default:
+                    real = pollutant.replace('REALTIME', '');
+            }
+
+            return real
+        },
     },
 
     mounted() {

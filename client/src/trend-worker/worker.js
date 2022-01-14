@@ -1,20 +1,23 @@
 /* eslint-disable no-fallthrough */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-constant-condition */
+/* eslint-disable no-console */
 
 import moment from 'moment';
 
-
 const sum = (arr) => {
-  return (arr.reduce((a, b) => a + b, 0)).toFixed(0);
+  const filtered = arr.filter(Boolean);
+  return (filtered.reduce((a, b) => a + b, 0)).toFixed(0);
 };
 
 const avg = (arr)  =>{
-  return (sum(arr) / arr.length || 0).toFixed(0);
+  const filtered = arr.filter(Boolean);
+  return (sum(filtered) / filtered.length || 0).toFixed(0);
 };
 
 const max = (arr) =>{
-    return (Math.abs(Math.max(...arr)) !== Infinity ? Math.max(...arr) : 0).toFixed(0);
+  const filtered = arr.filter(Boolean);
+  return (Math.abs(Math.max(...filtered)) !== Infinity ? Math.max(...filtered) : 0).toFixed(0);
 };
 
 addEventListener("message", event => {
@@ -28,8 +31,13 @@ addEventListener("message", event => {
     { name: 'Trains (max)', data: [] },
     { name: 'Wind Speed (avg)', data: [] },
     { name: 'Temperature (avg)', data: [] },
-    { name: 'AQI (total)', data: [] },
+    { name: 'Wind Bearing (avg)', data: [] },
   ];
+
+  for (const measurement in measurements) {
+    const value = measurements[measurement];
+    datasets.push( { name: value.replace('REALTIME', ''), data: [] } )
+  }
 
   const { airshits, weathers, flights, vessels, trains, traffics } = trends;
 
@@ -53,59 +61,65 @@ addEventListener("message", event => {
 
     filtered = airshits.filter((a) =>
       moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend)
-      );
+    );
 
     for (const measurement in measurements) {
       const value = measurements[measurement];
-      const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : -1);
+      const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : a.concentration);
       sum.push(...aqis.filter(e => e >= 0));
+
+      idx = datasets.findIndex(d => d.name === value.replace('REALTIME', ''));
+      datasets[idx].data.push(max(sum));
     }
 
-    idx = datasets.findIndex(d => d.name === 'AQI (total)');
-    datasets[idx].data.push(max(sum));
-
     // Weather
-    filtered = weathers.filter((a) =>moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
+    filtered = weathers.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
 
-    // Wind
+    // Wind Speed
     idx = datasets.findIndex(d => d.name === 'Wind Speed (avg)');
     datasets[idx]['data'].push(
       avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.windSpeed || 0))
-      );
+    );
+
+    // Wind Bearing
+    idx = datasets.findIndex(d => d.name === 'Wind Bearing (avg)');
+    datasets[idx]['data'].push(
+      avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => parseInt(a.windBearing) || 0))
+    );
 
     // Temp
     idx = datasets.findIndex(d => d.name === 'Temperature (avg)');
     datasets[idx]['data'].push(
       avg(filtered.map(a => a['REPORTED_WEATHER'] || {}).map(a => a.apparentTemperature || 0))
-      );
+    );
 
     // FLights
     filtered = flights.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Flights (max)');
     datasets[idx]['data'].push(
       max(filtered.map(a => a['FLIGHTS'] || {}).map(a => a.length || 0))
-      );
+    );
 
     // vessels
     filtered = vessels.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Vessels (max)');
     datasets[idx]['data'].push(
       max(filtered.map(a => a['VESSELS'] || {}).map(a => a.length) || 0)
-      );
+    );
 
     // Trains
     filtered = trains.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Trains (max)');
     datasets[idx]['data'].push(
       max(filtered.map(a => a['SOUTHSHORE'] || {}).map(a => a.length) || 0)
-      );
+    );
 
     // traffic
     filtered = traffics.filter((a) => moment(moment(a.createdAt).toISOString()).isBetween(date, seriesend));
     idx = datasets.findIndex(d => d.name === 'Traffic (max)');
     datasets[idx]['data'].push(
       max(filtered.map(a => a['INCIDENTS'] || []).map(a => a.reduce((sum, x) => sum + x.distance, 0) || 0) || [])
-      );
+    );
   }
 
   const colors = [
@@ -135,9 +149,6 @@ addEventListener("message", event => {
         reverseNegativeShade: false,
         distributed: true,
         useFillColorAsStroke: false,
-        colorScale: {
-          inverse: false,
-        },
       },
     },
     dataLabels: {
@@ -153,61 +164,8 @@ addEventListener("message", event => {
     tooltip: {
       x: {
         format: 'dd MMM yyyy HH:mm',
+        formatter: undefined,
       },
-      y: {
-        formatter: (value, a) => {
-          const { seriesIndex } = a;
-          const { name } = datasets[seriesIndex];
-          let format = '';
-          switch (name) {
-            case 'Traffic (max)':
-            format = `${value} miles`
-            break;
-            case 'Wind Speed (avg)':
-            format = `${value} mph`
-            break;
-            case 'Temperature (avg)':
-            format = `${value}\xB0F`
-            break;
-            default:
-            format = value;
-          }
-
-          return format;
-        },
-        title: {
-          formatter: (seriesName) => {
-            let format;
-            switch (seriesName) {
-              case 'Traffic (max)':
-              format = ``
-              break;
-              case 'Wind Speed (avg)':
-              format = ``
-              break;
-              case 'Temperature (avg)':
-              format = ``
-              break;
-              case 'AQI (total)':
-              format = ``
-              break;
-              case 'Trains (max)':
-              format = ``
-              break;
-              case 'Vessels (max)':
-              format = ``
-              break;
-              case 'Flights (max)':
-              format = ``
-              break;
-              default:
-              format = seriesName;
-            }
-
-            return format;
-          },
-        },
-      }
     }
   };
 

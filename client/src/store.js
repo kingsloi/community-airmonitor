@@ -14,13 +14,17 @@ const state = {
 
     airshit: {
         data: {
+            PM1REALTIME: null,
             PM25REALTIME: null,
+            PM4REALTIME: null,
             PM10REALTIME: null,
 
             SO2REALTIME: null,
+            NOREALTIME: null,
             NO2REALTIME: null,
             O3REALTIME: null,
             COREALTIME: null,
+            H2SREALTIME: null,
 
             PM_LAST_READ_AT: null,
             GASES_LAST_READ_AT: null
@@ -77,13 +81,32 @@ const mutations = {
         state.photos.vessels = payload;
     },
     setAirshit (state, payload) {
-        const { PM25REALTIME, PM10REALTIME, SO2REALTIME, NO2REALTIME, O3REALTIME, COREALTIME, createdAt, updatedAt } = payload;
+        const {
+            PM1REALTIME, PM25REALTIME, PM4REALTIME, PM10REALTIME,
 
-        if (SO2REALTIME || NO2REALTIME || O3REALTIME || COREALTIME) {
-            state.airshit.data = { PM25REALTIME, PM10REALTIME, SO2REALTIME, NO2REALTIME, O3REALTIME, COREALTIME };
-        } else {
-            state.airshit.data = { PM25REALTIME, PM10REALTIME }
-        }
+            SO2REALTIME,
+            O3REALTIME,
+            COREALTIME,
+            CO2REALTIME,
+            NOREALTIME, NO2REALTIME,
+
+            H2SREALTIME,
+
+            createdAt,
+            updatedAt
+        } = payload;
+
+        state.airshit.data = {
+            PM1REALTIME, PM25REALTIME, PM4REALTIME, PM10REALTIME,
+
+            SO2REALTIME,
+            O3REALTIME,
+            COREALTIME,
+            CO2REALTIME,
+            NOREALTIME, NO2REALTIME,
+
+            H2SREALTIME,
+        };
 
         state.airshit.createdAt = createdAt;
         state.airshit.updatedAt = updatedAt;
