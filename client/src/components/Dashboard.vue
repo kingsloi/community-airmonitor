@@ -85,10 +85,12 @@
                     <div class="stat stat--pm mt-4">
                         <h2 class="small text-uppercase clearfix">Particulate Matter</h2>
                         <!-- <small class="float-right text-muted text-right">updated: {{ airshit.createdAt }}</small> -->
-                        <div class="row row-cols-4">
+                        <div class="row condensed">
 
                             <template v-for="pm in measurementTypes.pm">
-                                <div class="col" v-if="airshit.data[pm]" v-bind:key="pm">
+                                <div class="col" v-if="airshit.data[pm]" v-bind:key="pm"
+                                    :style="`order: ${(airshit.data[pm] && airshit.data[pm]['category'] ? 0 : 1)}`"
+                                >
                                     <div class="aqi-card h-100 "
                                       :class="getAqiScoreClassname((airshit.data[pm] ? airshit.data[pm]['category'] : 'unsure'))"
                                     >
@@ -112,7 +114,7 @@
 
                                                 <template v-else>
                                                     <small class="font-size-80 d-block mx-n1">
-                                                        <span class="text-lowercase">{{ airshit.data[pm]['concentration'] }} &#181;</span>g/m<sup>3</sup>
+                                                        <span class="text-lowercase">{{ airshit.data[pm]['concentration'] }} </span>{{ airshit.data[pm]['units'] }}
                                                     </small>
                                                 </template>
                                             </p>
@@ -129,9 +131,11 @@
 
                         <h2 class="small text-uppercase">Gases</h2>
 
-                        <div class="row">
+                        <div class="row condensed">
                             <template v-for="gas in measurementTypes.gases">
-                                <div class="col" v-if="airshit.data[gas]" v-bind:key="gas">
+                                <div class="col" v-if="airshit.data[gas]" v-bind:key="gas"
+                                    :style="`order: ${(airshit.data[gas] && airshit.data[gas]['category'] ? 0 : 1)}`"
+                                >
                                     <div class="aqi-card h-100 "
                                       :class="getAqiScoreClassname((airshit.data[gas] ? airshit.data[gas]['category'] : 'unsure'))"
                                     >
@@ -155,7 +159,7 @@
 
                                                 <template v-else>
                                                     <small class="font-size-80 d-block mx-n1">
-                                                        <span class="text-lowercase">{{ airshit.data[gas]['concentration'] }} &#181;</span>g/m<sup>3</sup>
+                                                        <span class="text-lowercase">{{ airshit.data[gas]['concentration'] }} </span>{{ airshit.data[gas]['units'] }}
                                                     </small>
                                                 </template>
                                             </p>
@@ -168,7 +172,7 @@
 
                     <div class="stat stat--industry mt-4">
                         <h2 class="small text-uppercase">Industry/traffic</h2>
-                        <div class="row">
+                        <div class="row condensed">
                             <!-- Vessels -->
                             <div class="col">
                                 <div class="aqi-card h-100 aqi">
@@ -247,16 +251,20 @@
                                 <div class="aqi-card h-100 aqi">
                                   <div class="card-body small py-1">
                                     <p class="font-weight-bold mb-0 lead">
-                                      <span>{{ advisories.data.length }}</span>
+                                      <span>{{ advisories.data.length }} advisories affecting</span>
                                     </p>
                                     <ul class="list-unstyled pl-0 mb-0">
                                         <template v-for="(zoneAdvisories, zone) in advisoriesByZone()">
-                                            <li class="text-uppercase font-weight-bold" v-bind:key="zone">{{ lakeZones[zone] }}</li>
-                                            <li v-for="advisory in zoneAdvisories" class="text-uppercase font-weight-bold" v-bind:key="`id:${zone}-${advisory.id}`">
-                                                <small class="font-size-80 d-block">
-                                                    {{ advisory.event }}
-                                                </small>
-                                                <span class="small d-block divider">&mdash;</span>
+                                            <li class="text-uppercase font-weight-bold" v-bind:key="zone">
+                                                {{ lakeZones[zone] }}
+                                                <ul class="pl-0 list-unstyled">
+                                                    <li v-for="advisory in zoneAdvisories" class="text-uppercase font-weight-bold" v-bind:key="`id:${zone}-${advisory.id}`">
+                                                        <small class="font-size-80 d-block">
+                                                            {{ advisory.event }}
+                                                        </small>
+                                                        <span class="small d-block divider">&mdash;</span>
+                                                    </li>
+                                                </ul>
                                             </li>
                                         </template>
                                     </ul>
@@ -269,7 +277,7 @@
                     <div class="mb-0 small text-xl-right text-center mt-3" id="poweredbys">
                         <p class="mb-0" v-if="Object.keys(geography).length > 0">
                             <span class="d-block mb-2">
-                                AIS, {{ Object.keys(airshit.data).map(e => getRealPollutantName(e)).join(', ') }} recorded at base station.
+                                AIS, {{ localMeasurements }} recorded at base station.
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago)</span>
                             </span>
                             <span class="d-block">
@@ -1301,6 +1309,15 @@ export default {
     computed: {
         base() {
             return process.env.VUE_APP_API_URL;
+        },
+        localMeasurements() {
+            return Object.keys(this.airshit.data)
+            .filter(e => {
+                const { concentration } = this.airshit.data[e] || { concentration: null };
+                return concentration;
+            })
+            .map(e => this.getRealPollutantName(e))
+            .join(', ');
         },
         airshitContainsGases() {
             return Object.keys(this.airshit.data).filter(e => this.airshit.data[e]).some(metric => this.measurementTypes.gases.indexOf(metric) > -1);

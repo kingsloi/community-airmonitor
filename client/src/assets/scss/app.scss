@@ -418,12 +418,12 @@ textarea {
 
 .stat {
     > .row {
+        &.condensed {
+            padding-right: $spacer;
+        }
+
         .col {
             margin-right: -$spacer;
-
-            &:last-child {
-                margin-right: 0;
-            }
         }
     }
 

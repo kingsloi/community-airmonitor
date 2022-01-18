@@ -7,8 +7,8 @@ const Vessel = require('../models/Vessel');
 const VesselPhoto = require('../models/VesselPhoto');
 const Weather = require('../models/Weather');
 
-// const { gases } = require('../seeds/gases.js');
-// const { pms } = require('../seeds/pms.js');
+const { gases } = require('../seeds/gases.js');
+const { pms } = require('../seeds/pms.js');
 
 const moment = require('moment');
 const axios = require('axios');
@@ -452,41 +452,41 @@ exports.getPurpleAirAirQuality = async () => {
 
 exports.getAdvancedAirQuality = async () => {
   try {
-    const { data: { token } } = await axios.post(`https://apitest.aqmeshdata.net/api/Authenticate`, {
-      username: process.env.AQMESH_USERNAME,
-      password: process.env.AQMESH_PASSWORD
-    });
+    // const { data: { token } } = await axios.post(`https://apitest.aqmeshdata.net/api/Authenticate`, {
+    //   username: process.env.AQMESH_USERNAME,
+    //   password: process.env.AQMESH_PASSWORD
+    // });
 
-    const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/Pods/Assets_V1`, {
-      headers: {
-        'authorization': `Bearer ${token}`
-      }
-    });
+    // const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/Pods/Assets_V1`, {
+    //   headers: {
+    //     'authorization': `Bearer ${token}`
+    //   }
+    // });
 
-    const locations = data.map(p => p.location_number);
+    // const locations = data.map(p => p.location_number);
 
-    const promises = [];
+    // const promises = [];
 
-    for (const i in locations) {
-      const location = locations[i];
+    // for (const i in locations) {
+    //   const location = locations[i];
 
-      // GAS, F, µg/m3: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/11
-      // PM, F, PPB   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/10
-      const sensors = ['1/11', '2/10'];
+    //   // GAS, F, µg/m3: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/11
+    //   // PM, F, PPB   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/10
+    //   const sensors = ['1/11', '2/10'];
 
-      for (const x in sensors) {
-        const params = sensors[x];
+    //   for (const x in sensors) {
+    //     const params = sensors[x];
 
-        const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
-          headers: {
-            'authorization': `Bearer ${token}`
-          }
-        });
-        promises.push(data);
-      }
-    }
+    //     const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
+    //       headers: {
+    //         'authorization': `Bearer ${token}`
+    //       }
+    //     });
+    //     promises.push(data);
+    //   }
+    // }
 
-    const [ gases, pms ] = await Promise.all(promises);
+    // const [ gases, pms ] = await Promise.all(promises);
 
     const measurements = [];
 
