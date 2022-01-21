@@ -69,6 +69,8 @@ const airshitSchema = new mongoose.Schema({
     units: String,
   },
 
+  type: { type: String },
+
   createdAt: { type: Date, default: Date.now },
 
   updatedAt: { type: Date, default: Date.now }

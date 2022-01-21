@@ -60,7 +60,7 @@ exports.currently = async (req, res) => {
 };
 
 exports.trend = async (req, res) => {
-  const today = moment();
+  const today = moment().add(1, 'd');
   const start = today.format('YYYY-MM-DD HH:mm:ss');
   const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
 
@@ -424,7 +424,7 @@ exports.getAdvisories = async () => {
   }
 }
 
-exports.getPurpleAirAirQuality = async () => {
+exports.getSimpleAirQuality = async () => {
   const purpleId = process.env.PURPLE_AIR_ID;
 
   const avg = (arr) => arr.reduce((a, b) => a + parseFloat(b), 0).toFixed(5) / arr.length;
@@ -437,63 +437,64 @@ exports.getPurpleAirAirQuality = async () => {
     // we read both, and just average them. We do this for PM2.5/10
     const [ one, two ] = results;
 
-    const { pm2_5_atm: pm2_5a, pm10_0_atm: pm10a, LastSeen: PM_LAST_READ_AT } = one;
+    const { pm2_5_atm: pm2_5a, pm10_0_atm: pm10a } = one;
     const { pm2_5_atm: pm2_5b, pm10_0_atm: pm10b } = two;
 
     const aqi25 = await aqibot.AQICalculator.getAQIResult('PM2.5', avg([pm2_5a, pm2_5b]));
     const aqi10 = await aqibot.AQICalculator.getAQIResult('PM10', avg([pm10a, pm10b]));
 
-    return { PM25REALTIME: aqi25, PM10REALTIME: aqi10, PM_LAST_READ_AT };
+    return { PM25REALTIME: aqi25, PM10REALTIME: aqi10 };
   } catch (e) {
     console.error(e);
-    return { PM25REALTIME: {}, PM10REALTIME: {}, PM_LAST_READ_AT: null };
+    return { PM25REALTIME: {}, PM10REALTIME: {} };
   }
 }
 
 exports.getAdvancedAirQuality = async () => {
   try {
-    // const { data: { token } } = await axios.post(`https://apitest.aqmeshdata.net/api/Authenticate`, {
-    //   username: process.env.AQMESH_USERNAME,
-    //   password: process.env.AQMESH_PASSWORD
-    // });
+    const { data: { token } } = await axios.post(`https://api.aqmeshdata.net/api/Authenticate`, {
+      username: process.env.AQMESH_USERNAME,
+      password: process.env.AQMESH_PASSWORD
+    });
 
-    // const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/Pods/Assets_V1`, {
-    //   headers: {
-    //     'authorization': `Bearer ${token}`
-    //   }
-    // });
+    const { data } = await axios.get(`https://api.aqmeshdata.net/api/Pods/Assets_V1`, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
 
-    // const locations = data.map(p => p.location_number);
+    const locations = data.map(p => p.location_number);
 
-    // const promises = [];
+    const promises = [];
 
-    // for (const i in locations) {
-    //   const location = locations[i];
+    for (const i in locations) {
+      const location = locations[i];
 
-    //   // GAS, F, µg/m3: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/11
-    //   // PM, F, PPB   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/10
-    //   const sensors = ['1/11', '2/10'];
+      // GAS, F, ppb: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/10
+      // PM, F, ppb   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/11
+      const sensors = ['1/10', '2/11'];
 
-    //   for (const x in sensors) {
-    //     const params = sensors[x];
+      for (const x in sensors) {
+        const params = sensors[x];
 
-    //     const { data } = await axios.get(`https://apitest.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
-    //       headers: {
-    //         'authorization': `Bearer ${token}`
-    //       }
-    //     });
-    //     promises.push(data);
-    //   }
-    // }
+        const { data } = await axios.get(`https://api.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
+          headers: {
+            'authorization': `Bearer ${token}`
+          }
+        });
+        promises.push(data);
+      }
+    }
 
-    // const [ gases, pms ] = await Promise.all(promises);
+    const [ gases, pms ] = await Promise.all(promises);
 
     const measurements = [];
 
-    let combined = [...pms, ...gases].filter(e => moment(e.reading_datestamp).isBetween(moment().subtract(100, 'd'), moment()));
+    let combined = [...pms, ...gases];
 
-    // as gases and PM are from two different endpoints, combine 'em by date
-    const grouped = _.groupBy(combined, (p) => moment(p.reading_datestamp).format('YYYY-MM-DD HH:mm:ss'));
+    combined.sort((a, b)=> new Date(a.reading_datestamp) - new Date(b.reading_datestamp));
+
+    const grouped = _.groupBy(combined, (p) => moment(p.reading_datestamp).format('YYYY-MM-DD HH:mm'));
 
     // loop through all combined pollutants
     for await (const timestamp of Object.keys(grouped)) {
@@ -501,9 +502,9 @@ exports.getAdvancedAirQuality = async () => {
       const pollutants = grouped[timestamp];
 
       // loop through all pollutants, grab their measurement, and get the AQI for it
-      for (const idx in pollutants) {
-        const measurement = pollutants[idx];
-
+      for await (const measurement of pollutants) {
+        // const measurement = pollutants[idx];
+        // return;
         // Only get the data we're interested in
         await ['pm1', 'pm2_5', 'pm4', 'pm10', 'co', 'no', 'no2', 'so2', 'o3', 'h2s', 'eo', 'aux1', 'aux2'].forEach(async (pollutant) => {
 
@@ -516,7 +517,11 @@ exports.getAdvancedAirQuality = async () => {
           let value, units;
           if (pollutant.startsWith('pm') && measurement['reading_status'] === 'OK') {
             value = measurement[`${pollutant}_prescale`];
-          } else if (measurement[`${pollutant}_state`] === 'Reading') {
+          } else if (
+            measurement[`${pollutant}_state`] === 'Reading' ||
+            measurement[`${pollutant}_state`] === 'Rebased' ||
+            measurement[`${pollutant}_state`] === 'OK'
+          ) {
             value = measurement[`${pollutant}_prescaled`];
             units = measurement[`${pollutant}_units`];
           }
@@ -539,7 +544,7 @@ exports.getAdvancedAirQuality = async () => {
       }
     }
 
-    return await measurements;
+    return measurements;
   } catch (e) {
     console.error(e);
     return {};
@@ -561,7 +566,7 @@ exports.sync = async (req, res) => {
     advisories: [],
 
     weather: {},
-    airquality: { purpleair: {}, advanced: {} }
+    airquality: { simple: {}, advanced: [] }
   };
 
   await Promise.all(m.split(',').map(async (measurement) => {
@@ -616,20 +621,30 @@ exports.sync = async (req, res) => {
 
         metrics.advisories = advisories;
       break;
-      case 'airquality-purpleair':
-        const purpleair = await module.exports.getPurpleAirAirQuality();
+      case 'airquality-simple':
+        const simple = await module.exports.getSimpleAirQuality();
 
-        model = new Airshit(purpleair);
+        model = new Airshit({
+          ...simple,
+          type: 'simple'
+        });
         await model.save();
 
-        metrics.airquality.purpleair = purpleair;
+        metrics.airquality.simple = simple;
       break;
       case 'airquality-advanced':
         const advanced = await module.exports.getAdvancedAirQuality();
 
-        for (const datetime in advanced) {
+        for await (const datetime of Object.keys(advanced)) {
+
           const record = advanced[datetime];
-          model = new Airshit({...record, createdAt: datetime});
+
+          model = new Airshit({
+            ...record,
+            createdAt: datetime,
+            type: 'advanced'
+          });
+
           await model.save();
         }
 
@@ -657,78 +672,7 @@ exports.migrate = async (req, res) => {
   for await (const airshit of Airshit.find()) {
     let airshitobj = airshit.toObject();
 
-    const {
-      VESSELS,
-      REPORTED_WEATHER,
-      FLIGHTS,
-      TRAINS,
-      TRAFFIC,
-      createdAt, updatedAt,
-      TEMP_F,
-      HUMIDITY_PERCENT,
-      PRESSURE_BAR,
-      LAST_READ_AT
-    } = airshitobj;
-
-    if (TEMP_F) {
-      await Airshit.updateOne({ _id: airshit.id }, { $unset: {"TEMP_F": 1} });
-    }
-
-    if (HUMIDITY_PERCENT) {
-      await Airshit.updateOne({ _id: airshit.id }, { $unset: {"HUMIDITY_PERCENT": 1} });
-    }
-
-    if (PRESSURE_BAR) {
-      await Airshit.updateOne({ _id: airshit.id }, { $unset: {"PRESSURE_BAR": 1} });
-    }
-
-    if (LAST_READ_AT) {
-      // await Airshit.updateOne({ _id: airshit.id }, { $rename: { "LAST_READ_AT": "PM_LAST_READ_AT" } });
-    }
-
-    if (VESSELS.length >= 0) {
-      await new Vessel({ VESSELS, createdAt, updatedAt }).save();
-    }
-
-    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"VESSELS": 1} });
-
-    if (REPORTED_WEATHER) {
-      await new Weather({ REPORTED_WEATHER, createdAt, updatedAt }).save();
-    }
-
-    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"REPORTED_WEATHER": 1} });
-
-    let ALL_FLIGHTS = [];
-
-    if (FLIGHTS) {
-      if (FLIGHTS.GYY) {
-        ALL_FLIGHTS = [ ...ALL_FLIGHTS, ...FLIGHTS.GYY ]
-      }
-
-      if (FLIGHTS.MDW) {
-        ALL_FLIGHTS = [ ...ALL_FLIGHTS, ...FLIGHTS.MDW ]
-      }
-
-      if (FLIGHTS.ORD) {
-        ALL_FLIGHTS = [ ...ALL_FLIGHTS, ...FLIGHTS.ORD ]
-      }
-
-      await new Flight({ FLIGHTS: ALL_FLIGHTS, createdAt, updatedAt }).save();
-    }
-
-    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"FLIGHTS": 1} });
-
-    if (TRAINS && TRAINS.SOUTHSHORE.length > 0) {
-      await new Train({ SOUTHSHORE: TRAINS.SOUTHSHORE, createdAt, updatedAt }).save();
-    }
-
-    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"TRAINS": 1} });
-
-    if (TRAFFIC && TRAFFIC.INCIDENTS.length > 0) {
-      await new Traffic({ INCIDENTS: TRAFFIC.INCIDENTS, createdAt, updatedAt }).save();
-    }
-
-    await Airshit.updateOne({ _id: airshit.id }, { $unset: {"TRAFFIC": 1} });
+    await Airshit.updateOne({ _id: airshit.id }, { $set: { type: 'simple' } });
 
     console.log(`${airshit.id} migrated`);
   }

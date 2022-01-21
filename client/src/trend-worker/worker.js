@@ -46,7 +46,7 @@ addEventListener("message", event => {
 
   const dates = [];
   const start = moment().subtract(7, 'd');
-  const end   = moment().subtract(6, 'h');
+  const end   = moment().add(1, 'd');
 
   while (start.isSameOrBefore(end)) {
     dates.push(start.format('YYYY-MM-DD HH:mm:ss'));
@@ -124,16 +124,16 @@ addEventListener("message", event => {
   }
 
   const colors = [
-  '#FF9800',
-  '#9DD866',
-  '#0B84A5',
-  '#F6C85F',
-  '#CA472F',
-  '#5bc0dd',
-  '#FFA056',
-  '#8DDDD0',
-  '#6F4E7C',
-  '#60bf60',
+    '#FF9800',
+    '#9DD866',
+    '#0B84A5',
+    '#F6C85F',
+    '#CA472F',
+    '#5bc0dd',
+    '#FFA056',
+    '#8DDDD0',
+    '#6F4E7C',
+    '#60bf60',
   ];
 
   const options = {

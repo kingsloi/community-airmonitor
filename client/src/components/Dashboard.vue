@@ -109,12 +109,12 @@
 
                                                 <template v-else-if="! airshit.data[pm]['aqi']">
                                                     <span class="lead font-weight-bold text-lowercase d-block">
-                                                        {{ airshit.data[pm]['concentration'].toFixed(0) }} </span> ppb
+                                                        {{ airshit.data[pm]['concentration'].toFixed(0) }} </span>&#181;g/m<sup>3</sup>
                                                 </template>
 
                                                 <template v-else>
                                                     <small class="font-size-80 d-block mx-n1">
-                                                        <span class="text-lowercase">{{ airshit.data[pm]['concentration'] }} </span>{{ airshit.data[pm]['units'] }}
+                                                        <span class="text-lowercase">{{ airshit.data[pm]['concentration'] }} &#181;</span>g/m<sup>3</sup>
                                                     </small>
                                                 </template>
                                             </p>

@@ -25,9 +25,6 @@ const state = {
             O3REALTIME: null,
             COREALTIME: null,
             H2SREALTIME: null,
-
-            PM_LAST_READ_AT: null,
-            GASES_LAST_READ_AT: null
         },
         createdAt: null,
         updatedAt: null,
