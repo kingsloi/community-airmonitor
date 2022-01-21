@@ -107,7 +107,7 @@
                                             <p class="mb-0 font-weight-bold">
                                                 <span class="text--blurred" v-if="! airshit.data[pm]"></span>
 
-                                                <template v-else-if="! airshit.data[pm]['aqi']">
+                                                <template v-else-if="airshit.data[pm]['aqi'] === null">
                                                     <span class="lead font-weight-bold text-lowercase d-block">
                                                         {{ airshit.data[pm]['concentration'].toFixed(0) }} </span>&#181;g/m<sup>3</sup>
                                                 </template>
