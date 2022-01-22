@@ -46,7 +46,7 @@ addEventListener("message", event => {
 
   const dates = [];
   const start = moment().subtract(7, 'd');
-  const end   = moment().add(1, 'd');
+  const end   = moment();
 
   while (start.isSameOrBefore(end)) {
     dates.push(start.format('YYYY-MM-DD HH:mm:ss'));

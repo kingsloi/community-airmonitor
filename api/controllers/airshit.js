@@ -452,41 +452,41 @@ exports.getSimpleAirQuality = async () => {
 
 exports.getAdvancedAirQuality = async () => {
   try {
-    const { data: { token } } = await axios.post(`https://api.aqmeshdata.net/api/Authenticate`, {
-      username: process.env.AQMESH_USERNAME,
-      password: process.env.AQMESH_PASSWORD
-    });
+    // const { data: { token } } = await axios.post(`https://api.aqmeshdata.net/api/Authenticate`, {
+    //   username: process.env.AQMESH_USERNAME,
+    //   password: process.env.AQMESH_PASSWORD
+    // });
 
-    const { data } = await axios.get(`https://api.aqmeshdata.net/api/Pods/Assets_V1`, {
-      headers: {
-        'authorization': `Bearer ${token}`
-      }
-    });
+    // const { data } = await axios.get(`https://api.aqmeshdata.net/api/Pods/Assets_V1`, {
+    //   headers: {
+    //     'authorization': `Bearer ${token}`
+    //   }
+    // });
 
-    const locations = data.map(p => p.location_number);
+    // const locations = data.map(p => p.location_number);
 
-    const promises = [];
+    // const promises = [];
 
-    for (const i in locations) {
-      const location = locations[i];
+    // for (const i in locations) {
+    //   const location = locations[i];
 
-      // GAS, F, ppb: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/10
-      // PM, F, ppb   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/11
-      const sensors = ['1/10', '2/11'];
+    //   // GAS, F, ppb: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/10
+    //   // PM, F, ppb   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/11
+    //   const sensors = ['1/10', '2/11'];
 
-      for (const x in sensors) {
-        const params = sensors[x];
+    //   for (const x in sensors) {
+    //     const params = sensors[x];
 
-        const { data } = await axios.get(`https://api.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
-          headers: {
-            'authorization': `Bearer ${token}`
-          }
-        });
-        promises.push(data);
-      }
-    }
+    //     const { data } = await axios.get(`https://api.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
+    //       headers: {
+    //         'authorization': `Bearer ${token}`
+    //       }
+    //     });
+    //     promises.push(data);
+    //   }
+    // }
 
-    const [ gases, pms ] = await Promise.all(promises);
+    // const [ gases, pms ] = await Promise.all(promises);
 
     const measurements = [];
 
@@ -566,7 +566,7 @@ exports.sync = async (req, res) => {
     advisories: [],
 
     weather: {},
-    airquality: { simple: {}, advanced: [] }
+    airquality: {}
   };
 
   await Promise.all(m.split(',').map(async (measurement) => {
@@ -630,13 +630,12 @@ exports.sync = async (req, res) => {
         });
         await model.save();
 
-        metrics.airquality.simple = simple;
+        metrics.airquality = simple;
       break;
       case 'airquality-advanced':
         const advanced = await module.exports.getAdvancedAirQuality();
 
         for await (const datetime of Object.keys(advanced)) {
-
           const record = advanced[datetime];
 
           model = new Airshit({
@@ -648,12 +647,19 @@ exports.sync = async (req, res) => {
           await model.save();
         }
 
-        metrics.airquality.advanced = advanced;
+        metrics.airquality = Object.assign({}, advanced);
       break;
       default:
     }
   }))
   .then(() => {
+    // delete empty metrics
+    Object.keys(metrics).forEach((k) => metrics[k] === null || Object.keys(metrics[k]).length === 0 && delete metrics[k])
+
+    cache.del('/currently', (error, deleted) => {
+      if (error) throw error;
+    });
+
     return res.json({ success: true, metrics });
   })
   .catch((e) => {

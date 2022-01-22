@@ -8,6 +8,13 @@
             <span class="d-inline-block mb-0 h6 mt-0">lasted updated <span class="highlighted">{{ getLatestUpdated() }}</span> ago</span>
         </header>
 
+        <div class="container" v-if="error">
+            <div class="alert alert-danger mb-5 w-50 mx-auto" role="alert">
+                <p class="mb-0 lead text-center">An error occurred while loading this page</p>
+                <p class="mb-0 lead text-center">Try refreshing this page, or try again later</p>
+            </div>
+        </div>
+
         <section class="container pb-10" id="visuals">
             <div class="row flex-xl-row-reverse">
 
@@ -18,10 +25,12 @@
                       <div id="map"></div>
                     </div>
 
-                    <p class="text-center mt-2">
+                    <p class="text-center mt-0">
+                        <small class="px-5 w-100 d-block"><span class="leaflet-emoji">💩</span> listed are <a href="https://www.in.gov/idem/airmonitoring/files/monitoring_criteria_trend_northwest.pdf" target="_blank">Northwest Indiana's Top Ten Emission Sources (2010)</a></small>
+
                         <small class="px-5 w-100 d-block"><a target="_blank" href="/icons/set/train">Train</a>, <a target="_blank" href="/icons/set/fishing-boat">Fishing Boat</a> and other icons by <a target="_blank" href="https://icons8.com">Icons8</a></small>
-                        <small class="px-5 w-100 d-block">Factories listed are <a href="https://www.in.gov/idem/airquality/files/monitoring_criteria_trend_northwest.pdf" target="_blank">Northwest Indiana's Top Ten Emission Sources</a></small>
                     </p>
+
                     <p class="text-center mt-2" v-if="Object.keys(geography).length > 0">
                         Base Station: <code>{{ geography.sensor.lat }},{{ geography.sensor.lng }}</code><br>
                         Lake:<a class="pl-1" target="_blank"
@@ -45,7 +54,6 @@
 
                         <h2 class="small text-uppercase clearfix">Weather</h2>
                         <div class="row">
-                            <!-- CO -->
                             <div class="col">
                                 <div class="aqi-card h-100 aqi">
                                     <div class="card-body small py-1">
@@ -57,7 +65,7 @@
                                                 &mdash;
                                                 {{ weather.data.windGust.toFixed(0) }}<small>mph</small>
                                             </span>
-                                            <span class="d-inline-block mb-0 font-weight-bold" :title="`wind bearing ${weather.data.windBearing}\xB0`" :style="`transform: rotate(${degeesToRotation(weather.data.windBearing)}deg)`">
+                                            <span class="d-inline-block mb-0 font-weight-bold" :title="`wind bearing ${weather.data.windBearing}\xB0`" :style="`transform: rotate(${convertDegeesToRotation(weather.data.windBearing)}deg)`">
                                             &darr;
                                             </span>
                                         </div>
@@ -84,7 +92,6 @@
 
                     <div class="stat stat--pm mt-4">
                         <h2 class="small text-uppercase clearfix">Particulate Matter</h2>
-                        <!-- <small class="float-right text-muted text-right">updated: {{ airshit.createdAt }}</small> -->
                         <div class="row condensed">
 
                             <template v-for="pm in measurementTypes.pm">
@@ -95,7 +102,9 @@
                                       :class="getAqiScoreClassname((airshit.data[pm] ? airshit.data[pm]['category'] : 'unsure'))"
                                     >
                                         <div class="card-body small py-1">
-                                            <p class="text-uppercase font-weight-bold mb-0">{{ getRealPollutantName(pm) }}</p>
+                                            <p class="text-uppercase font-weight-bold mb-0" v-html="
+                                                getRealPollutantName(pm) + '<sup>' + (airshit.data[pm] && ! airshit.data[pm]['category'] ? '&#10013;' : '') + '</sup>'
+                                            "></p>
 
                                             <!-- aqi -->
                                             <p class="font-weight-bold mb-0 lead">
@@ -109,12 +118,13 @@
 
                                                 <template v-else-if="airshit.data[pm]['aqi'] === null">
                                                     <span class="lead font-weight-bold text-lowercase d-block">
-                                                        {{ airshit.data[pm]['concentration'].toFixed(0) }} </span>&#181;g/m<sup>3</sup>
+                                                        {{ getRealConcentration(airshit.data[pm]['concentration']) }}</span>&#181;g/m<sup>3</sup>
                                                 </template>
 
                                                 <template v-else>
                                                     <small class="font-size-80 d-block mx-n1">
-                                                        <span class="text-lowercase">{{ airshit.data[pm]['concentration'] }} &#181;</span>g/m<sup>3</sup>
+                                                        <span class="text-lowercase">
+                                                            {{ getRealConcentration(airshit.data[pm]['concentration']) }} &#181;</span>g/m<sup>3</sup>
                                                     </small>
                                                 </template>
                                             </p>
@@ -140,7 +150,10 @@
                                       :class="getAqiScoreClassname((airshit.data[gas] ? airshit.data[gas]['category'] : 'unsure'))"
                                     >
                                         <div class="card-body small py-1">
-                                            <p class="text-uppercase font-weight-bold mb-0">{{ getRealPollutantName(gas) }}</p>
+                                            <p class="text-uppercase font-weight-bold mb-0" v-html="
+                                                getRealPollutantName(gas) + '<sup>' + (airshit.data[gas] && ! airshit.data[gas]['category'] ? '&#10013;' : '') + '</sup>'
+                                            "></p>
+
 
                                             <!-- aqi -->
                                             <p class="font-weight-bold mb-0 lead">
@@ -154,12 +167,15 @@
 
                                                 <template v-else-if="airshit.data[gas]['aqi'] === null">
                                                     <span class="lead font-weight-bold text-lowercase d-block">
-                                                    {{ airshit.data[gas]['concentration'].toFixed(0) }} </span> {{ airshit.data[gas]['units'] }}
+                                                        {{ getRealConcentration(airshit.data[gas]['concentration']) }}
+                                                    </span>{{ airshit.data[gas]['units'] }}
                                                 </template>
 
                                                 <template v-else>
                                                     <small class="font-size-80 d-block mx-n1">
-                                                        <span class="text-lowercase">{{ airshit.data[gas]['concentration'] }} </span>{{ airshit.data[gas]['units'] }}
+                                                        <span class="text-lowercase">
+                                                            {{ airshit.data[gas]['concentration'] }}
+                                                        </span>{{ airshit.data[gas]['units'] }}
                                                     </small>
                                                 </template>
                                             </p>
@@ -276,6 +292,10 @@
 
                     <div class="mb-0 small text-xl-right text-center mt-3" id="poweredbys">
                         <p class="mb-0" v-if="Object.keys(geography).length > 0">
+                            <span class="d-block mb-2">
+                                <sup style="font-size: 100%;">&#10013;</sup>
+                                <span class="text-right mt-0 ml-1 d-inline-block small mb-0">pollutant not regulated by the US EPA</span>
+                            </span>
                             <span class="d-block mb-2">
                                 AIS, {{ localMeasurements }} recorded at base station.
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago)</span>
@@ -445,7 +465,7 @@
                                                         <span class="mr-3">
                                                             {{ weather.data.windSpeed.toFixed(0) }} &mdash; {{ weather.data.windGust.toFixed(0) }}<sub>mph</sub>
                                                         </span>
-                                                        <span class="d-inline-block lead mb-0" :title="`wind bearing from ${weather.data.windBearing}\xB0`" :style="`transform: rotate(${degeesToRotation(weather.data.windBearing)}deg)`">
+                                                        <span class="d-inline-block lead mb-0" :title="`wind bearing from ${weather.data.windBearing}\xB0`" :style="`transform: rotate(${convertDegeesToRotation(weather.data.windBearing)}deg)`">
                                                             &darr;
                                                         </span>
                                                     </template>
@@ -567,7 +587,7 @@
                                             <td>
                                                 <p class="lead mb-0 text-lowercase"><abbr title="See 'Region' below for coordinates">Region</abbr> Traffic</p>
                                                 <p class="mb-0">
-                                                    <a href="#" class="d-block small" @click.prevent="toggle('activeIndustries', 'traffic')">
+                                                    <a href="#" class="d-block small" @click.prevent="toggleActiveTable('activeIndustries', 'traffic')">
                                                         {{ ((activeIndustries.indexOf('traffic') > -1 ) ? 'hide' : 'show') }} traffic
                                                     </a>
                                                 </p>
@@ -628,7 +648,7 @@
                                                     <abbr title="See 'Region' below for coordinates">Region</abbr> Flights
                                                 </p>
                                                 <p class="mb-0">
-                                                    <a href="#" class="d-block small" @click.prevent="toggle('activeIndustries', 'flights')">
+                                                    <a href="#" class="d-block small" @click.prevent="toggleActiveTable('activeIndustries', 'flights')">
                                                         {{ ((activeIndustries.indexOf('flights') > -1 ) ? 'hide' : 'show') }} flights
                                                     </a>
                                                 </p>
@@ -637,17 +657,17 @@
                                                 <p class="lead mb-0">
                                                     <span class="separator">
                                                         <span class="number--blurred" v-if="! flights.data"></span>
-                                                        <span v-else class="font-weight-bold">{{ getAirportFlights('GYY').length }}</span>
+                                                        <span v-else class="font-weight-bold">{{ getFlightsByAirport('GYY').length }}</span>
                                                         <small class="small font-weight-light">to/from Gary/GYY</small>
                                                     </span>
                                                     <span class="separator">
                                                         <span class="number--blurred" v-if="! flights.data"></span>
-                                                        <span v-else class="font-weight-bold">{{ getAirportFlights('MDW').length }}</span>
+                                                        <span v-else class="font-weight-bold">{{ getFlightsByAirport('MDW').length }}</span>
                                                         <small class="small font-weight-light">to/from Midway/MDW</small>
                                                     </span>
                                                     <span class="separator">
                                                         <span class="number--blurred" v-if="! flights.data"></span>
-                                                        <span v-else class="font-weight-bold">{{ getAirportFlights('ORD').length }}</span>
+                                                        <span v-else class="font-weight-bold">{{ getFlightsByAirport('ORD').length }}</span>
                                                         <small class="small font-weight-light">to/from O'Hare/ORD</small>
                                                     </span>
                                                 </p>
@@ -693,7 +713,7 @@
                                                     <abbr title="See 'Lake' below for coordinates">Lake</abbr> Ships
                                                 </p>
                                                 <p class="mb-0">
-                                                    <a href="#" class="d-block small" @click.prevent="toggle('activeIndustries', 'ships')">
+                                                    <a href="#" class="d-block small" @click.prevent="toggleActiveTable('activeIndustries', 'ships')">
                                                         {{ ((activeIndustries.indexOf('ships') > -1 ) ? 'hide' : 'show') }} ships
                                                     </a>
                                                 </p>
@@ -757,7 +777,7 @@
                                                     <abbr title="See 'Region' below for coordinates">Region</abbr> Trains
                                                 </p>
                                                 <p class="mb-0">
-                                                    <a href="#" class="d-block small" @click.prevent="toggle('activeIndustries', 'trains')">
+                                                    <a href="#" class="d-block small" @click.prevent="toggleActiveTable('activeIndustries', 'trains')">
                                                         {{ ((activeIndustries.indexOf('trains') > -1 ) ? 'hide' : 'show') }} trains
                                                     </a>
                                                 </p>
@@ -1426,6 +1446,7 @@ export default {
         return {
             loaded: {
                 trends: false,
+                error: false,
             },
 
             activeIndustries: [],
@@ -1473,34 +1494,65 @@ export default {
     },
 
     methods: {
-        buildChart(trends) {
-          trendWorker.send({ trends, measurements: this.measurements })
+        convertDegeesToRotation(angle) {
+            return angle;
         },
 
-        getAirportFlights(airport) {
-            return this.flights.data.filter((flight) => {
-                return flight.departing === airport || flight.arriving === airport;
-            });
+        convertToLineBreaks(string) {
+            const regex = /\\n|\\r\\n|\\n\\r|\\r/g;
+            return string.replace(regex, '<br>');
         },
 
-        toggle(variable, value) {
+        sum(arr) {
+          return (arr.reduce((a, b) => a + b, 0)).toFixed(0);
+        },
+
+        avg(arr) {
+          return (this.sum(arr) / arr.length || 0).toFixed(0);
+        },
+
+        max(arr) {
+            return (Math.abs(Math.max(...arr)) !== Infinity ? Math.max(...arr) : 0).toFixed(0);
+        },
+
+        toggleActiveTable(variable, value) {
             this[variable] = this[variable].includes(value) ? this[variable].filter(i => i !== value) : [ ...this[variable], value ];
         },
 
-        removeMapMask() {
-            this.mapMaskActive = false;
+        formatDateTime(datetime, format = 'Do MMM YYYY HH:mm') {
+            return moment(datetime).format(format);
+        },
+
+        formatDateTimeDiffToHuman(end) {
+            const moment1 = moment();
+            const moment2 = moment(end)
+            return moment.duration(moment1.diff(moment2)).humanize();
+        },
+
+        formatDateTimeToLocal(datetime, format = 'Do MMM YY HH:mm') {
+            return moment.utc(datetime).local().format(format);
+        },
+
+        formatDateTimeDiffToLocalHuman(datetime) {
+            const moment1 = moment.utc(datetime);
+            const moment2 = moment().utc();
+            return moment.duration(moment1.diff(moment2)).humanize();
         },
 
         getTrendValues() {
             API.get(`/trend`).then(response => {
                 const { data: { weathers, airshits, flights, traffics, trains, vessels } } = response;
 
-                this.buildChart({ weathers, airshits, flights, traffics, trains, vessels })
+                this.buildTrendChart({ weathers, airshits, flights, traffics, trains, vessels })
             })
             .catch(e => {
-                alert('error!');
+                this.error = true;
                 console.log(e); // eslint-disable-line no-console
             });
+        },
+
+        buildTrendChart(trends) {
+          trendWorker.send({ trends, measurements: this.measurements })
         },
 
         getHighestValues() {
@@ -1508,7 +1560,7 @@ export default {
                 this.$store.commit('setHistoricalHighs', response.data);
             })
             .catch(e => {
-                alert('error!');
+                this.error = true;
                 console.log(e); // eslint-disable-line no-console
             });
         },
@@ -1530,7 +1582,7 @@ export default {
                 this.initMap();
             })
             .catch(e => {
-                alert('error!');
+                this.error = true;
                 console.log(e); // eslint-disable-line no-console
             });
         },
@@ -1571,12 +1623,12 @@ export default {
                 }
             });
 
-            const sensorIcon        = new LeafIcon({iconUrl: `${root}/images/maps/icons8-radio-tower-50.png`});
-            const trainIcon         = new LeafIcon({iconUrl: `${root}/images/maps/icons8-train-50.png`});
-            const aircraftIcon      = new LeafIcon({iconUrl: `${root}/images/maps/icons8-airport-50.png`});
-            const boatIcon          = new LeafIcon({iconUrl: `${root}/images/maps/icons8-fishing-boat-50.png`});
-            const trafficIcon       = new LeafIcon({iconUrl: `${root}/images/maps/icons8-traffic-jam-50.png`});
-            const shitIcon          = new LeafIcon({iconUrl: `${root}/images/maps/icons8-factory-50.png`});
+            const sensorIcon        = new LeafIcon({ iconUrl: `${root}/images/maps/icons8-radio-tower-50.png` });
+            const trainIcon         = new LeafIcon({ iconUrl: `${root}/images/maps/icons8-train-50.png` });
+            const aircraftIcon      = new LeafIcon({ iconUrl: `${root}/images/maps/icons8-airport-50.png` });
+            const boatIcon          = new LeafIcon({ iconUrl: `${root}/images/maps/icons8-fishing-boat-50.png` });
+            const trafficIcon       = new LeafIcon({ iconUrl: `${root}/images/maps/icons8-traffic-jam-50.png` });
+            const shitIcon          = L.divIcon({ html: '💩', className: 'leaflet-emoji' });
 
             megaemitters.forEach((shit) => {
                 L.marker([ shit.lat, shit.lng ], { icon: shitIcon }).bindPopup(`${shit.name}`).addTo(map);
@@ -1635,7 +1687,7 @@ export default {
             });
 
             self.vessels.data.forEach((vessel) => {
-                const vesselAngle = (vessel.direction ? this.degeesToRotation(vessel.direction) : 0);
+                const vesselAngle = (vessel.direction ? this.convertDegeesToRotation(vessel.direction) : 0);
                 L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
                     ${(this.getVesselPhoto(vessel.imo) ? `<img class="mw-100 mb-2" src="${ this.getVesselPhoto(vessel.imo) }" />` : ' ')}
                     Name: ${vessel.name}<br>
@@ -1666,8 +1718,20 @@ export default {
             });
         },
 
-        degeesToRotation(angle) {
-            return angle;
+        removeMapMask() {
+            this.mapMaskActive = false;
+        },
+
+        getLatestUpdated() {
+            const dates = [
+                new Date(this.flights.createdAt),
+                new Date(this.vessels.createdAt),
+                new Date(this.trains.createdAt),
+                new Date(this.traffic.createdAt),
+                new Date(this.airshit.createdAt)
+            ];
+
+            return this.formatDateTimeDiffToLocalHuman(new Date(Math.max(...dates)));
         },
 
         getOverallAqiScore(total) {
@@ -1724,59 +1788,10 @@ export default {
             return pm25 + pm10 + so2 + no2 + o3 + co;
         },
 
-        formatDateTime(datetime, format = 'Do MMM YYYY HH:mm') {
-            return moment(datetime).format(format);
-        },
-
-        formatDateTimeDiffToHuman(end) {
-            const moment1 = moment();
-            const moment2 = moment(end)
-            return moment.duration(moment1.diff(moment2)).humanize();
-        },
-
-        formatDateTimeToLocal(datetime, format = 'Do MMM YY HH:mm') {
-            return moment.utc(datetime).local().format(format);
-        },
-
-        formatDateTimeDiffToLocalHuman(datetime) {
-            const moment1 = moment.utc(datetime);
-            const moment2 = moment().utc();
-            return moment.duration(moment1.diff(moment2)).humanize();
-        },
-
         getReversedCoordinates(region) {
             return region.map((coordinates) => {
                 return [...coordinates].reverse();
             }).join('\r\n');
-        },
-
-        convertToLineBreaks(string) {
-            const regex = /\\n|\\r\\n|\\n\\r|\\r/g;
-            return string.replace(regex, '<br>');
-        },
-
-        sum(arr) {
-          return (arr.reduce((a, b) => a + b, 0)).toFixed(0);
-        },
-
-        avg(arr) {
-          return (this.sum(arr) / arr.length || 0).toFixed(0);
-        },
-
-        max(arr) {
-            return (Math.abs(Math.max(...arr)) !== Infinity ? Math.max(...arr) : 0).toFixed(0);
-        },
-
-        getLatestUpdated() {
-            const dates = [
-                new Date(this.flights.createdAt),
-                new Date(this.vessels.createdAt),
-                new Date(this.trains.createdAt),
-                new Date(this.traffic.createdAt),
-                new Date(this.airshit.createdAt)
-            ];
-
-            return this.formatDateTimeDiffToLocalHuman(new Date(Math.max(...dates)));
         },
 
         advisoriesByZone(filter) {
@@ -1797,10 +1812,10 @@ export default {
             return locations;
         },
 
-        generateAdvisoryPopup(e) {
+        generateAdvisoryPopup(advisory) {
             let list = ``;
 
-            const events = this.advisoriesByZone(e.toUpperCase())[e.toUpperCase()] || [].map(a => a.event)
+            const events = this.advisoriesByZone(advisory.toUpperCase())[advisory.toUpperCase()] || [].map(a => a.event)
 
             for (const idx of events) {
                 list += `<li>${idx.event}</li>`;
@@ -1812,12 +1827,18 @@ export default {
 
             return `
                 <div>
-                    <strong>${this.lakeZones[e.toUpperCase()]}</strong>
+                    <strong>${this.lakeZones[advisory.toUpperCase()]}</strong>
                     <ul class="pl-4">
                         ${list}
                     </ul>
                 </div>
             `;
+        },
+
+        getFlightsByAirport(airport) {
+            return this.flights.data.filter((flight) => {
+                return flight.departing === airport || flight.arriving === airport;
+            });
         },
 
         getVesselPhoto(imoNumber) {
@@ -1842,6 +1863,14 @@ export default {
 
             return real
         },
+
+        getRealConcentration(concentration) {
+            if (concentration > 0) {
+                return concentration.toFixed(0);
+            }
+
+            return 0;
+        },
     },
 
     mounted() {
@@ -1849,7 +1878,8 @@ export default {
         $('body').scrollspy({ target: '#site-navigation', offset: 50 });
 
         trendWorker.worker.onmessage = event => {
-            self.initChart(event.data);
+            const { data: options } = event;
+            self.initChart(options);
             self.loaded.trends = true;
         }
     },

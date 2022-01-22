@@ -285,6 +285,10 @@ textarea {
 // Map
 // -------------------------
 
+.leaflet-emoji {
+    font-size: 1.33rem;
+}
+
 .map-container {
     &.map-container--has-mask {
         cursor: pointer;
