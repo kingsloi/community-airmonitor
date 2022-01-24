@@ -7,8 +7,8 @@ const Vessel = require('../models/Vessel');
 const VesselPhoto = require('../models/VesselPhoto');
 const Weather = require('../models/Weather');
 
-const { gases } = require('../seeds/gases.js');
-const { pms } = require('../seeds/pms.js');
+// const { gases } = require('../seeds/gases.js');
+// const { pms } = require('../seeds/pms.js');
 
 const moment = require('moment');
 const axios = require('axios');
@@ -29,7 +29,7 @@ exports.currently = async (req, res) => {
   const vesselphotos = await VesselPhoto.find();
 
   const advisories   = await Advisories.findOne({}, {}, { sort: { _id: -1 } });
-  const airshit      = await Airshit.findOne({}, {}, { sort: { _id: -1 } });
+  const airshit      = await Airshit.findOne({ type: 'advanced' }, {}, { sort: { _id: -1 } });
   const flight       = await Flight.findOne({}, {}, { sort: { _id: -1 } });
   const traffic      = await Traffic.findOne({}, {}, { sort: { _id: -1 } });
   const train        = await Train.findOne({}, {}, { sort: { _id: -1 } });
@@ -66,7 +66,7 @@ exports.trend = async (req, res) => {
 
   const weathers      = await Weather.find({ createdAt: {'$gte': end, '$lte': start } });
   const advisories    = await Advisories.find({ createdAt: {'$gte': end, '$lte': start } });
-  const airshits      = await Airshit.find({ createdAt: {'$gte': end, '$lte': start } });
+  const airshits      = await Airshit.find({ createdAt: {'$gte': end, '$lte': start }, type: 'advanced' });
   const flights       = await Flight.find({ createdAt: {'$gte': end, '$lte': start } });
   const traffics      = await Traffic.find({ createdAt: {'$gte': end, '$lte': start } });
   const trains        = await Train.find({ createdAt: {'$gte': end, '$lte': start } });
@@ -86,10 +86,10 @@ exports.highs = (req, res) => {
 
   async.series([
     (callback) => { // month high
-      Airshit.find({ createdAt: {'$gte': startMonth, '$lte': endMonth}}).exec(callback);
+      Airshit.find({ createdAt: {'$gte': startMonth, '$lte': endMonth}, type: 'advanced' }).exec(callback);
     },
     (callback) => { // year high
-      Airshit.find({ createdAt: {'$gte': startYear, '$lte': endYear}}).exec(callback);
+      Airshit.find({ createdAt: {'$gte': startYear, '$lte': endYear}, type: 'advanced' }).exec(callback);
     },
     (callback) => { // all time high
       Airshit.aggregate([
@@ -452,47 +452,51 @@ exports.getSimpleAirQuality = async () => {
 
 exports.getAdvancedAirQuality = async () => {
   try {
-    // const { data: { token } } = await axios.post(`https://api.aqmeshdata.net/api/Authenticate`, {
-    //   username: process.env.AQMESH_USERNAME,
-    //   password: process.env.AQMESH_PASSWORD
-    // });
+    const endpoint = process.env.AQMESH_ENDPOINT_URL;
 
-    // const { data } = await axios.get(`https://api.aqmeshdata.net/api/Pods/Assets_V1`, {
-    //   headers: {
-    //     'authorization': `Bearer ${token}`
-    //   }
-    // });
+    const { data: { token } } = await axios.post(`${endpoint}/api/Authenticate`, {
+      username: process.env.AQMESH_USERNAME,
+      password: process.env.AQMESH_PASSWORD
+    });
 
-    // const locations = data.map(p => p.location_number);
+    const { data } = await axios.get(`${endpoint}/api/Pods/Assets_V1`, {
+      headers: {
+        'authorization': `Bearer ${token}`
+      }
+    });
 
-    // const promises = [];
+    const locations = data.map(p => p.location_number);
 
-    // for (const i in locations) {
-    //   const location = locations[i];
+    const promises = [];
 
-    //   // GAS, F, ppb: https://apitest.aqmeshdata.net/api/LocationData/next/${location}/1/10
-    //   // PM, F, ppb   : https://apitest.aqmeshdata.net/api/LocationData/next/${location}/2/11
-    //   const sensors = ['1/10', '2/11'];
+    for (const i in locations) {
+      const location = locations[i];
 
-    //   for (const x in sensors) {
-    //     const params = sensors[x];
+      // GAS, F, ppb: /api/LocationData/next/${location}/1/10
+      // PM, F, ppb : /api/LocationData/next/${location}/2/11
+      const sensors = ['1/10', '2/11'];
 
-    //     const { data } = await axios.get(`https://api.aqmeshdata.net/api/LocationData/next/${location}/${params}`, {
-    //       headers: {
-    //         'authorization': `Bearer ${token}`
-    //       }
-    //     });
-    //     promises.push(data);
-    //   }
-    // }
+      for (const x in sensors) {
+        const params = sensors[x];
 
-    // const [ gases, pms ] = await Promise.all(promises);
+        const { data } = await axios.get(`${endpoint}/api/LocationData/next/${location}/${params}`, {
+          headers: {
+            'authorization': `Bearer ${token}`
+          }
+        });
+        promises.push(data);
+      }
+    }
+
+    const [ gases, pms ] = await Promise.all(promises);
 
     const measurements = [];
 
     let combined = [...pms, ...gases];
 
-    combined.sort((a, b)=> new Date(a.reading_datestamp) - new Date(b.reading_datestamp));
+    // console.log(JSON.stringify(combined));
+
+    combined.sort((a, b) => new Date(a.reading_datestamp) - new Date(b.reading_datestamp));
 
     const grouped = _.groupBy(combined, (p) => moment(p.reading_datestamp).format('YYYY-MM-DD HH:mm'));
 
@@ -503,8 +507,7 @@ exports.getAdvancedAirQuality = async () => {
 
       // loop through all pollutants, grab their measurement, and get the AQI for it
       for await (const measurement of pollutants) {
-        // const measurement = pollutants[idx];
-        // return;
+
         // Only get the data we're interested in
         await ['pm1', 'pm2_5', 'pm4', 'pm10', 'co', 'no', 'no2', 'so2', 'o3', 'h2s', 'eo', 'aux1', 'aux2'].forEach(async (pollutant) => {
 
@@ -670,6 +673,8 @@ exports.sync = async (req, res) => {
 
 exports.migrate = async (req, res) => {
   const { hash } = req.query;
+
+  return res.json({ ran: true });
 
   if (hash !== process.env.SYNC_SECRET_HASH) {
     res.status(400).end();
