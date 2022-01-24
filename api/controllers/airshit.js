@@ -625,6 +625,8 @@ exports.sync = async (req, res) => {
         metrics.advisories = advisories;
       break;
       case 'airquality-simple':
+      case 'airquality-purpleair':
+      case 'airquality-purple-air':
         const simple = await module.exports.getSimpleAirQuality();
 
         model = new Airshit({
