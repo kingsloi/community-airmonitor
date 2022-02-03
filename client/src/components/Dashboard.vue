@@ -1444,9 +1444,10 @@ export default {
 
     data() {
         return {
+            error: false,
+
             loaded: {
                 trends: false,
-                error: false,
             },
 
             activeIndustries: [],

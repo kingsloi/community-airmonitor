@@ -65,7 +65,10 @@ addEventListener("message", event => {
 
     for (const measurement in measurements) {
       const value = measurements[measurement];
-      const aqis = filtered.map(a => a[value] || {}).map(a => a.aqi >= 0 ? a.aqi : a.concentration);
+      const aqis = filtered.map(a => a[value] || {}).map((a) => {
+        return typeof a.aqi === 'undefined' || a.aqi === null ? a.concentration : a.aqi;
+      });
+
       sum.push(...aqis.filter(e => e >= 0));
 
       idx = datasets.findIndex(d => d.name === value.replace('REALTIME', ''));
@@ -135,6 +138,17 @@ addEventListener("message", event => {
     '#6F4E7C',
     '#60bf60',
   ];
+
+// remove empties
+for (const dataset of datasets) {
+  const { data, name } = dataset;
+
+  if (data.every(d => d == 0)) {
+    const idxa = datasets.findIndex(d => d.name === name);
+    datasets.splice(idxa, 1);
+    colors.splice(idxa, 1);
+  }
+}
 
   const options = {
     series: datasets,
