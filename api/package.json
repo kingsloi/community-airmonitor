@@ -38,7 +38,7 @@
     "lodash": "^4.17.15",
     "lusca": "^1.6.1",
     "mailchecker": "^3.2.35",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mongoose": "^5.7.5",
     "mongoose-paginate-v2": "^1.3.1",
     "morgan": "^1.9.1",
