@@ -19,7 +19,7 @@
     "leaflet": "^1.6.0",
     "leaflet-rotatedmarker": "^0.2.0",
     "lodash": "^4.17.21",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "popper.js": "^1.16.0",
     "serve-index": "^1.9.1",
     "timeline-vuejs": "^1.0.11",
