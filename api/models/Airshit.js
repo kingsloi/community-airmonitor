@@ -62,6 +62,13 @@ const airshitSchema = new mongoose.Schema({
     units: String,
   },
 
+  CO2REALTIME: {
+    concentration: Number,
+    aqi: Number,
+    category: String,
+    units: String,
+  },
+
   H2SREALTIME: {
     concentration: Number,
     aqi: Number,

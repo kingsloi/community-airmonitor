@@ -450,7 +450,7 @@ exports.getSimpleAirQuality = async () => {
   }
 }
 
-exports.getAdvancedAirQuality = async () => {
+exports.getAdvancedAirQualityByAQMesh = async () => {
   try {
     const endpoint = process.env.AQMESH_ENDPOINT_URL;
 
@@ -554,6 +554,83 @@ exports.getAdvancedAirQuality = async () => {
   }
 }
 
+exports.getAdvancedAirQualityBySensit = async () => {
+  try {
+    const endpoint = process.env.SENSIT_ENDPOINT_URL;
+
+    const { data: { accessToken } } = await axios.post(`${endpoint}/users/signin`, {
+      email: process.env.SENSIT_USERNAME,
+      password: process.env.SENSIT_PASSWORD
+    });
+
+    const date = moment().utc();
+    const StartDate = date.clone().subtract(30, 'minutes').format();
+    const EndDate = date.clone().subtract(15, 'minutes').format()
+
+    const { data: { data } } = await axios.post(`${endpoint}/sensors-data/getRAMPDeviceLogBetweenTimePeriod`, {
+      DeviceId: "1014",
+      StartDate,
+      EndDate,
+    }, {
+      headers: {
+        'authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const pollutants = {
+      'PM_1_1_0': 'PM1',
+      'PM_1_2_5': 'PM25',
+      'PM_1_10_0': 'PM10',
+      'CO': 'CO',
+      'NO': 'NO',
+      'NO2': 'NO2',
+      'SO2': 'SO2',
+      'CO2': 'CO2'
+    }
+
+    const measurements = [];
+
+    // Only get the data we're interested in
+    for (const measurement of data) {
+
+      const { date } = measurement;
+      const timestamp = moment(date).format('YYYY-MM-DD HH:mm')
+
+      if (! measurements[timestamp]) {
+        measurements[timestamp] = {};
+      }
+
+      for await (const theirs of Object.keys(pollutants)) {
+        const ours = pollutants[theirs];
+        const value = measurement[theirs];
+
+        const actual = (ours === 'PM25' ? 'PM2.5' : ours);
+        const units = () => {
+          if (ours === 'CO2') {
+            return `ppm`;
+          } else if (['CO','NO','NO2','SO2'].indexOf(ours)) {
+            return `ppb`;
+          }
+          return `µg/m3`;
+        }
+
+        try {
+          const { concentration, aqi, category } = await aqibot.AQICalculator.getAQIResult(actual, value);
+          measurements[timestamp][`${ours}REALTIME`] = { concentration, aqi, category, units: units() };
+        } catch (e) {
+          measurements[timestamp][`${ours}REALTIME`] = { concentration: value, aqi: null, category: null, units: units() };
+        }
+      };
+    }
+
+    return measurements;
+  } catch (e) {
+    console.error(e);
+    return {};
+  }
+}
+
 exports.sync = async (req, res) => {
   const { hash, metrics: m } = req.query;
 
@@ -637,8 +714,8 @@ exports.sync = async (req, res) => {
 
         metrics.airquality = simple;
       break;
-      case 'airquality-advanced':
-        const advanced = await module.exports.getAdvancedAirQuality();
+      case 'airquality-aqmesh':
+        const advanced = await module.exports.getAdvancedAirQualityByAQMesh();
 
         for await (const datetime of Object.keys(advanced)) {
           const record = advanced[datetime];
@@ -653,6 +730,24 @@ exports.sync = async (req, res) => {
         }
 
         metrics.airquality = Object.assign({}, advanced);
+      break;
+      case 'airquality-sensit':
+        const advanced2 = await module.exports.getAdvancedAirQualityBySensit();
+
+        for await (const datetime of Object.keys(advanced2)) {
+          const record = advanced2[datetime];
+
+          model = new Airshit({
+            ...record,
+            createdAt: datetime,
+            type: 'advanced'
+          });
+
+          await model.save();
+        }
+
+        metrics.airquality = Object.assign({}, advanced2);
+
       break;
       default:
     }
