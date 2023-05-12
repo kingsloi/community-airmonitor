@@ -1414,7 +1414,7 @@ export default {
             const no = this.getOverallAqiScore(this.airshit.data.NOREALTIME && this.airshit.data.NOREALTIME.aqi || 0);
             const no2 = this.getOverallAqiScore(this.airshit.data.NO2REALTIME && this.airshit.data.NO2REALTIME.aqi || 0);
             const co = this.getOverallAqiScore(this.airshit.data.COREALTIME && this.airshit.data.COREALTIME.aqi || 0);
-            const co2 = this.getOverallAqiScore(this.airshit.data.CO2REALTIME && this.airshit.data.CO2REALTIME.aqi || 0);
+            const so2 = this.getOverallAqiScore(this.airshit.data.SO2REALTIME && this.airshit.data.SO2REALTIME.aqi || 0);
 
             const severity = [
                 'good',
@@ -1427,7 +1427,7 @@ export default {
 
             return severity[Math.max(
                 severity.indexOf(pm1), severity.indexOf(pm25), severity.indexOf(pm10),
-                severity.indexOf(no), severity.indexOf(no2), severity.indexOf(co), severity.indexOf(co2)
+                severity.indexOf(no), severity.indexOf(no2), severity.indexOf(co), severity.indexOf(so2)
             )];
         },
         overallFlightTotal() {
@@ -1467,7 +1467,7 @@ export default {
 
             measurementTypes: {
                 pm:     ['PM1REALTIME','PM25REALTIME', 'PM10REALTIME'],
-                gases:  ['NO2REALTIME', 'NOREALTIME', 'COREALTIME', 'CO2REALTIME'],
+                gases:  ['NO2REALTIME', 'NOREALTIME', 'COREALTIME', 'SO2REALTIME'],
             },
 
             measurements: {
@@ -1478,7 +1478,7 @@ export default {
                 'measurement-4': 'NOREALTIME',
                 'measurement-5': 'NO2REALTIME',
                 'measurement-6': 'COREALTIME',
-                'measurement-7': 'CO2REALTIME',
+                'measurement-7': 'SO2REALTIME',
             },
         }
     },
@@ -1784,9 +1784,9 @@ export default {
             const no = airshit.NOREALTIME && airshit.NOREALTIME.aqi || 0;
             const no2 = airshit.NO2REALTIME && airshit.NO2REALTIME.aqi || 0;
             const co = airshit.COREALTIME && airshit.COREALTIME.aqi || 0;
-            const co2 = airshit.CO2REALTIME && airshit.CO2REALTIME.aqi || 0;
+            const so2 = airshit.SO2REALTIME && airshit.SO2REALTIME.aqi || 0;
 
-            return pm1 + pm25 + pm10 + no + no2 + co + co2;
+            return pm1 + pm25 + pm10 + no + no2 + co + so2;
         },
 
         getReversedCoordinates(region) {
