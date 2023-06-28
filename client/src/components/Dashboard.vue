@@ -1485,8 +1485,8 @@ export default {
 
     created () {
         this.getLatestValues();
-        this.getHighestValues();
-        this.getTrendValues();
+        // this.getHighestValues();
+        // this.getTrendValues();
     },
 
     watch: {
