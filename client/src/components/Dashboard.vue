@@ -1609,9 +1609,12 @@ export default {
                 this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
             ], 10);
 
-            L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
-                maxZoom: 20,
-                attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+            L.tileLayer('https://{s}.tile.jawg.io/jawg-terrain/{z}/{x}/{y}{r}.png?access-token={accessToken}', {
+                attribution: '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                minZoom: 0,
+                maxZoom: 19,
+                subdomains: 'abcd',
+                accessToken: 'bYsGASvQL4qDSdRUL7lHpEmOY6lKkZ1wiK8CGmZGNPiS3HTc4sNyOzkhaCmPfzKa'
             }).addTo(map);
 
             const LeafIcon = L.Icon.extend({
