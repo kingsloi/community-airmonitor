@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "postinstall": "npm rebuild node-sass",
-    "start": "./node_modules/nodemon/bin/nodemon.js app.js",
+    "start": "NODE_OPTIONS=--max-old-space-size=1536 ./node_modules/nodemon/bin/nodemon.js app.js",
     "test": "nyc mocha --timeout=10000 --exit",
     "lint": "eslint \"**/*.js\""
   },
