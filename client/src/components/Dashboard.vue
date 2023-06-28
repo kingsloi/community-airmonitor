@@ -50,14 +50,14 @@
                 </div>
 
                 <div class="col-xl-4 mt-5 mt-xl-0 px-xl-3 px-xl-0" id="currently">
-                    <div class="stat stat--weather">
+                    <div class="stat stat--weather" v-if="weather.data">
 
                         <h2 class="small text-uppercase clearfix">Weather</h2>
                         <div class="row">
                             <div class="col">
                                 <div class="aqi-card h-100 aqi">
                                     <div class="card-body small py-1">
-                                        <div class="summary" v-if="weather.data">
+                                        <div class="summary">
                                             <span class="mr-2">{{ weather.data.summary.toLowerCase() }},</span>
                                             <span class="mr-2">{{ weather.data.apparentTemperature.toFixed(0) }}&deg;F, </span>
                                             <span class="mr-1">
@@ -1609,10 +1609,9 @@ export default {
                 this.$store.state.geography.sensor.lat, this.$store.state.geography.sensor.lng
             ], 10);
 
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-                subdomains: 'abcd',
-                maxZoom: 19
+            L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
             }).addTo(map);
 
             const LeafIcon = L.Icon.extend({
