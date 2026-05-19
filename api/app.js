@@ -113,9 +113,9 @@ app.use('/files', express.static('public/files'), serveIndex('public/files', {
   'stylesheet': path.join(__dirname, '../', 'client', 'public', 'directory-listing.css'),
 }))
 
-app.get('/currently', cache.route({ expire: 30  }), airShirtController.currently);
+app.get('/currently', cache.route({ expire: 300  }), airShirtController.currently);
 app.get('/trend', cache.route({ expire: 86400  }), airShirtController.trend);
-app.get('/highs',  airShirtController.highs);
+app.get('/highs', cache.route({ expire: 86400  }), airShirtController.highs);
 app.get('/sync', airShirtController.sync);
 app.get('/migrate', airShirtController.migrate);
 //app.get('/previous-by-day', cache.route({ expire: 86400  }), airShirtController.past);
