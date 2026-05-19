@@ -52,7 +52,9 @@
                 <div class="col-xl-4 mt-5 mt-xl-0 px-xl-3 px-xl-0" id="currently">
                     <div class="stat stat--weather" v-if="weather.data">
 
-                        <h2 class="small text-uppercase clearfix">Weather</h2>
+                        <h2 class="small text-uppercase clearfix">Weather
+                            <span v-if="isStale(weather.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(weather.createdAt) }} ago</span>
+                        </h2>
                         <div class="row">
                             <div class="col">
                                 <div class="aqi-card h-100 aqi">
@@ -76,7 +78,9 @@
                     </div>
 
                     <div class="stat stat--airquality mt-4">
-                        <h2 class="small text-uppercase">Overall Air Quality</h2>
+                        <h2 class="small text-uppercase">Overall Air Quality
+                            <span v-if="isStale(airshit.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
+                        </h2>
                         <div class="row">
                             <div class="col" >
                                 <div class="aqi-card aqi h-100 "
@@ -91,7 +95,9 @@
                     </div>
 
                     <div class="stat stat--pm mt-4">
-                        <h2 class="small text-uppercase clearfix">Particulate Matter</h2>
+                        <h2 class="small text-uppercase clearfix">Particulate Matter
+                            <span v-if="isStale(airshit.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
+                        </h2>
                         <div class="row condensed">
 
                             <template v-for="pm in measurementTypes.pm">
@@ -139,7 +145,9 @@
                         v-if="airshitContainsGases"
                     >
 
-                        <h2 class="small text-uppercase">Gases</h2>
+                        <h2 class="small text-uppercase">Gases
+                            <span v-if="isStale(airshit.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
+                        </h2>
 
                         <div class="row condensed">
                             <template v-for="gas in measurementTypes.gases">
@@ -187,7 +195,9 @@
                     </div>
 
                     <div class="stat stat--industry mt-4">
-                        <h2 class="small text-uppercase">Industry/traffic</h2>
+                        <h2 class="small text-uppercase">Industry/traffic
+                            <span v-if="isStale(flights.createdAt) || isStale(vessels.createdAt) || isStale(traffic.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">some data stale</span>
+                        </h2>
                         <div class="row condensed">
                             <!-- Vessels -->
                             <div class="col">
@@ -201,6 +211,7 @@
                                     </p>
                                     <p class="mb-0 text-uppercase font-weight-bold ">
                                         <small class="font-size-80  d-block">Lake boats</small>
+                                        <small v-if="isStale(vessels.createdAt)" class="d-block text-warning font-weight-normal text-lowercase">{{ formatDateTimeDiffToLocalHuman(vessels.createdAt) }} ago</small>
                                     </p>
                                   </div>
                                 </div>
@@ -218,6 +229,7 @@
                                     </p>
                                     <p class="mb-0 text-uppercase font-weight-bold ">
                                         <small class="font-size-80  d-block">NWI flights</small>
+                                        <small v-if="isStale(flights.createdAt)" class="d-block text-warning font-weight-normal text-lowercase">{{ formatDateTimeDiffToLocalHuman(flights.createdAt) }} ago</small>
                                     </p>
                                   </div>
                                 </div>
@@ -235,6 +247,7 @@
                                     </p>
                                     <p class="mb-0 text-uppercase font-weight-bold ">
                                         <small class="font-size-80  d-block">NWI Trains</small>
+                                        <small v-if="isStale(trains.createdAt)" class="d-block text-warning font-weight-normal text-lowercase">{{ formatDateTimeDiffToLocalHuman(trains.createdAt) }} ago</small>
                                     </p>
                                   </div>
                                 </div>
@@ -252,6 +265,7 @@
                                     </p>
                                     <p class="mb-0 text-uppercase font-weight-bold ">
                                         <small class="font-size-80  d-block">NWI miles</small>
+                                        <small v-if="isStale(traffic.createdAt)" class="d-block text-warning font-weight-normal text-lowercase">{{ formatDateTimeDiffToLocalHuman(traffic.createdAt) }} ago</small>
                                     </p>
                                   </div>
                                 </div>
@@ -260,7 +274,9 @@
                     </div>
 
                     <div class="stat stat--advisories mt-4">
-                        <h2 class="small text-uppercase">Southernmost Lake Michigan Advisories</h2>
+                        <h2 class="small text-uppercase">Southernmost Lake Michigan Advisories
+                            <span v-if="isStale(advisories.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(advisories.createdAt) }} ago</span>
+                        </h2>
                         <div class="row">
                             <!-- advisories -->
                             <div class="col" >
@@ -1485,8 +1501,8 @@ export default {
 
     created () {
         this.getLatestValues();
-        // this.getHighestValues();
-        // this.getTrendValues();
+        this.getHighestValues();
+        this.getTrendValues();
     },
 
     watch: {
@@ -1537,6 +1553,11 @@ export default {
             const moment1 = moment.utc(datetime);
             const moment2 = moment().utc();
             return moment.duration(moment1.diff(moment2)).humanize();
+        },
+
+        isStale(datetime) {
+            if (!datetime) return false;
+            return moment().diff(moment.utc(datetime), 'hours') >= 1;
         },
 
         getTrendValues() {
