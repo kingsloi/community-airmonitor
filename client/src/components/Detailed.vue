@@ -213,7 +213,7 @@
                         <p class=" mb-0 font-weight-bold">
                           <span class="number--blurred" v-if="! airshit.REPORTED_WEATHER"></span>
                           <span v-else>
-                            {{ airshit.REPORTED_WEATHER['ozone'].toFixed(0) }}
+                            {{ airshit.REPORTED_WEATHER['ozone'] != null ? airshit.REPORTED_WEATHER['ozone'].toFixed(0) : 'N/A' }}
                           </span>
                           &nbsp;<a href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank"><sub>DU</sub></a>
                         </p>

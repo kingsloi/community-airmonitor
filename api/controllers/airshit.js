@@ -263,14 +263,49 @@ exports.getVessels = async () => {
   }
 }
 
+const WMO_WEATHER_CODES = {
+  0: 'Clear Sky', 1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
+  45: 'Fog', 48: 'Fog',
+  51: 'Drizzle', 53: 'Drizzle', 55: 'Drizzle',
+  56: 'Freezing Drizzle', 57: 'Freezing Drizzle',
+  61: 'Rain', 63: 'Rain', 65: 'Rain',
+  66: 'Freezing Rain', 67: 'Freezing Rain',
+  71: 'Snow', 73: 'Snow', 75: 'Snow', 77: 'Snow Grains',
+  80: 'Rain Showers', 81: 'Rain Showers', 82: 'Rain Showers',
+  85: 'Snow Showers', 86: 'Snow Showers',
+  95: 'Thunderstorm', 96: 'Thunderstorm', 99: 'Thunderstorm',
+};
+
+function getPrecipType(code) {
+  if ([56, 57, 66, 67, 71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].includes(code)) return 'rain';
+  return 'none';
+}
+
 exports.getWeather = async () => {
-  const location = `${process.env.LOCATION_LAT},${process.env.LOCATION_LON}`;
-  const weatherApiKey = process.env.FORCASTIO_API_KEY;
-  const exclude = 'minutely,hourly,daily,alerts,flags';
+  const lat = process.env.LOCATION_LAT;
+  const lon = process.env.LOCATION_LON;
+  const params = 'temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,surface_pressure,wind_speed_10m,wind_gusts_10m,wind_direction_10m,cloud_cover,uv_index,visibility,precipitation,weather_code';
 
   try {
-    const { data: { currently } } = await axios.get(`https://api.forecast.io/forecast/${weatherApiKey}/${location}?units=us&exclude=${exclude}`);
-    return currently;
+    const { data } = await axios.get(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=${params}&temperature_unit=fahrenheit&wind_speed_unit=mph`);
+    const c = data.current;
+    return {
+      summary: WMO_WEATHER_CODES[c.weather_code] || 'Unknown',
+      apparentTemperature: c.apparent_temperature,
+      dewPoint: c.dew_point_2m,
+      humidity: c.relative_humidity_2m / 100,
+      pressure: c.surface_pressure,
+      windSpeed: c.wind_speed_10m,
+      windGust: c.wind_gusts_10m,
+      windBearing: String(c.wind_direction_10m),
+      cloudCover: c.cloud_cover / 100,
+      uvIndex: c.uv_index,
+      visibility: c.visibility / 1609.34,
+      ozone: null,
+      precipIntensity: String(c.precipitation / 25.4),
+      precipType: getPrecipType(c.weather_code),
+    };
   } catch (e) {
     console.error(e);
     return {};

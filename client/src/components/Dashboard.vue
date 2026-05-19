@@ -562,7 +562,7 @@
                                             <td>
                                                 <p class="lead mb-0 font-weight-bold">
                                                     <span class="number--blurred" v-if="! weather.data"></span>
-                                                    <span v-else>{{ weather.data.ozone.toFixed(0) }}</span>
+                                                    <span v-else>{{ weather.data.ozone != null ? weather.data.ozone.toFixed(0) : 'N/A' }}</span>
                                                     <small><a href="https://en.wikipedia.org/wiki/Dobson_unit" role="button" target="_blank">DU</a></small>
                                                 </p>
                                             </td>
