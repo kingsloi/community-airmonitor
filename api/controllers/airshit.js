@@ -16,26 +16,23 @@ const aqibot = require('aqi-bot');
 const geo = require('geolocation-utils');
 const regionArea = require('../config/region');
 const { generatePageRange } = require('../helpers/pagination');
-const async = require('async');
-const calculations = require('../helpers/calculations');
 const _ = require('lodash');
 const fs = require('fs');
 const cache = require('express-redis-cache')();
 
 
 exports.currently = async (req, res) => {
-  const today = moment();
-
   const vesselphotos = await VesselPhoto.find();
 
-  const advisories   = await Advisories.findOne({}, {}, { sort: { _id: -1 } });
-  const airshit      = await Airshit.findOne({ type: 'advanced' }, {}, { sort: { _id: -1 } });
-  const flight       = await Flight.findOne({}, {}, { sort: { _id: -1 } });
-  const traffic      = await Traffic.findOne({}, {}, { sort: { _id: -1 } });
-  const train        = await Train.findOne({}, {}, { sort: { _id: -1 } });
-  const vessel       = await Vessel.findOne({}, {}, { sort: { _id: -1 } });
-
-  const weather      = await Weather.findOne({}, {}, { sort: { _id: -1 } });
+  const [advisories, airshit, flight, traffic, train, vessel, weather] = await Promise.all([
+    Advisories.findOne({ 'ADVISORIES.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
+    Airshit.findOne({ type: 'advanced' }, {}, { sort: { _id: -1 } }),
+    Flight.findOne({ 'FLIGHTS.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
+    Traffic.findOne({ 'INCIDENTS.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
+    Train.findOne({ 'SOUTHSHORE.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
+    Vessel.findOne({ 'VESSELS.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
+    Weather.findOne({ 'REPORTED_WEATHER': { $exists: true } }, {}, { sort: { _id: -1 } }),
+  ]);
 
   return res.json({
     advisories,
@@ -60,175 +57,119 @@ exports.currently = async (req, res) => {
 };
 
 exports.trend = async (req, res) => {
-  const today = moment();
-  const start = today.format('YYYY-MM-DD HH:mm:ss');
-  const end   = today.subtract(7, 'd').format('YYYY-MM-DD HH:mm:ss');
+  const sevenDaysAgo = moment().subtract(7, 'd').toDate();
+  const dateFilter = { createdAt: { '$gte': sevenDaysAgo } };
 
-  const weathers      = await Weather.find({ createdAt: {'$gte': end, '$lte': start } });
-  const advisories    = await Advisories.find({ createdAt: {'$gte': end, '$lte': start } });
-  const airshits      = await Airshit.find({ createdAt: {'$gte': end, '$lte': start }, type: 'advanced' });
-  const flights       = await Flight.find({ createdAt: {'$gte': end, '$lte': start } });
-  const traffics      = await Traffic.find({ createdAt: {'$gte': end, '$lte': start } });
-  const trains        = await Train.find({ createdAt: {'$gte': end, '$lte': start } });
-  const vessels       = await Vessel.find({ createdAt: {'$gte': end, '$lte': start } });
+  const [weathers, advisories, airshits, flights, traffics, trains, vessels] = await Promise.all([
+    Weather.find({ ...dateFilter, 'REPORTED_WEATHER': { $exists: true } }).select('REPORTED_WEATHER createdAt').lean(),
+    Advisories.find({ ...dateFilter, 'ADVISORIES.0': { $exists: true } }).select('ADVISORIES createdAt').lean(),
+    Airshit.find({ ...dateFilter, type: 'advanced' }).select('PM25REALTIME PM10REALTIME SO2REALTIME NO2REALTIME O3REALTIME COREALTIME createdAt').lean(),
+    Flight.aggregate([
+      { $match: { ...dateFilter, 'FLIGHTS.0': { $exists: true } } },
+      { $project: { count: { $size: '$FLIGHTS' }, createdAt: 1 } }
+    ]),
+    Traffic.aggregate([
+      { $match: { ...dateFilter, 'INCIDENTS.0': { $exists: true } } },
+      { $project: { count: { $size: '$INCIDENTS' }, createdAt: 1 } }
+    ]),
+    Train.aggregate([
+      { $match: { ...dateFilter, 'SOUTHSHORE.0': { $exists: true } } },
+      { $project: { count: { $size: '$SOUTHSHORE' }, createdAt: 1 } }
+    ]),
+    Vessel.aggregate([
+      { $match: { ...dateFilter, 'VESSELS.0': { $exists: true } } },
+      { $project: { count: { $size: '$VESSELS' }, createdAt: 1 } }
+    ]),
+  ]);
 
   return res.json({ weathers, advisories, airshits, flights, traffics, trains, vessels });
 };
 
-exports.highs = (req, res) => {
-  const today = moment();
+exports.highs = async (req, res) => {
+  const startMonth = moment().startOf('month').toDate();
+  const endMonth = moment().endOf('month').toDate();
+  const startYear = moment().startOf('year').toDate();
+  const endYear = moment().endOf('year').toDate();
 
-  const startMonth = today.startOf('month').toDate();
-  const endMonth = moment(startMonth).endOf('month').toDate();
+  const aqiSumExpr = {
+    $add: [
+      { $ifNull: ['$PM25REALTIME.aqi', 0] },
+      { $ifNull: ['$PM10REALTIME.aqi', 0] },
+      { $ifNull: ['$SO2REALTIME.aqi', 0] },
+      { $ifNull: ['$NO2REALTIME.aqi', 0] },
+      { $ifNull: ['$O3REALTIME.aqi', 0] },
+      { $ifNull: ['$COREALTIME.aqi', 0] },
+    ],
+  };
 
-  const startYear = today.startOf('year').toDate();
-  const endYear = moment(startYear).endOf('year').toDate();
-
-  async.series([
-    (callback) => { // month high
-      Airshit.find({ createdAt: {'$gte': startMonth, '$lte': endMonth}, type: 'advanced' }).exec(callback);
+  const aqiProjection = {
+    $project: {
+      sum: aqiSumExpr,
+      PM25REALTIME: 1, PM10REALTIME: 1, SO2REALTIME: 1,
+      NO2REALTIME: 1, O3REALTIME: 1, COREALTIME: 1,
+      createdAt: 1,
     },
-    (callback) => { // year high
-      Airshit.find({ createdAt: {'$gte': startYear, '$lte': endYear}, type: 'advanced' }).exec(callback);
-    },
-    (callback) => { // all time high
+  };
+
+  try {
+    const [monthHigh, yearHigh, allTimeHigh, highestVessels, highestFlights, highestTrains, highestTraffic] = await Promise.all([
       Airshit.aggregate([
-        {
-          $project: {
-            sum: {
-              $add: [{
-                $max: {
-                  $sum: [
-                    { $ifNull: ['$PM25REALTIME.aqi', 0] },
-                    { $ifNull: ['$PM10REALTIME.aqi', 0] },
-                    { $ifNull: ['$SO2REALTIME.aqi', 0] },
-                    { $ifNull: ['$NO2REALTIME.aqi', 0] },
-                    { $ifNull: ['$O3REALTIME.aqi', 0] },
-                    { $ifNull: ['$COREALTIME.aqi', 0] },
-                  ],
-                },
-              }],
-            },
-            PM25REALTIME: '$PM25REALTIME',
-            PM10REALTIME: '$PM10REALTIME',
-            SO2REALTIME: '$SO2REALTIME',
-            NO2REALTIME: '$NO2REALTIME',
-            O3REALTIME: '$O3REALTIME',
-            COREALTIME: '$COREALTIME',
-            createdAt: '$createdAt',
-          },
-        },
+        { $match: { createdAt: { $gte: startMonth, $lte: endMonth }, type: 'advanced' } },
+        aqiProjection,
         { $sort: { sum: -1 } },
         { $limit: 1 },
-      ]).exec(callback);
-    },
-    (callback) => { // vessels high
+      ]),
+      Airshit.aggregate([
+        { $match: { createdAt: { $gte: startYear, $lte: endYear }, type: 'advanced' } },
+        aqiProjection,
+        { $sort: { sum: -1 } },
+        { $limit: 1 },
+      ]),
+      Airshit.aggregate([
+        { $match: { type: 'advanced' } },
+        aqiProjection,
+        { $sort: { sum: -1 } },
+        { $limit: 1 },
+      ]),
       Vessel.aggregate([
-        {
-          $project: {
-            count: {
-              $max: { $size: { $ifNull: ['$VESSELS', []] } },
-            },
-            createdAt: '$createdAt',
-          },
-        },
+        { $match: { 'VESSELS.0': { $exists: true } } },
+        { $project: { count: { $size: '$VESSELS' }, createdAt: 1 } },
         { $sort: { count: -1 } },
         { $limit: 1 },
-      ]).exec(callback);
-    },
-    (callback) => { // flights high
+      ]),
       Flight.aggregate([
-        {
-          $project: {
-            count: {
-              $add: [
-                { $max: { $size: { $ifNull: ['$FLIGHTS', []] } } },
-              ],
-            },
-            createdAt: '$createdAt',
-          },
-        },
+        { $match: { 'FLIGHTS.0': { $exists: true } } },
+        { $project: { count: { $size: '$FLIGHTS' }, createdAt: 1 } },
         { $sort: { count: -1 } },
         { $limit: 1 },
-      ]).exec(callback);
-    },
-    (callback) => { // trains high
+      ]),
       Train.aggregate([
-        {
-          $project: {
-            count: {
-              $add: [
-                { $max: { $size: { $ifNull: ['$SOUTHSHORE', []] } } },
-              ],
-            },
-            createdAt: '$createdAt',
-          },
-        },
+        { $match: { 'SOUTHSHORE.0': { $exists: true } } },
+        { $project: { count: { $size: '$SOUTHSHORE' }, createdAt: 1 } },
         { $sort: { count: -1 } },
         { $limit: 1 },
-      ]).exec(callback);
-    },
-    (callback) => { // traffic high
+      ]),
       Traffic.aggregate([
-        {
-          $project: {
-            sum: {
-              $add: [
-                { $max: { $sum: { $ifNull: ['$INCIDENTS.distance', []] } } },
-              ],
-            },
-            createdAt: '$createdAt',
-          },
-        },
+        { $match: { 'INCIDENTS.0': { $exists: true } } },
+        { $project: { sum: { $sum: '$INCIDENTS.distance' }, createdAt: 1 } },
         { $sort: { sum: -1 } },
         { $limit: 1 },
-      ]).exec(callback);
-    },
-  ], (err, results) => {
-    if (err) {
-      console.log(err);
-      return res.send('Error Contacting the database or Some Trouble happened while exec Pagination Script');
-    }
-
-    // AQI Month
-    const highestInMonth = Math.max(...results[0].map((airshit) => {
-      return calculations.totalAirQuality(airshit);
-    }));
-    const highestMonthDay = results[0].find((airshit) => {
-      return calculations.totalAirQuality(airshit) === highestInMonth;
-    });
-
-    // AQI Year
-    const highestInYear = Math.max(...results[1].map((airshit) => {
-      return calculations.totalAirQuality(airshit);
-    }));
-    const highestYearDay = results[1].find((airshit) => {
-      return calculations.totalAirQuality(airshit) === highestInYear;
-    });
-
-    // All Time
-    const highestAllTimeDay = results[2][0];
-
-    // Vessels
-    const highestVessels = results[3][0];
-    // Flights
-    const highestFlights = results[4][0];
-    // Trains
-    const highestTrains = results[5][0];
-    // Traffic
-    const highestTraffic = results[6][0];
+      ]),
+    ]);
 
     res.json({
-      month: highestMonthDay,
-      year: highestYearDay,
-      alltime: highestAllTimeDay,
-
-      vessels: highestVessels,
-      flights: highestFlights,
-      trains: highestTrains,
-      traffic: highestTraffic,
+      month: monthHigh[0] || null,
+      year: yearHigh[0] || null,
+      alltime: allTimeHigh[0] || null,
+      vessels: highestVessels[0] || null,
+      flights: highestFlights[0] || null,
+      trains: highestTrains[0] || null,
+      traffic: highestTraffic[0] || null,
     });
-  });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send('Error querying highs');
+  }
 };
 
 exports.getFlights = async () => {
@@ -771,18 +712,25 @@ exports.sync = async (req, res) => {
 exports.migrate = async (req, res) => {
   const { hash } = req.query;
 
-  return res.json({ ran: true });
-
   if (hash !== process.env.SYNC_SECRET_HASH) {
-    res.status(400).end();
+    return res.status(400).end();
   }
 
-  for await (const airshit of Airshit.find()) {
-    let airshitobj = airshit.toObject();
+  try {
+    await Promise.all([
+      Airshit.collection.createIndex({ createdAt: -1, type: 1 }),
+      Weather.collection.createIndex({ createdAt: -1 }),
+      Flight.collection.createIndex({ createdAt: -1 }),
+      Vessel.collection.createIndex({ createdAt: -1 }),
+      Train.collection.createIndex({ createdAt: -1 }),
+      Traffic.collection.createIndex({ createdAt: -1 }),
+      Advisories.collection.createIndex({ createdAt: -1 }),
+    ]);
 
-    await Airshit.updateOne({ _id: airshit.id }, { $set: { type: 'simple' } });
-
-    console.log(`${airshit.id} migrated`);
+    return res.json({ ran: true, indexes: 'created' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ran: false, error: err.message });
   }
 };
 
