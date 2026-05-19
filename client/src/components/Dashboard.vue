@@ -317,7 +317,7 @@
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago)</span>
                             </span>
                             <span class="d-block">
-                                Weather: <a href="https://darksky.net/poweredby/" target="_blank">darksky.net</a>
+                                Weather: <a href="https://open-meteo.com/" target="_blank">open-meteo.com</a>
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(weather.createdAt) }} ago)</span>
                             </span>
                             <span class="d-block">
@@ -1202,7 +1202,7 @@
                         <li>Storing data is expensive, support our efforts in longer-term air quality tracking by donating cloud MongoDB hosting.</li>
                         <li>Keep this website up and running by <a href="https://www.buymeacoffee.com/kingsloi" target="_blank">buying the host a coffee</a>.</li>
                         <li>Help get more accurate/localised weather <a href="https://shop.weatherflow.com/products/tempest" target="_blank">purchasing this weather station</a>.</li>
-                        <li>We use the free version for both the <a href="https://darksky.net/dev" target="_blank">weather</a> and <a href="https://developer.mapquest.com/plans" target="_blank">traffic</a> services, limiting how many times we can check,, support us by providing a premium key so we can increase how frequently we can check.</li>
+                        <li>We use <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a> (free) for weather and <a href="https://developer.mapquest.com/plans" target="_blank">MapQuest</a> ($0.0045/request) for traffic, limiting how many times we can check. Support us by <a href="https://www.buymeacoffee.com/kingsloi" target="_blank">buying the host a coffee</a> to help cover traffic API costs.</li>
                     </ul>
                 </div>
 
