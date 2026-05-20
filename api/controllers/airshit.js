@@ -733,16 +733,26 @@ exports.sync = async (req, res) => {
     Object.keys(metrics).forEach((k) => metrics[k] === null || Object.keys(metrics[k]).length === 0 && delete metrics[k])
 
     cache.del('/currently', (error) => {
-      if (error) throw error;
+      if (error) console.error('cache del /currently', error);
     });
 
     cache.del('/trend', (error) => {
-      if (error) throw error;
+      if (error) console.error('cache del /trend', error);
     });
 
     cache.del('/highs', (error) => {
-      if (error) throw error;
+      if (error) console.error('cache del /highs', error);
     });
+
+    // Warm caches in the background so the first visitor doesn't wait
+    const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 8080}`;
+    setTimeout(() => {
+      Promise.all([
+        axios.get(`${baseUrl}/currently`),
+        axios.get(`${baseUrl}/trend`),
+        axios.get(`${baseUrl}/highs`),
+      ]).catch((e) => console.error('Cache warm failed:', e.message));
+    }, 1000);
 
     return res.json({ success: true, metrics });
   })
