@@ -732,7 +732,15 @@ exports.sync = async (req, res) => {
     // delete empty metrics
     Object.keys(metrics).forEach((k) => metrics[k] === null || Object.keys(metrics[k]).length === 0 && delete metrics[k])
 
-    cache.del('/currently', (error, deleted) => {
+    cache.del('/currently', (error) => {
+      if (error) throw error;
+    });
+
+    cache.del('/trend', (error) => {
+      if (error) throw error;
+    });
+
+    cache.del('/highs', (error) => {
       if (error) throw error;
     });
 
