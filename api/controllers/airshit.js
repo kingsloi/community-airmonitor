@@ -1,5 +1,6 @@
 const Advisories = require('../models/Advisories');
 const Airshit = require('../models/Airshit');
+const Beach = require('../models/Beach');
 const Flight = require('../models/Flight');
 const Traffic = require('../models/Traffic');
 const Train = require('../models/Train');
@@ -24,9 +25,10 @@ const cache = require('express-redis-cache')();
 exports.currently = async (req, res) => {
   const vesselphotos = await VesselPhoto.find();
 
-  const [advisories, airshit, flight, traffic, train, vessel, weather] = await Promise.all([
+  const [advisories, airshit, beach, flight, traffic, train, vessel, weather] = await Promise.all([
     Advisories.findOne({ 'ADVISORIES.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
     Airshit.findOne({ type: 'advanced' }, {}, { sort: { _id: -1 } }),
+    Beach.findOne({ 'BEACHES.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
     Flight.findOne({ 'FLIGHTS.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
     Traffic.findOne({ 'INCIDENTS.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
     Train.findOne({ 'SOUTHSHORE.0': { $exists: true } }, {}, { sort: { _id: -1 } }),
@@ -37,6 +39,7 @@ exports.currently = async (req, res) => {
   return res.json({
     advisories,
     airshit,
+    beach,
     flight,
     traffic,
     train,
@@ -60,10 +63,11 @@ exports.trend = async (req, res) => {
   const sevenDaysAgo = moment().subtract(7, 'd').toDate();
   const dateFilter = { createdAt: { '$gte': sevenDaysAgo } };
 
-  const [weathers, advisories, airshits, flights, traffics, trains, vessels] = await Promise.all([
+  const [weathers, advisories, airshits, beaches, flights, traffics, trains, vessels] = await Promise.all([
     Weather.find({ ...dateFilter, 'REPORTED_WEATHER': { $exists: true } }).select('REPORTED_WEATHER createdAt').lean(),
     Advisories.find({ ...dateFilter, 'ADVISORIES.0': { $exists: true } }).select('ADVISORIES createdAt').lean(),
     Airshit.find({ ...dateFilter, type: 'advanced' }).select('PM25REALTIME PM10REALTIME SO2REALTIME NO2REALTIME O3REALTIME COREALTIME createdAt').lean(),
+    Beach.find({ ...dateFilter, 'BEACHES.0': { $exists: true } }).select('BEACHES createdAt').lean(),
     Flight.aggregate([
       { $match: { ...dateFilter, 'FLIGHTS.0': { $exists: true } } },
       { $project: { count: { $size: '$FLIGHTS' }, createdAt: 1 } }
@@ -82,7 +86,7 @@ exports.trend = async (req, res) => {
     ]),
   ]);
 
-  return res.json({ weathers, advisories, airshits, flights, traffics, trains, vessels });
+  return res.json({ weathers, advisories, airshits, beaches, flights, traffics, trains, vessels });
 };
 
 exports.highs = async (req, res) => {
@@ -355,6 +359,29 @@ exports.getTrains = async () => {
   }
 }
 
+exports.getBeaches = async () => {
+  const targetIds = (process.env.IDEM_BEACH_IDS || '').split(',').filter(Boolean);
+
+  try {
+    const { data } = await axios.get('https://portal.idem.in.gov/getBeaches/');
+
+    const filtered = data.filter((beach) => targetIds.includes(beach.id));
+
+    return filtered.map((beach) => ({
+      id: beach.id,
+      name: beach.name,
+      color: beach.color,
+      reason: beach.reason,
+      alertstartdate: beach.alertstartdate,
+      lat: beach.lat,
+      long: beach.long,
+    }));
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
 exports.getAdvisories = async () => {
   const regionAsPolygon = regionArea.landPolygon();
 
@@ -620,6 +647,7 @@ exports.sync = async (req, res) => {
     vessels: [],
     traffic: [],
     advisories: [],
+    beaches: [],
 
     weather: {},
     airquality: {}
@@ -676,6 +704,14 @@ exports.sync = async (req, res) => {
         await model.save();
 
         metrics.advisories = advisories;
+      break;
+      case 'beaches':
+        const beaches = await module.exports.getBeaches();
+
+        model = new Beach({ BEACHES: beaches });
+        await model.save();
+
+        metrics.beaches = beaches;
       break;
       case 'airquality-simple':
       case 'airquality-purpleair':
@@ -778,6 +814,7 @@ exports.migrate = async (req, res) => {
       Train.collection.createIndex({ createdAt: -1 }),
       Traffic.collection.createIndex({ createdAt: -1 }),
       Advisories.collection.createIndex({ createdAt: -1 }),
+      Beach.collection.createIndex({ createdAt: -1 }),
     ]);
 
     return res.json({ ran: true, indexes: 'created' });
@@ -827,6 +864,11 @@ exports.airshitByDate = (req, res) => {
   const start = moment(`${date} 00:00:00`).format();
   const end = moment(`${date} 23:59:59`).format();
   Airshit.find({ createdAt: { $gte: start, $lt: end } }).then((result) => res.json({ airshits: result }));
+};
+
+exports.beaches = async (req, res) => {
+  const beach = await Beach.findOne({ 'BEACHES.0': { $exists: true } }, {}, { sort: { _id: -1 } });
+  return res.json({ beach });
 };
 
 exports.getVesselPhotos = async (req, res) => {

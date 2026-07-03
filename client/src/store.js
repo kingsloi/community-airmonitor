@@ -31,6 +31,7 @@ const state = {
     },
 
     advisories: { data: [], createdAt: null, updatedAt: null },
+    beaches: { data: [], createdAt: null, updatedAt: null },
     flights: { data: [], createdAt: null, updatedAt: null },
     traffic: { data: [], createdAt: null, updatedAt: null },
     trains: { data: [], createdAt: null, updatedAt: null },
@@ -113,6 +114,12 @@ const mutations = {
         state.advisories.data = ADVISORIES;
         state.advisories.createdAt = createdAt;
         state.advisories.updatedAt = updatedAt;
+    },
+    setBeaches (state, payload) {
+        const { BEACHES, createdAt, updatedAt } = payload;
+        state.beaches.data = BEACHES;
+        state.beaches.createdAt = createdAt;
+        state.beaches.updatedAt = updatedAt;
     },
     setFlight (state, payload) {
         const { FLIGHTS, createdAt, updatedAt } = payload;

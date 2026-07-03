@@ -518,6 +518,35 @@
                     </tr>
                   </tfoot>
                 </table>
+
+                <table class="table text-monospace mb-0 table-sm small mt-5"
+                  v-if="beaches.data.length > 0"
+                >
+                  <tbody>
+                    <tr>
+                      <td colspan="3" style="border-top:0;" class="pt-0">
+                        <h2 class="text-left mb-0 h4 text-uppercase text-monospace">
+                          <span class="font-weight-bold">Beach Status</span>
+                        </h2>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="font-weight-bold">beach</td>
+                      <td class="font-weight-bold">status</td>
+                      <td class="font-weight-bold">reason</td>
+                    </tr>
+
+                    <tr v-for="beach in beaches.data" v-bind:key="`beach-${beach.id}`" class="small">
+                      <td>{{ beach.name }}</td>
+                      <td>
+                        <span class="badge"
+                          :class="beachStatusClass(beach.color)"
+                        >{{ beachStatusLabel(beach.color) }}</span>
+                      </td>
+                      <td>{{ beach.reason || '—' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -650,6 +679,7 @@
       created() {
         this.getAllGroupedAirShits();
         this.getVesselPhotos();
+        this.getCurrentBeaches();
       },
 
       mounted() {},
@@ -661,6 +691,9 @@
 
         airshit() {
           return this.$store.state.airshit;
+        },
+        beaches() {
+          return this.$store.state.beaches;
         },
         airshits() {
           return this.$store.state.airshits;
@@ -752,6 +785,12 @@
       },
 
       methods: {
+        beachStatusLabel(color) {
+          return { Green: 'Open', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
+        },
+        beachStatusClass(color) {
+          return { Green: 'badge-success', Yellow: 'badge-warning', Red: 'badge-danger' }[color] || 'badge-secondary';
+        },
 
         currentlyViewable(view) {
           return this.viewing[view];
@@ -833,6 +872,15 @@
           })
           .catch(e => {
             alert('error!');
+            console.log(e); // eslint-disable-line no-console
+          });
+        },
+
+        getCurrentBeaches() {
+          API.get(`/beaches`).then(response => {
+            if (response.data.beach) this.$store.commit('setBeaches', response.data.beach);
+          })
+          .catch(e => {
             console.log(e); // eslint-disable-line no-console
           });
         },

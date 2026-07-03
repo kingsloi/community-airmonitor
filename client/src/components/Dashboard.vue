@@ -306,6 +306,29 @@
                         </div>
                     </div>
 
+                    <div class="stat stat--beaches mt-4" v-if="beaches.data.length > 0">
+                        <h2 class="small text-uppercase">Beach Status
+                            <span v-if="isStale(beaches.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago</span>
+                        </h2>
+                        <div class="row">
+                            <div class="col">
+                                <div class="aqi-card h-100 aqi">
+                                    <div class="card-body small py-1">
+                                        <ul class="list-unstyled pl-0 mb-0">
+                                            <li v-for="beach in beaches.data" v-bind:key="`sidebar-${beach.id}`" class="mb-1">
+                                                <span class="badge mr-1"
+                                                    :class="beachStatusClass(beach.color)"
+                                                >{{ beachStatusLabel(beach.color) }}</span>
+                                                <span class="font-weight-bold">{{ beach.name }}</span>
+                                                <small class="d-block text-muted" v-if="beach.reason">{{ beach.reason }}</small>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="mb-0 small text-xl-right text-center mt-3" id="poweredbys">
                         <p class="mb-0" v-if="Object.keys(geography).length > 0">
                             <span class="d-block mb-2">
@@ -913,6 +936,48 @@
             </div>
         </section>
 
+        <section class="container pb-10" id="beach-advisories">
+            <div class="row">
+                <div class="col-xl-12 mt-5 card-item card-item--beaches">
+                    <div class="card">
+                        <div class="card-body px-0 pb-3">
+                            <h2 class="h5 text-left mb-3">
+                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Indiana Beach Advisories
+                                    <span v-if="isStale(beaches.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale &mdash; {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago</span>
+                                </span>
+                            </h2>
+
+                            <div class="row px-3">
+                                <div class="col-sm-12 col-xl-4 mb-4" v-for="beach in beaches.data" v-bind:key="beach.id">
+                                    <div class="card">
+                                        <div class="card-body py-4">
+                                            <h5 class="card-title mb-2">{{ beach.name }}</h5>
+                                            <div class="card-text">
+                                                <span class="badge mb-2"
+                                                    :class="beachStatusClass(beach.color)"
+                                                >{{ beachStatusLabel(beach.color) }}</span>
+
+                                                <p class="small mb-1" v-if="beach.reason">{{ beach.reason }}</p>
+                                                <p class="small text-muted mb-0" v-if="beach.alertstartdate">Alert since: {{ formatDateTime(beach.alertstartdate) }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div card col-md-6 col-lg-4 v-if="beaches.data.length === 0">
+                                    <div class="card-body">&mdash;</div>
+                                </div>
+                            </div>
+
+                            <p class="small text-right px-3 mb-0" v-if="beaches.createdAt">
+                                Source: <a href="https://portal.idem.in.gov/getBeaches/" target="_blank">IN IDEM</a>
+                                <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago)</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="container pb-10" id="historical-highs">
             <div class="row">
 
@@ -1372,6 +1437,10 @@ export default {
             return this.$store.state.advisories;
         },
 
+        beaches() {
+            return this.$store.state.beaches;
+        },
+
         flights() {
             return this.$store.state.flights;
         },
@@ -1510,6 +1579,13 @@ export default {
     },
 
     methods: {
+        beachStatusLabel(color) {
+            return { Green: 'Open', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
+        },
+        beachStatusClass(color) {
+            return { Green: 'badge-success', Yellow: 'badge-warning', Red: 'badge-danger' }[color] || 'badge-secondary';
+        },
+
         convertDegeesToRotation(angle) {
             return angle;
         },
@@ -1593,6 +1669,7 @@ export default {
                 this.$store.commit('setAirshit', response.data.airshit);
 
                 if (response.data.advisories) this.$store.commit('setAdvisories', response.data.advisories);
+                if (response.data.beach) this.$store.commit('setBeaches', response.data.beach);
                 if (response.data.flight) this.$store.commit('setFlight', response.data.flight);
                 if (response.data.traffic) this.$store.commit('setTraffic', response.data.traffic);
                 if (response.data.train) this.$store.commit('setTrain', response.data.train);

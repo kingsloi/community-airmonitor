@@ -121,6 +121,7 @@ app.get('/migrate', airShirtController.migrate);
 //app.get('/previous-by-day', cache.route({ expire: 86400  }), airShirtController.past);
 //app.get('/airshits/date/:date', cache.route({ expire: 31540000  }), airShirtController.airshitByDate);
 //app.get('/airshits/:airshit', cache.route({ expire: 31540000  }), airShirtController.airshit);
+app.get('/beaches', cache.route({ expire: 300  }), airShirtController.beaches);
 app.get('/vessels/photos', cache.route({ expire: 86400  }), airShirtController.getVesselPhotos);
 app.get('/vessels/:vessel/photos', airShirtController.searchVesselPhoto);
 
