@@ -30,14 +30,14 @@
                         </span>
                         <small class="text-muted mr-3">Beaches are tested for E. coli bacteria &middot; above 235 cfu/100ml (colonies per sample) = advisory or closure</small>
                     </span>
-                    <span class="beach-ticker__content" aria-hidden="true">
+                    <span class="beach-ticker__content">
                         <span class="small text-uppercase font-weight-bold mr-2">
-                            <span class="text-reset">IDEM BeachAlert</span>
+                            <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
                             &mdash;
                         </span>
                         <span v-for="beach in beaches.data" v-bind:key="`t2-${beach.id}`" class="mr-3">
                             <span class="mr-1">{{ beachAlertEmoji(beach.color) }}</span>
-                            <span class="small">{{ beach.name }}</span>
+                            <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
                             <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
                         </span>
                         <small class="text-muted mr-3">Beaches are tested for E. coli bacteria &middot; above 235 cfu/100ml (colonies per sample) = advisory or closure</small>
