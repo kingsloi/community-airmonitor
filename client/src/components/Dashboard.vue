@@ -15,23 +15,24 @@
             </div>
         </div>
 
-        <section class="container mb-4" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
-            <div class="d-flex flex-wrap align-items-center">
-                <span class="small text-uppercase font-weight-bold mr-3">
-                    <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
-                </span>
-                <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
-                    <span class="badge mr-1" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
-                    <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
-                    <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
-                </span>
-            </div>
-        </section>
-
         <section class="container pb-10" id="visuals">
             <div class="row flex-xl-row-reverse">
 
                 <div class="col-xl-8 ">
+                    <div class="mb-3" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
+                        <div class="d-flex flex-wrap align-items-center">
+                            <span class="small text-uppercase font-weight-bold mr-3">
+                                <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
+                            </span>
+                            <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
+                                <span class="badge mr-1" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
+                                <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
+                                <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
+                            </span>
+                        </div>
+                        <small class="text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</small>
+                    </div>
+
                     <div class="map-container" style="position: relative;" @click.prevent="mapMaskActive = false"
                         v-bind:class="{ 'map-container--has-mask': mapMaskActive }"
                     >
@@ -1798,15 +1799,15 @@ export default {
 
             const beachOpacity = this.isStale(this.beaches.createdAt) ? 0.25 : 1;
             this.$store.state.beaches.data.forEach((beach) => {
-                const flagColor = { Green: '#28a745', Yellow: '#ffc107', Red: '#dc3545' }[beach.color] || '#6c757d';
-                const beachFlag = L.divIcon({
-                    html: `<span style="font-size: 2rem; text-shadow: 0 0 4px ${flagColor}, 0 0 8px ${flagColor};">🚩</span>`,
+                const circle = { Green: '🟢', Yellow: '🟡', Red: '🔴' }[beach.color] || '⚪';
+                const beachIcon = L.divIcon({
+                    html: `<span style="font-size: 1.75rem; white-space: nowrap;">${circle}🏖️</span>`,
                     className: 'leaflet-beach-flag',
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 28],
-                    popupAnchor: [0, -28]
+                    iconSize: [50, 30],
+                    iconAnchor: [25, 15],
+                    popupAnchor: [0, -15]
                 });
-                L.marker([beach.lat, beach.long], { icon: beachFlag, opacity: beachOpacity }).bindPopup(`
+                L.marker([beach.lat, beach.long], { icon: beachIcon, opacity: beachOpacity }).bindPopup(`
                     <strong>${beach.name}</strong><br>
                     Status: ${this.beachAlertLabel(beach.color)}<br>
                     ${beach.reason ? `Reason: ${beach.reason}<br>` : ''}
