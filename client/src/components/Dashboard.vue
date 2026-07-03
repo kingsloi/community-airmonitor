@@ -15,24 +15,24 @@
             </div>
         </div>
 
-        <div class="container mb-3" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
-            <div class="d-flex flex-wrap align-items-center">
-                <span class="small text-uppercase font-weight-bold mr-3">
-                    <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
-                </span>
-                <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
-                    <span class="badge mr-1" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
-                    <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
-                    <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
-                </span>
-            </div>
-            <small class="text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</small>
-        </div>
-
         <section class="container pb-10" id="visuals">
             <div class="row flex-xl-row-reverse">
 
                 <div class="col-xl-8 ">
+                    <div class="mb-2" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
+                        <div class="d-flex flex-wrap align-items-center">
+                            <span class="small text-uppercase font-weight-bold mr-3">
+                                <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
+                            </span>
+                            <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
+                                <span class="mr-1">{{ beachAlertEmoji(beach.color) }}</span>
+                                <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
+                                <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
+                            </span>
+                        </div>
+                        <small class="text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</small>
+                    </div>
+
                     <div class="map-container" style="position: relative;" @click.prevent="mapMaskActive = false"
                         v-bind:class="{ 'map-container--has-mask': mapMaskActive }"
                     >
@@ -1553,10 +1553,13 @@ export default {
 
     methods: {
         beachAlertLabel(status) {
-            return { Open: 'No Alert', Advisory: 'Advisory', Closed: 'Closed' }[status] || status;
+            return { Open: 'Open', Advisory: 'Advisory', Closed: 'Closed' }[status] || status;
         },
         beachAlertClass(status) {
             return { Open: 'badge-success', Advisory: 'badge-warning', Closed: 'badge-danger' }[status] || 'badge-secondary';
+        },
+        beachAlertEmoji(status) {
+            return { Open: '🟢', Advisory: '🟡', Closed: '🔴' }[status] || '⚪';
         },
         beachInfoUrl(id) {
             return `https://portal.idem.in.gov/BeachAlert/beach-info/?id=${id}`;
@@ -1799,9 +1802,9 @@ export default {
 
             const beachOpacity = this.isStale(this.beaches.createdAt) ? 0.25 : 1;
             this.$store.state.beaches.data.forEach((beach) => {
-                const dotColor = { Open: '#28a745', Advisory: '#ffc107', Closed: '#dc3545' }[beach.color] || '#6c757d';
+                const circle = { Open: '🟢', Advisory: '🟡', Closed: '🔴' }[beach.color] || '⚪';
                 const beachIcon = L.divIcon({
-                    html: `<div style="text-align:center;line-height:1;overflow:hidden;"><span style="color:${dotColor};font-size:14px;">&#9679;</span><br>🏖️</div>`,
+                    html: `<div style="text-align:center;line-height:1;">${circle}<br>🏖️</div>`,
                     className: 'leaflet-emoji',
                     iconSize: [24, 34],
                     iconAnchor: [12, 17],
