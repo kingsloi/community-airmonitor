@@ -421,6 +421,10 @@ textarea {
 }
 
 .stat {
+    &.is-stale {
+        opacity: 0.25;
+    }
+
     > .row {
         &.condensed {
             padding-right: $spacer;

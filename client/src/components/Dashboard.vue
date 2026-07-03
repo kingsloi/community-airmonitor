@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="col-xl-4 mt-5 mt-xl-0 px-xl-3 px-xl-0" id="currently">
-                    <div class="stat stat--weather" v-if="weather.data">
+                    <div class="stat stat--weather" :class="{ 'is-stale': isStale(weather.createdAt) }" v-if="weather.data">
 
                         <h2 class="small text-uppercase clearfix">Weather
                             <span v-if="isStale(weather.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(weather.createdAt) }} ago</span>
@@ -77,7 +77,7 @@
                         </div>
                     </div>
 
-                    <div class="stat stat--airquality mt-4">
+                    <div class="stat stat--airquality mt-4" :class="{ 'is-stale': isStale(airshit.createdAt) }">
                         <h2 class="small text-uppercase">Overall Air Quality
                             <span v-if="isStale(airshit.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
                         </h2>
@@ -94,7 +94,7 @@
                         </div>
                     </div>
 
-                    <div class="stat stat--pm mt-4">
+                    <div class="stat stat--pm mt-4" :class="{ 'is-stale': isStale(airshit.createdAt) }">
                         <h2 class="small text-uppercase clearfix">Particulate Matter
                             <span v-if="isStale(airshit.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(airshit.createdAt) }} ago</span>
                         </h2>
@@ -142,6 +142,7 @@
                     </div>
 
                     <div class="stat stat--gases mt-4"
+                        :class="{ 'is-stale': isStale(airshit.createdAt) }"
                         v-if="airshitContainsGases"
                     >
 
@@ -194,7 +195,7 @@
                         </div>
                     </div>
 
-                    <div class="stat stat--industry mt-4">
+                    <div class="stat stat--industry mt-4" :class="{ 'is-stale': isStale(flights.createdAt) && isStale(vessels.createdAt) && isStale(trains.createdAt) && isStale(traffic.createdAt) }">
                         <h2 class="small text-uppercase">Industry/traffic
                             <span v-if="isStale(flights.createdAt) || isStale(vessels.createdAt) || isStale(traffic.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">some data stale</span>
                         </h2>
@@ -273,7 +274,7 @@
                         </div>
                     </div>
 
-                    <div class="stat stat--advisories mt-4">
+                    <div class="stat stat--advisories mt-4" :class="{ 'is-stale': isStale(advisories.createdAt) }">
                         <h2 class="small text-uppercase">Southernmost Lake Michigan Advisories
                             <span v-if="isStale(advisories.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(advisories.createdAt) }} ago</span>
                         </h2>
@@ -306,7 +307,7 @@
                         </div>
                     </div>
 
-                    <div class="stat stat--beaches mt-4" v-if="beaches.data.length > 0">
+                    <div class="stat stat--beaches mt-4" :class="{ 'is-stale': isStale(beaches.createdAt) }" v-if="beaches.data.length > 0">
                         <h2 class="small text-uppercase"><a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
                             <span v-if="isStale(beaches.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago</span>
                         </h2>
@@ -936,7 +937,7 @@
             </div>
         </section>
 
-        <section class="container pb-10" id="beach-advisories">
+        <section class="container pb-10" id="beach-advisories" v-if="beaches.data.length > 0">
             <div class="row">
                 <div class="col-xl-12 mt-5 card-item card-item--beaches">
                     <div class="card">
@@ -947,38 +948,27 @@
                                 </span>
                             </h2>
 
-                            <p class="small px-3 mb-3 text-muted">E. coli water quality monitoring &mdash; any sample exceeding Indiana's Recreational Water Quality Standard of 235 cfu/100ml triggers an alert.</p>
+                            <p class="small px-3 mb-3 text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</p>
 
-                            <div class="row px-3">
-                                <div class="col-sm-12 col-xl-4 mb-4" v-for="beach in beaches.data" v-bind:key="beach.id">
-                                    <div class="card">
-                                        <div class="card-body py-4">
-                                            <h5 class="card-title mb-2">
-                                                <a :href="beachInfoUrl(beach.id)" target="_blank">{{ beach.name }}</a>
-                                            </h5>
-                                            <div class="card-text">
-                                                <span class="badge mb-2"
-                                                    :class="beachAlertClass(beach.color)"
-                                                >{{ beachAlertLabel(beach.color) }}</span>
+                            <table class="table table-sm mb-0 mx-3" style="width: calc(100% - 2rem);">
+                                <tbody>
+                                    <tr v-for="beach in beaches.data" v-bind:key="beach.id">
+                                        <td>
+                                            <a :href="beachInfoUrl(beach.id)" target="_blank">{{ beach.name }}</a>
+                                        </td>
+                                        <td>
+                                            <span class="badge" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
+                                        </td>
+                                        <td class="small text-muted">
+                                            <span v-if="beach.reason">{{ beach.reason }}</span>
+                                            <span v-if="beach.alertstartdate"> &middot; since {{ formatDateTime(beach.alertstartdate) }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
 
-                                                <p class="small mb-1" v-if="beach.reason">{{ beach.reason }}</p>
-                                                <p class="small text-muted mb-0" v-if="beach.alertstartdate">Alert since: {{ formatDateTime(beach.alertstartdate) }}</p>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer">
-                                            <small class="text-muted">
-                                                <a :href="beachInfoUrl(beach.id)" target="_blank">sampling results &amp; details</a>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div card col-md-6 col-lg-4 v-if="beaches.data.length === 0">
-                                    <div class="card-body">&mdash;</div>
-                                </div>
-                            </div>
-
-                            <p class="small text-right px-3 mb-0" v-if="beaches.createdAt">
-                                Source: <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank">IDEM BeachAlert</a>
+                            <p class="small text-right px-3 mb-0 mt-2">
+                                <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank">IDEM BeachAlert</a>
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago)</span>
                             </p>
                         </div>
@@ -1779,8 +1769,9 @@ export default {
                 Base Station, PM2.5/PM10 sensor, AIS antenna, and reported weather are recorded from this location.
             `).addTo(map);
 
+            const flightOpacity = this.isStale(this.flights.createdAt) ? 0.25 : 1;
             this.$store.state.flights.data.forEach((flight) => {
-                L.marker([flight.lat, flight.lng], {icon: aircraftIcon, rotationAngle: flight.bearing}).bindPopup(`
+                L.marker([flight.lat, flight.lng], {icon: aircraftIcon, rotationAngle: flight.bearing, opacity: flightOpacity}).bindPopup(`
                     Aircraft: ${flight.aircraft}<br>
                     Flight: <a href="https://www.planemapper.com/flights/${flight.flight}" target="_blank">${flight.flight}</a> <small>(open in new window)</small><br>
                     Departing: ${flight.departing}, Arriving: ${flight.arriving}<br>
@@ -1790,17 +1781,19 @@ export default {
                 `).addTo(map);
             });
 
+            const trainOpacity = this.isStale(this.trains.createdAt) ? 0.25 : 1;
             this.$store.state.trains.data.forEach((train) => {
                 const trainAngle = (train.direction === 'East' ? 90 : 270);
-                L.marker([train.lat, train.lng], {icon: trainIcon, rotationAngle: trainAngle}).bindPopup(`
+                L.marker([train.lat, train.lng], {icon: trainIcon, rotationAngle: trainAngle, opacity: trainOpacity}).bindPopup(`
                     ID: ${train.id}<br>
                     Direction: ${train.direction}
                 `).addTo(map);
             });
 
+            const vesselOpacity = this.isStale(this.vessels.createdAt) ? 0.25 : 1;
             self.vessels.data.forEach((vessel) => {
                 const vesselAngle = (vessel.direction ? this.convertDegeesToRotation(vessel.direction) : 0);
-                L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle}).bindPopup(`
+                L.marker([vessel.lat, vessel.lng], {icon: boatIcon, rotationAngle: vesselAngle, opacity: vesselOpacity}).bindPopup(`
                     ${(this.getVesselPhoto(vessel.imo) ? `<img class="mw-100 mb-2" src="${ this.getVesselPhoto(vessel.imo) }" />` : ' ')}
                     Name: ${vessel.name}<br>
                     IMO: ${ vessel.imo || '-' }<br>
@@ -1818,14 +1811,27 @@ export default {
                 `).addTo(map);
             });
 
+            const trafficOpacity = this.isStale(this.traffic.createdAt) ? 0.25 : 1;
             (this.$store.state.traffic.data || []).forEach((incident) => {
-                L.marker([incident.lat, incident.lng], {icon: trafficIcon}).bindPopup(`
+                L.marker([incident.lat, incident.lng], {icon: trafficIcon, opacity: trafficOpacity}).bindPopup(`
                     ${incident.shortDesc}<br>
                     <br>
                     Distance: ${incident.distance}<br>
                     Minute Delay: ${incident.freeFlowMinDelay}<br>
                     Started: ${incident.startTime}<br>
                     Ending: ${incident.endTime}<br>
+                `).addTo(map);
+            });
+
+            const beachOpacity = this.isStale(this.beaches.createdAt) ? 0.25 : 1;
+            this.$store.state.beaches.data.forEach((beach) => {
+                const flagColor = { Green: '🟢', Yellow: '🟡', Red: '🔴' }[beach.color] || '⚪';
+                const beachFlag = L.divIcon({ html: `🏖${flagColor}`, className: 'leaflet-emoji' });
+                L.marker([beach.lat, beach.long], { icon: beachFlag, opacity: beachOpacity }).bindPopup(`
+                    <strong>${beach.name}</strong><br>
+                    Status: ${this.beachAlertLabel(beach.color)}<br>
+                    ${beach.reason ? `Reason: ${beach.reason}<br>` : ''}
+                    <a href="https://portal.idem.in.gov/BeachAlert/beach-info/?id=${beach.id}" target="_blank">sampling results & details</a>
                 `).addTo(map);
             });
         },
