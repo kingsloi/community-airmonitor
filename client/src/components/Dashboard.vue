@@ -15,24 +15,24 @@
             </div>
         </div>
 
+        <div class="container mb-3" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
+            <div class="d-flex flex-wrap align-items-center">
+                <span class="small text-uppercase font-weight-bold mr-3">
+                    <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
+                </span>
+                <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
+                    <span class="badge mr-1" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
+                    <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
+                    <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
+                </span>
+            </div>
+            <small class="text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</small>
+        </div>
+
         <section class="container pb-10" id="visuals">
             <div class="row flex-xl-row-reverse">
 
                 <div class="col-xl-8 ">
-                    <div class="mb-3" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
-                        <div class="d-flex flex-wrap align-items-center">
-                            <span class="small text-uppercase font-weight-bold mr-3">
-                                <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
-                            </span>
-                            <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
-                                <span class="badge mr-1" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
-                                <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
-                                <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
-                            </span>
-                        </div>
-                        <small class="text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</small>
-                    </div>
-
                     <div class="map-container" style="position: relative;" @click.prevent="mapMaskActive = false"
                         v-bind:class="{ 'map-container--has-mask': mapMaskActive }"
                     >
