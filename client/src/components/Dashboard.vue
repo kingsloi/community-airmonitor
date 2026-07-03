@@ -1801,11 +1801,11 @@ export default {
             this.$store.state.beaches.data.forEach((beach) => {
                 const dotColor = { Open: '#28a745', Advisory: '#ffc107', Closed: '#dc3545' }[beach.color] || '#6c757d';
                 const beachIcon = L.divIcon({
-                    html: `<div style="text-align:center; line-height:1;"><span style="color:${dotColor}; font-size:1.25rem;">&#9679;</span><br><span style="font-size:1.5rem;">🏖️</span></div>`,
+                    html: `<div style="text-align:center;line-height:1;overflow:hidden;"><span style="color:${dotColor};font-size:14px;">&#9679;</span><br>🏖️</div>`,
                     className: 'leaflet-emoji',
-                    iconSize: [30, 40],
-                    iconAnchor: [15, 20],
-                    popupAnchor: [0, -20]
+                    iconSize: [24, 34],
+                    iconAnchor: [12, 17],
+                    popupAnchor: [0, -17]
                 });
                 L.marker([beach.lat, beach.long], { icon: beachIcon, opacity: beachOpacity }).bindPopup(`
                     <strong>${beach.name}</strong><br>
