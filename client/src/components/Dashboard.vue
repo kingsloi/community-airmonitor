@@ -307,7 +307,7 @@
                     </div>
 
                     <div class="stat stat--beaches mt-4" v-if="beaches.data.length > 0">
-                        <h2 class="small text-uppercase">Beach Status
+                        <h2 class="small text-uppercase"><a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
                             <span v-if="isStale(beaches.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale — {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago</span>
                         </h2>
                         <div class="row">
@@ -317,9 +317,9 @@
                                         <ul class="list-unstyled pl-0 mb-0">
                                             <li v-for="beach in beaches.data" v-bind:key="`sidebar-${beach.id}`" class="mb-1">
                                                 <span class="badge mr-1"
-                                                    :class="beachStatusClass(beach.color)"
-                                                >{{ beachStatusLabel(beach.color) }}</span>
-                                                <span class="font-weight-bold">{{ beach.name }}</span>
+                                                    :class="beachAlertClass(beach.color)"
+                                                >{{ beachAlertLabel(beach.color) }}</span>
+                                                <a :href="beachInfoUrl(beach.id)" target="_blank" class="font-weight-bold">{{ beach.name }}</a>
                                                 <small class="d-block text-muted" v-if="beach.reason">{{ beach.reason }}</small>
                                             </li>
                                         </ul>
@@ -942,24 +942,33 @@
                     <div class="card">
                         <div class="card-body px-0 pb-3">
                             <h2 class="h5 text-left mb-3">
-                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Indiana Beach Advisories
+                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">IDEM BeachAlert
                                     <span v-if="isStale(beaches.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale &mdash; {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago</span>
                                 </span>
                             </h2>
+
+                            <p class="small px-3 mb-3 text-muted">E. coli water quality monitoring &mdash; any sample exceeding Indiana's Recreational Water Quality Standard of 235 cfu/100ml triggers an alert.</p>
 
                             <div class="row px-3">
                                 <div class="col-sm-12 col-xl-4 mb-4" v-for="beach in beaches.data" v-bind:key="beach.id">
                                     <div class="card">
                                         <div class="card-body py-4">
-                                            <h5 class="card-title mb-2">{{ beach.name }}</h5>
+                                            <h5 class="card-title mb-2">
+                                                <a :href="beachInfoUrl(beach.id)" target="_blank">{{ beach.name }}</a>
+                                            </h5>
                                             <div class="card-text">
                                                 <span class="badge mb-2"
-                                                    :class="beachStatusClass(beach.color)"
-                                                >{{ beachStatusLabel(beach.color) }}</span>
+                                                    :class="beachAlertClass(beach.color)"
+                                                >{{ beachAlertLabel(beach.color) }}</span>
 
                                                 <p class="small mb-1" v-if="beach.reason">{{ beach.reason }}</p>
                                                 <p class="small text-muted mb-0" v-if="beach.alertstartdate">Alert since: {{ formatDateTime(beach.alertstartdate) }}</p>
                                             </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <small class="text-muted">
+                                                <a :href="beachInfoUrl(beach.id)" target="_blank">sampling results &amp; details</a>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -969,7 +978,7 @@
                             </div>
 
                             <p class="small text-right px-3 mb-0" v-if="beaches.createdAt">
-                                Source: <a href="https://portal.idem.in.gov/getBeaches/" target="_blank">IN IDEM</a>
+                                Source: <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank">IDEM BeachAlert</a>
                                 <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago)</span>
                             </p>
                         </div>
@@ -1579,11 +1588,14 @@ export default {
     },
 
     methods: {
-        beachStatusLabel(color) {
-            return { Green: 'Open', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
+        beachAlertLabel(color) {
+            return { Green: 'No Alert', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
         },
-        beachStatusClass(color) {
+        beachAlertClass(color) {
             return { Green: 'badge-success', Yellow: 'badge-warning', Red: 'badge-danger' }[color] || 'badge-secondary';
+        },
+        beachInfoUrl(id) {
+            return `https://portal.idem.in.gov/BeachAlert/beach-info/?id=${id}`;
         },
 
         convertDegeesToRotation(angle) {

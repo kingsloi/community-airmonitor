@@ -526,22 +526,22 @@
                     <tr>
                       <td colspan="3" style="border-top:0;" class="pt-0">
                         <h2 class="text-left mb-0 h4 text-uppercase text-monospace">
-                          <span class="font-weight-bold">Beach Status</span>
+                          <span class="font-weight-bold"><a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a></span>
                         </h2>
                       </td>
                     </tr>
                     <tr>
                       <td class="font-weight-bold">beach</td>
-                      <td class="font-weight-bold">status</td>
+                      <td class="font-weight-bold">alert status</td>
                       <td class="font-weight-bold">reason</td>
                     </tr>
 
                     <tr v-for="beach in beaches.data" v-bind:key="`beach-${beach.id}`" class="small">
-                      <td>{{ beach.name }}</td>
+                      <td><a :href="beachInfoUrl(beach.id)" target="_blank">{{ beach.name }}</a></td>
                       <td>
                         <span class="badge"
-                          :class="beachStatusClass(beach.color)"
-                        >{{ beachStatusLabel(beach.color) }}</span>
+                          :class="beachAlertClass(beach.color)"
+                        >{{ beachAlertLabel(beach.color) }}</span>
                       </td>
                       <td>{{ beach.reason || '—' }}</td>
                     </tr>
@@ -785,11 +785,14 @@
       },
 
       methods: {
-        beachStatusLabel(color) {
-          return { Green: 'Open', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
+        beachAlertLabel(color) {
+          return { Green: 'No Alert', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
         },
-        beachStatusClass(color) {
+        beachAlertClass(color) {
           return { Green: 'badge-success', Yellow: 'badge-warning', Red: 'badge-danger' }[color] || 'badge-secondary';
+        },
+        beachInfoUrl(id) {
+          return `https://portal.idem.in.gov/BeachAlert/beach-info/?id=${id}`;
         },
 
         currentlyViewable(view) {
