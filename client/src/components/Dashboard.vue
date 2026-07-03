@@ -1552,11 +1552,11 @@ export default {
     },
 
     methods: {
-        beachAlertLabel(color) {
-            return { Green: 'No Alert', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
+        beachAlertLabel(status) {
+            return { Open: 'No Alert', Advisory: 'Advisory', Closed: 'Closed' }[status] || status;
         },
-        beachAlertClass(color) {
-            return { Green: 'badge-success', Yellow: 'badge-warning', Red: 'badge-danger' }[color] || 'badge-secondary';
+        beachAlertClass(status) {
+            return { Open: 'badge-success', Advisory: 'badge-warning', Closed: 'badge-danger' }[status] || 'badge-secondary';
         },
         beachInfoUrl(id) {
             return `https://portal.idem.in.gov/BeachAlert/beach-info/?id=${id}`;
@@ -1799,13 +1799,13 @@ export default {
 
             const beachOpacity = this.isStale(this.beaches.createdAt) ? 0.25 : 1;
             this.$store.state.beaches.data.forEach((beach) => {
-                const circle = { Green: '🟢', Yellow: '🟡', Red: '🔴' }[beach.color] || '⚪';
+                const dotColor = { Open: '#28a745', Advisory: '#ffc107', Closed: '#dc3545' }[beach.color] || '#6c757d';
                 const beachIcon = L.divIcon({
-                    html: `<span style="font-size: 1.75rem; white-space: nowrap;">${circle}🏖️</span>`,
-                    className: 'leaflet-beach-flag',
-                    iconSize: [50, 30],
-                    iconAnchor: [25, 15],
-                    popupAnchor: [0, -15]
+                    html: `<div style="text-align:center; line-height:1;"><span style="color:${dotColor}; font-size:1.25rem;">&#9679;</span><br><span style="font-size:1.5rem;">🏖️</span></div>`,
+                    className: 'leaflet-emoji',
+                    iconSize: [30, 40],
+                    iconAnchor: [15, 20],
+                    popupAnchor: [0, -20]
                 });
                 L.marker([beach.lat, beach.long], { icon: beachIcon, opacity: beachOpacity }).bindPopup(`
                     <strong>${beach.name}</strong><br>

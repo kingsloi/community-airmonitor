@@ -785,11 +785,11 @@
       },
 
       methods: {
-        beachAlertLabel(color) {
-          return { Green: 'No Alert', Yellow: 'Advisory', Red: 'Closed' }[color] || color;
+        beachAlertLabel(status) {
+          return { Open: 'No Alert', Advisory: 'Advisory', Closed: 'Closed' }[status] || status;
         },
-        beachAlertClass(color) {
-          return { Green: 'badge-success', Yellow: 'badge-warning', Red: 'badge-danger' }[color] || 'badge-secondary';
+        beachAlertClass(status) {
+          return { Open: 'badge-success', Advisory: 'badge-warning', Closed: 'badge-danger' }[status] || 'badge-secondary';
         },
         beachInfoUrl(id) {
           return `https://portal.idem.in.gov/BeachAlert/beach-info/?id=${id}`;
