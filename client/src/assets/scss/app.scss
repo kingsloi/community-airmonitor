@@ -285,6 +285,31 @@ textarea {
 // Map
 // -------------------------
 
+.beach-ticker {
+    overflow: hidden;
+    white-space: nowrap;
+
+    &:hover .beach-ticker__track {
+        animation-play-state: paused;
+    }
+
+    &__track {
+        display: inline-flex;
+        animation: beach-ticker-scroll 30s linear infinite;
+    }
+
+    &__content {
+        display: inline-flex;
+        align-items: center;
+        padding-right: 2rem;
+    }
+}
+
+@keyframes beach-ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
 .leaflet-emoji {
     font-size: 1.33rem;
 }
