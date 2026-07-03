@@ -15,33 +15,16 @@
             </div>
         </div>
 
-        <section class="container mb-4" id="advisories" v-if="advisories.data.length > 0">
-            <div v-for="advisory in advisories.data" v-bind:key="advisory.id" class="card mb-2">
-                <div class="card-body py-2 px-3">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between">
-                        <div class="d-flex align-items-center flex-grow-1 mr-3">
-                            <h5 class="mb-0 mr-3 font-weight-bold">{{ advisory.event }}</h5>
-                            <span class="badge badge-secondary mr-1">{{ advisory.severity }}</span>
-                            <span class="badge badge-secondary mr-1">{{ advisory.certainty }}</span>
-                            <span class="badge badge-secondary mr-1">{{ advisory.urgency }}</span>
-                            <small class="text-muted ml-2 d-none d-md-inline">
-                                <template v-for="zone in advisory.geocode">
-                                    <span v-bind:key="zone" v-if="geography.region && geography.region.lake_zones && geography.region.lake_zones.includes(zone)" class="mr-1">{{ lakeZones[zone] }}</span>
-                                </template>
-                            </small>
-                        </div>
-                        <div class="small text-right text-nowrap">
-                            <span class="d-inline-block">{{ formatDateTime(advisory.effective) }}</span>
-                            <span class="d-inline-block ml-1" v-if="advisory.ends">&rarr; {{ formatDateTime(advisory.ends) }} ({{ formatDateTimeDiffToHuman(advisory.ends) }})</span>
-                        </div>
-                    </div>
-                    <details class="mt-1" v-if="advisory.description || advisory.instruction">
-                        <summary class="small font-weight-bold text-uppercase">details</summary>
-                        <p class="small mb-1 mt-1" v-if="advisory.instruction">{{ convertToLineBreaks(advisory.instruction) }}</p>
-                        <p class="small font-weight-light mb-0 mt-1 pl-3" style="border-left: 3px solid #ccc; white-space: pre-line;" v-if="advisory.description">{{ convertToLineBreaks(advisory.description) }}</p>
-                        <small class="text-muted d-block mt-1">{{ advisory.senderName }}</small>
-                    </details>
-                </div>
+        <section class="container mb-4" :class="{ 'is-stale': isStale(beaches.createdAt) }" id="beach-advisories" v-if="beaches.data.length > 0">
+            <div class="d-flex flex-wrap align-items-center">
+                <span class="small text-uppercase font-weight-bold mr-3">
+                    <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank" class="text-reset">IDEM BeachAlert</a>
+                </span>
+                <span v-for="beach in beaches.data" v-bind:key="beach.id" class="mr-3 mb-1">
+                    <span class="badge mr-1" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
+                    <a :href="beachInfoUrl(beach.id)" target="_blank" class="small">{{ beach.name }}</a>
+                    <small class="text-muted" v-if="beach.reason"> &middot; {{ beach.reason }}</small>
+                </span>
             </div>
         </section>
 
@@ -892,43 +875,75 @@
                     </div>
                 </div>
 
-            </div>
-        </section>
-
-        <section class="container pb-10" id="beach-advisories" v-if="beaches.data.length > 0">
-            <div class="row">
-                <div class="col-xl-12 mt-5 card-item card-item--beaches">
+                <div class="col-xl-12 mt-5 card-item card-item--advisories" id="advisories">
                     <div class="card">
                         <div class="card-body px-0 pb-3">
                             <h2 class="h5 text-left mb-3">
-                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">IDEM BeachAlert
-                                    <span v-if="isStale(beaches.createdAt)" class="badge badge-warning ml-1 text-lowercase font-weight-normal">stale &mdash; {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago</span>
-                                </span>
+                                <span class="font-weight-bold text-uppercase px-3 border-bottom d-block mb-0 pb-3 pt-2">Southernmost Lake Michigan Advisories</span>
                             </h2>
 
-                            <p class="small px-3 mb-3 text-muted">E. coli water quality monitoring at Indiana's coastal beaches. Samples exceeding 235 cfu/100ml require an alert posting.</p>
+                            <div class="row px-3">
+                                <div class=" col-sm-12 col-xl-4 mb-4 " v-for="advisory in advisories.data" v-bind:key="advisory.id">
+                                    <Div class="card">
+                                        <div class="card-body py-4">
+                                            <h5 class="card-title mb-2"><a href="">{{ advisory.event }}</a></h5>
+                                            <div class="card-text">
+                                                <div class="clearfix mb-3">
+                                                    <span class="badge badge-secondary ml-0">{{ advisory.severity }}</span>
+                                                    <span class="badge badge-secondary ml-1">{{ advisory.certainty }}</span>
+                                                    <span class="badge badge-secondary ml-1">{{ advisory.urgency }}</span>
+                                                    <span class="badge badge-secondary ml-1">{{ advisory.response }}</span>
+                                                </div>
 
-                            <table class="table table-sm mb-0 mx-3" style="width: calc(100% - 2rem);">
-                                <tbody>
-                                    <tr v-for="beach in beaches.data" v-bind:key="beach.id">
-                                        <td>
-                                            <a :href="beachInfoUrl(beach.id)" target="_blank">{{ beach.name }}</a>
-                                        </td>
-                                        <td>
-                                            <span class="badge" :class="beachAlertClass(beach.color)">{{ beachAlertLabel(beach.color) }}</span>
-                                        </td>
-                                        <td class="small text-muted">
-                                            <span v-if="beach.reason">{{ beach.reason }}</span>
-                                            <span v-if="beach.alertstartdate"> &middot; since {{ formatDateTime(beach.alertstartdate) }}</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                                <span class="d-block small text-right font-weight-bold">
+                                                    effective:
+                                                    <time :datetime="advisory.effective" class="font-weight-light">{{ formatDateTime(advisory.effective) }}</time>
+                                                </span>
+                                                <span class="d-block small text-right font-weight-bold mb-3">
+                                                    expires:
+                                                    <time :datetime="advisory.ends" class="font-weight-light d-blosck">{{ formatDateTime(advisory.ends) }}</time>
+                                                    <span class="font-weight-light d-block ad-none">
+                                                        (in {{  formatDateTimeDiffToHuman(advisory.ends) }})
+                                                    </span>
+                                                </span>
 
-                            <p class="small text-right px-3 mb-0 mt-2">
-                                <a href="https://portal.idem.in.gov/BeachAlert/" target="_blank">IDEM BeachAlert</a>
-                                <span class="text-right mt-0 ml-1 d-inline-block small mb-0">(updated {{ formatDateTimeDiffToLocalHuman(beaches.createdAt) }} ago)</span>
-                            </p>
+                                                <h4 class="small text-uppercase font-weight-bold mt-3 mb-0">affected areas</h4>
+                                                <small class="d-block">
+                                                    <template v-for="zone in advisory.geocode">
+                                                        <a href="#" v-bind:key="zone" v-if="geography.region.lake_zones.includes(zone)" class="d-block">
+                                                            {{ zone }} - {{ lakeZones[zone] }}
+                                                        </a>
+                                                    </template>
+                                                </small>
+
+                                                <h4 class="small text-uppercase font-weight-bold mt-3 mb-0" v-if="advisory.instruction">instructions</h4>
+                                                <p class="" v-if="advisory.instruction">{{ convertToLineBreaks(advisory.instruction) }}</p>
+
+                                                <details class="mt-3">
+                                                    <summary class="pb-1">
+                                                        <h4 class="small text-uppercase mb-0 font-weight-bold  d-inline-block">summary</h4>
+                                                    </summary>
+                                                    <p class="font-weight-light mb-0 pt-1 pl-3 ml-3" style="border-left: 5px solid #ccc; white-space: pre-line;"
+                                                        v-if="advisory.description"
+                                                    >
+                                                        {{ convertToLineBreaks(advisory.description) }}
+                                                    </p>
+                                                </details>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="text-muted d-block clearfix small">
+                                                <div class="">
+                                                    <span>{{ advisory.senderName }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Div>
+                                </div>
+                                <div card col-md-6 col-lg-4 v-if="advisories.data.length === 0">
+                                    <div class="card-body">&mdash;</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
