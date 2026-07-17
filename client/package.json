@@ -34,7 +34,7 @@
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@vue/cli-plugin-babel": "^4.0.0",
     "@vue/cli-plugin-eslint": "^4.0.0",
-    "@vue/cli-service": "^4.0.0",
+    "@vue/cli-service": "^5.0.8",
     "@vue/composition-api": "^1.0.0-rc.12",
     "babel-eslint": "^10.0.3",
     "babel-plugin-transform-runtime": "^6.23.0",
